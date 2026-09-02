@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#294b8f">
+<title>Approval</title><link rel="stylesheet" href="../assets/css/app.css"></head><body>
+<script src="../assets/js/config.js"></script><script src="../assets/js/common.js"></script><script src="../assets/js/api.js"></script><script src="../assets/js/auth.js"></script>
+<script>
+Auth.requireLoggedIn(); pageShell('Approval','');
+async function load(){
+  try{
+    const rows=await API.call('getPendingApprovals',Auth.token()), data=Array.isArray(rows)?rows:[], u=Auth.user()||{}, r=role(u), manager=r==='MANAJER';
+    $('page').innerHTML=`<div class="card"><div class="page-head"><div><h2>📥 ${manager?'Approval Manager':'Approval SDM'}</h2><p class="muted">${manager?'Pengajuan bawahan yang menunggu persetujuan.':'Pengajuan yang telah disetujui Manager.'}</p></div><a class="btn gray small" href="dashboard.html">Beranda</a></div>
+    ${data.length?data.map(x=>`<article class="approvalItem"><div class="row"><div><b>${esc(x.nama)}</b><div class="muted">${esc(x.jenis)}</div></div>${badge(x.statusAkhir||'MENUNGGU')}</div>
+    <div class="approvalMeta"><span>📅 ${esc(x.mulai)} s/d ${esc(x.selesai)}</span><span>📌 ${manager?'Tahap 1':'Tahap 2'}</span></div>
+    <p><b>Alasan:</b> ${esc(x.alasan)}</p><div class="actions"><button class="btn green" onclick="decision('${esc(x.id)}',true)">✓ SETUJUI</button><button class="btn red" onclick="decision('${esc(x.id)}',false)">✕ TOLAK</button></div></article>`).join(''):'<p class="muted">Tidak ada pengajuan yang menunggu persetujuan.</p>'}</div>`;
+  }catch(e){toast(e.message)}
+}
+async function decision(id,ok){
+  const note=prompt(ok?'Catatan approval (opsional):':'Alasan penolakan (wajib):','');
+  if(!ok&&!String(note||'').trim())return toast('Alasan penolakan wajib diisi.');
+  try{
+    const r=role(Auth.user()||{});
+    if(r==='MANAJER')await API.call('approveManager',Auth.token(),id,ok,note||'');
+    else if(r==='SDM'||r==='ADMIN')await API.call('approveSdm',Auth.token(),id,ok,note||'');
+    else throw new Error('Anda tidak memiliki hak approval.');
+    toast(ok?'Pengajuan disetujui.':'Pengajuan ditolak.'); setTimeout(load,400);
+  }catch(e){toast(e.message)}
+}
+load();
+</script></body></html>

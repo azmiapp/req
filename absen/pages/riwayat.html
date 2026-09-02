@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#294b8f">
+<title>Riwayat Absensi</title><link rel="stylesheet" href="../assets/css/app.css"></head><body>
+<script src="../assets/js/config.js"></script><script src="../assets/js/common.js"></script><script src="../assets/js/api.js"></script><script src="../assets/js/auth.js"></script>
+<script>
+Auth.requireLoggedIn(); pageShell('Riwayat','');
+let historyRows=[];
+async function init(){
+  try{
+    const emp=await API.call('getEmployees',Auth.token()), data=Array.isArray(emp)?emp:[];
+    $('page').innerHTML=`<div class="card"><div class="page-head"><div><h2>📊 Riwayat Absensi</h2><p class="muted">Filter data absensi.</p></div><a class="btn gray small" href="dashboard.html">Beranda</a></div>
+    <label class="field">Karyawan<select id="nik"><option value="">Semua Karyawan</option>${data.map(x=>`<option value="${esc(x.nik)}">${esc(x.nama)} — ${esc(x.nik)}</option>`).join('')}</select></label>
+    <label class="field">Bulan<input id="month" type="month" value="${new Date().toISOString().slice(0,7)}"></label>
+    <label class="field">Status<select id="status"><option value="">Semua</option><option>VALID</option></select></label>
+    <button class="btn blue wide" onclick="loadRows()">TAMPILKAN</button><div id="result" style="margin-top:15px"></div></div>`;
+    loadRows();
+  }catch(e){toast(e.message)}
+}
+async function loadRows(){
+  try{
+    historyRows=await API.call('getAttendanceHistory',Auth.token(),{nik:$('nik').value,month:$('month').value,status:$('status').value});
+    historyRows=Array.isArray(historyRows)?historyRows:[];
+    $('result').innerHTML=`<div class="row"><b>${historyRows.length} data</b><button class="btn gray small" onclick="exportCSV()">⬇ CSV</button></div>
+    <div class="tablewrap" style="margin-top:9px"><table class="table"><thead><tr><th>Tanggal</th><th>Jam</th><th>Nama</th><th>Jenis</th><th>Lokasi</th><th>Jarak</th><th>Status</th></tr></thead><tbody>
+    ${historyRows.map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.jam)}</td><td>${esc(x.nama)}</td><td>${esc(x.jenis)}</td><td>${esc(x.tipe)}</td><td>${esc(x.jarak)} m</td><td>${badge(x.status)}</td></tr>`).join('')}</tbody></table></div>`;
+  }catch(e){toast(e.message)}
+}
+function exportCSV(){
+  if(!historyRows.length)return toast('Tidak ada data.');
+  const h=['TANGGAL','JAM','NIK','NAMA','JENIS','LATITUDE','LONGITUDE','JARAK_KANTOR_M','TIPE_ABSEN','STATUS'];
+  const rows=[h.join(','),...historyRows.map(r=>h.map(k=>`"${String(r[k]??'').replace(/"/g,'""')}"`).join(','))];
+  const a=document.createElement('a'), url=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8'}));
+  a.href=url;a.download='riwayat_absensi.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+init();
+</script></body></html>

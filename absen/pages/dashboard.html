@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#294b8f"><title>Beranda - Teams BAZNAS Sragen</title>
+<link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+<script src="../assets/js/config.js"></script><script src="../assets/js/common.js"></script><script src="../assets/js/api.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/gps.js"></script>
+<script>
+Auth.requireLoggedIn();
+pageShell('Beranda','home');
+
+let timer;
+async function load(){
+  try{
+    const d = await API.call('getDashboard',Auth.token());
+    const u = d.user || d.me || Auth.user() || {};
+    localStorage.setItem(APP_CONFIG.USER_KEY,JSON.stringify(u));
+    const s = d.summary || {totalKaryawan:0,hadir:0,pulang:0,lokasiLapangan:0};
+    const r = role(u), today = Array.isArray(d.today)?d.today:[];
+    const pending = Number(d.pending||0);
+    const pendingHtml = pending ? `
+      <div class="notice"><div class="row"><div><b>${pending}</b> pengajuan perlu diproses<div class="muted">${r==='MANAJER'?'Menunggu persetujuan Anda sebagai Manager':'Menunggu verifikasi SDM/Admin'}</div></div><a class="btn gray small" href="approval.html">Lihat</a></div></div>` : '';
+    const adminStats = (r==='SDM'||r==='ADMIN') ? `
+      <div class="bluecard"><h3 style="margin:0 0 10px">📊 Dashboard ${esc(r)}</h3><div class="stats">
+      <div class="stat"><b>${s.totalKaryawan}</b><span>Total</span></div>
+      <div class="stat"><b>${s.hadir}</b><span>Hadir</span></div>
+      <div class="stat"><b>${s.pulang}</b><span>Pulang</span></div>
+      <div class="stat"><b>${s.lokasiLapangan}</b><span>Lapangan</span></div></div></div>` : '';
+    const rows = today.length ? today.map(x=>`<div class="row" style="padding:7px 0;border-bottom:1px solid #eee"><span><b>${esc(x.jenis)}</b><br><small class="muted">${esc(x.tipe||'')}</small></span><b>${esc(x.jam)}</b></div>`).join('') : '<p class="muted">Belum ada absensi hari ini.</p>';
+
+    $('page').innerHTML = `
+      <section class="hero">
+        <div class="welcome"><div class="avatar">👤</div><div class="hello"><small>Selamat Datang,</small><b>${esc(u.nama||u.NAMA||'-')}</b><span>${esc(u.jabatan||u.JABATAN||'')}</span></div><div class="clock"><b id="time"></b><div id="date"></div></div></div>
+        <div class="location">📍<div><b>Lokasi Anda</b><div id="loc">Mencari lokasi...</div></div></div>
+        <div class="locationBox"><div id="locationDetail">Meminta GPS...</div><div class="locationActions"><button id="refreshLoc">↻ Perbarui</button><button id="maps">🗺️ Maps</button></div></div>
+      </section>
+      ${adminStats}${pendingHtml}
+      <div class="card"><h2 class="section-title">Menu</h2><div class="grid">
+        <a class="menu" href="absensi.html"><span class="icon">🕘</span><span>Absensi</span></a>
+        <a class="menu" href="pengajuan.html?jenis=CUTI"><span class="icon">📝</span><span>Ajukan Cuti</span></a>
+        <a class="menu" href="pengajuan-saya.html"><span class="icon">📋</span><span>Pengajuan</span></a>
+        <a class="menu" href="pengajuan.html?jenis=IZIN"><span class="icon">🏖️</span><span>Izin</span></a>
+        <a class="menu" href="pengajuan.html?jenis=SAKIT"><span class="icon">🏥</span><span>Sakit</span></a>
+        <a class="menu" href="pengajuan.html?jenis=DINAS"><span class="icon">✈️</span><span>Dinas</span></a>
+      </div></div>
+      ${(r==='SDM'||r==='ADMIN')?'<div class="bluecard"><div class="row"><b>Riwayat Absensi SDM</b><a class="btn primary gray small" href="riwayat.html">Buka</a></div></div>':''}
+      <div class="card"><div class="row"><div><b>Status Hari Ini</b><div class="muted">Masuk: ${d.hasIn?'✓ sudah':'— belum'} · Pulang: ${d.hasOut?'✓ sudah':'— belum'}</div></div><a class="btn green small" href="absensi.html">ABSEN</a></div><div style="margin-top:10px">${rows}</div></div>`;
+    startClock();
+    $('refreshLoc').onclick = () => updateLocation(true);
+    $('maps').onclick = () => {
+      if(window._loc) window.open(`https://www.google.com/maps?q=${window._loc.lat},${window._loc.lng}`,'_blank');
+      else toast('Lokasi belum tersedia.');
+    };
+    updateLocation(false);
+  }catch(e){toast(e.message)}
+}
+function startClock(){
+  clearInterval(timer);
+  const f=()=>{const d=new Date(); if($('time')){$('time').textContent=d.toLocaleTimeString('id-ID');$('date').textContent=d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'});}};
+  f(); timer=setInterval(f,1000);
+}
+async function updateLocation(force){
+  try{
+    const p=await GPS.locate(force); window._loc=p;
+    $('loc').textContent=`${p.kecamatan||'Kecamatan tidak terdeteksi'}, ${p.kabupaten||'Sragen'} · ±${Math.round(p.acc)} m`;
+    $('locationDetail').innerHTML=`<b>${esc(p.kecamatan||'Kecamatan tidak terdeteksi')}</b>, ${esc(p.kabupaten||'Sragen')}<br><small>${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · ±${Math.round(p.acc)} meter</small>`;
+  }catch(e){$('loc').textContent='Lokasi tidak tersedia';$('locationDetail').textContent='❌ '+e.message}
+}
+load();
+</script>
+</body></html>

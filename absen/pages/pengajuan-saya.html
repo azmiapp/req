@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#294b8f">
+<title>Pengajuan Saya</title><link rel="stylesheet" href="../assets/css/app.css"></head><body>
+<script src="../assets/js/config.js"></script><script src="../assets/js/common.js"></script><script src="../assets/js/api.js"></script><script src="../assets/js/auth.js"></script>
+<script>
+Auth.requireLoggedIn(); pageShell('Pengajuan Saya','');
+async function load(){
+  try{
+    const rows=await API.call('getMyRequests',Auth.token()), data=Array.isArray(rows)?rows:[];
+    $('page').innerHTML=`<div class="card"><div class="page-head"><div><h2>📋 Pengajuan Saya</h2><p class="muted">${data.length} pengajuan</p></div><a class="btn gray small" href="pengajuan.html">+ Buat</a></div>
+    ${data.length?data.map(r=>`<article class="approvalItem"><div class="row"><b>${esc(r.jenis)}</b>${badge(r.statusAkhir||r.statusManager||'MENUNGGU')}</div>
+    <div class="approvalMeta"><span>📅 ${esc(r.mulai)} s/d ${esc(r.selesai)}</span><span>👤 Manager: ${esc(r.managerUsername||'-')}</span></div>
+    <p>${esc(r.alasan)}</p><div class="muted">Manager: ${esc(r.statusManager||'-')} · SDM: ${esc(r.statusSdm||'-')} · Akhir: ${esc(r.statusAkhir||'-')}</div>
+    ${r.catatanManager?`<div class="muted" style="margin-top:5px">Catatan Manager: ${esc(r.catatanManager)}</div>`:''}
+    ${r.catatanSdm?`<div class="muted" style="margin-top:5px">Catatan SDM: ${esc(r.catatanSdm)}</div>`:''}</article>`).join(''):'<p class="muted">Belum ada pengajuan.</p>'}</div>`;
+  }catch(e){toast(e.message)}
+}
+load();
+</script></body></html>

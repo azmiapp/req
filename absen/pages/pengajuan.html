@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#294b8f">
+<title>Pengajuan - Teams BAZNAS Sragen</title><link rel="stylesheet" href="../assets/css/app.css">
+</head><body>
+<script src="../assets/js/config.js"></script><script src="../assets/js/common.js"></script><script src="../assets/js/api.js"></script><script src="../assets/js/auth.js"></script>
+<script>
+Auth.requireLoggedIn(); pageShell('Pengajuan','');
+const qs=new URLSearchParams(location.search), defaultType=qs.get('jenis')||'CUTI';
+$('page').innerHTML=`
+<div class="card"><div class="page-head"><div><h2>📝 Pengajuan</h2><p class="muted">Cuti, izin, sakit atau perjalanan dinas.</p></div><a class="btn gray small" href="dashboard.html">Beranda</a></div>
+<label class="field">Jenis<select id="jenis"><option>CUTI</option><option>IZIN</option><option>SAKIT</option><option>DINAS</option></select></label>
+<label class="field">Tanggal Mulai<input id="mulai" type="date"></label>
+<label class="field">Tanggal Selesai<input id="selesai" type="date"></label>
+<label class="field">Alasan<textarea id="alasan" placeholder="Tuliskan alasan..."></textarea></label>
+<label class="field">Link lampiran (opsional)<input id="lampiran" placeholder="https://drive.google.com/..."></label>
+<button id="submit" class="btn blue wide">KIRIM PENGAJUAN</button></div>`;
+$('jenis').value=defaultType;
+$('mulai').value=todayISO(); $('selesai').value=todayISO();
+$('submit').onclick=async()=>{
+  const btn=$('submit'), mulai=$('mulai').value, selesai=$('selesai').value, alasan=$('alasan').value.trim();
+  if(!mulai||!selesai||!alasan)return toast('Jenis, tanggal dan alasan wajib diisi.');
+  if(selesai<mulai)return toast('Tanggal selesai tidak boleh sebelum tanggal mulai.');
+  try{
+    btn.disabled=true;
+    const r=await API.call('submitRequest',Auth.token(),{jenis:$('jenis').value,tglMulai:mulai,tglSelesai:selesai,alasan,lampiranUrl:$('lampiran').value.trim()});
+    toast('Pengajuan berhasil dikirim: '+(r?.id||'-'));
+    setTimeout(()=>location.href='pengajuan-saya.html',500);
+  }catch(e){toast(e.message);btn.disabled=false}
+};
+</script></body></html>

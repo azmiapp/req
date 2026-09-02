@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#294b8f">
+<title>Absensi - Teams BAZNAS Sragen</title><link rel="stylesheet" href="../assets/css/app.css">
+</head><body>
+<script src="../assets/js/config.js"></script><script src="../assets/js/common.js"></script><script src="../assets/js/api.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/gps.js"></script>
+<script>
+Auth.requireLoggedIn(); pageShell('Absensi','');
+let stream=null, photo='';
+$('page').innerHTML=`
+<div class="card"><div class="page-head"><div><h2>📷 Absensi</h2><p class="muted">Selfie + GPS sebagai bukti absensi.</p></div><a class="btn gray small" href="dashboard.html">Beranda</a></div>
+<video id="camera" class="camera" autoplay playsinline muted></video>
+<canvas id="canvas" class="hidden"></canvas>
+<p class="muted">Posisikan wajah di tengah kamera lalu ambil foto.</p>
+<div id="selfie" class="selfie-ok hidden">✓ Foto selfie siap digunakan</div>
+<div id="gps" class="card">Mengecek lokasi...</div>
+<div class="camera-actions"><button id="start" class="btn gray">↻ Kamera</button><button id="take" class="btn orange">📸 Ambil Foto</button></div>
+<div class="actions" style="margin-top:10px"><button id="in" class="btn green" disabled>ABSEN MASUK</button><button id="out" class="btn blue" disabled>ABSEN PULANG</button></div></div>`;
+async function startCamera(){
+  try{
+    stopCamera(); photo=''; $('selfie').classList.add('hidden'); $('in').disabled=true; $('out').disabled=true;
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'user'},width:{ideal:640},height:{ideal:853}},audio:false});
+    $('camera').srcObject=stream;
+  }catch(e){toast('Kamera tidak dapat diakses. Gunakan HTTPS dan izinkan kamera.')}
+}
+function stopCamera(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+$('start').onclick=startCamera;
+$('take').onclick=()=>{
+  const v=$('camera'), c=$('canvas');
+  if(!stream || v.readyState<2){toast('Kamera belum siap.');return}
+  const max=640, scale=Math.min(1,max/v.videoWidth);
+  c.width=Math.round(v.videoWidth*scale); c.height=Math.round(v.videoHeight*scale);
+  c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+  photo=c.toDataURL('image/jpeg',.65); $('selfie').classList.remove('hidden'); $('in').disabled=false; $('out').disabled=false; stopCamera(); toast('Foto selfie berhasil diambil.');
+};
+async function loadGPS(){
+  try{
+    const p=await GPS.locate(true); window._gps=p;
+    $('gps').innerHTML=`📍 <b>${esc(p.kecamatan||'Kecamatan tidak terdeteksi')}</b>, ${esc(p.kabupaten||'Sragen')}<br><span class="muted">${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · Akurasi ±${Math.round(p.acc)} m</span>`;
+  }catch(e){$('gps').textContent='❌ '+e.message}
+}
+async function submit(jenis,btn){
+  if(!photo)return toast('Ambil foto selfie terlebih dahulu.');
+  try{
+    btn.disabled=true;
+    const p=await GPS.locate(true); window._gps=p;
+    const r=await API.call('submitAttendance',Auth.token(),{jenis,lat:p.lat,lng:p.lng,acc:p.acc,kecamatan:p.kecamatan,kabupaten:p.kabupaten,alamat:p.alamat,photoData:photo,keterangan:''});
+    toast(`Absensi ${jenis.toLowerCase()} berhasil pukul ${r?.jam||r?.time||'-'}`);
+    setTimeout(()=>location.href='dashboard.html',500);
+  }catch(e){toast(e.message);btn.disabled=false}
+}
+$('in').onclick=()=>submit('MASUK',$('in')); $('out').onclick=()=>submit('PULANG',$('out'));
+startCamera(); loadGPS();
+window.addEventListener('pagehide',stopCamera);
+</script>
+</body></html>

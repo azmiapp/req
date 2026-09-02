@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#294b8f">
+<title>Profil</title><link rel="stylesheet" href="../assets/css/app.css"></head><body>
+<script src="../assets/js/config.js"></script><script src="../assets/js/common.js"></script><script src="../assets/js/api.js"></script><script src="../assets/js/auth.js"></script>
+<script>
+Auth.requireLoggedIn(); pageShell('Profil','profile');
+const u=Auth.user()||{};
+$('page').innerHTML=`<div class="card"><div class="page-head"><h2>👤 Profil</h2><a class="btn gray small" href="dashboard.html">Beranda</a></div>
+<p><b>${esc(u.nama||u.NAMA||'-')}</b></p>
+<p class="muted">${esc(u.nik||u.NIK||'-')} · ${esc(u.jabatan||u.JABATAN||'-')} · ${esc(u.divisi||u.DIVISI||'-')}</p>
+<p>Tipe absensi: <b>${esc(u.tipe||u.TIPE_ABSEN||'-')}</b></p>
+<p>Role: <b>${esc(u.role||u.ROLE||'-')}</b></p>
+<p>Sisa cuti: <b>${esc(u.sisaCuti??u.SISA_CUTI??'-')}</b></p>
+<button id="logout" class="btn red">Keluar</button></div>`;
+$('logout').onclick=()=>Auth.logout();
+</script></body></html>

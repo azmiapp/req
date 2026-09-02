@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#294b8f">
+<title>Login - Teams BAZNAS Sragen</title>
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="login-page">
+<main class="login">
+  <section class="loginbox">
+    <div class="logo">🏢</div>
+    <h1>Teams BAZNAS Sragen</h1>
+    <p class="muted center">Sistem Absensi & Administrasi Karyawan</p>
+    <form id="loginForm">
+      <label class="field">Username<input id="username" autocomplete="username" required></label>
+      <label class="field">Password<input id="password" type="password" autocomplete="current-password" required></label>
+      <button class="btn wide blue" type="submit">MASUK</button>
+    </form>
+    <p id="loginError" class="error center"></p>
+  </section>
+</main>
+<div id="toast" class="toast"></div>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+Auth.requireLoggedOut();
+document.getElementById('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.submitter;
+  btn.disabled = true;
+  try {
+    await Auth.login(
+      document.getElementById('username').value.trim(),
+      document.getElementById('password').value
+    );
+    location.href = 'pages/dashboard.html';
+  } catch (err) {
+    document.getElementById('loginError').textContent = err.message;
+    toast(err.message);
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
