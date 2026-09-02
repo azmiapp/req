@@ -27,6 +27,15 @@ input,select,textarea{font-size:16px}
 .hello{min-width:0}.hello small{opacity:.85}.hello b{font-size:23px;font-weight:500;display:block;margin:3px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hello span{font-size:13px;opacity:.9}
 .clock{text-align:right;white-space:nowrap}.clock b{font-size:18px;font-weight:500}.clock div{font-size:12px;opacity:.85;margin-top:2px}
 .location{margin-top:20px;display:flex;gap:9px;align-items:flex-start;font-size:13px}
+.locationBox{margin-top:12px;background:#fff1;padding:11px 12px;border:1px solid #ffffff33;border-radius:14px}
+.locationBox b{display:block;font-size:13px;margin-bottom:4px}.locationBox small{display:block;opacity:.88;line-height:1.45}
+.locationActions{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}.locationActions button{font-size:12px;padding:8px 10px;border-radius:10px}
+.notice{border:1px solid #f0d48a;background:#fffaf0;color:#5e4700;border-radius:16px;padding:13px;margin-bottom:16px}
+.notice strong{display:block;margin-bottom:4px}.notice .count{font-size:25px;font-weight:800}
+.approvalItem{background:#fff;border:1px solid #e4e8ef;border-radius:16px;padding:14px;margin-top:10px}
+.approvalMeta{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.approvalMeta span{font-size:11px;padding:5px 8px;border-radius:999px;background:#edf0f5}
+.approvalItem p{margin:9px 0;line-height:1.45;font-size:13px}
+
 .card,.bluecard{border-radius:20px;padding:16px;box-shadow:0 5px 14px #0002;margin-bottom:16px}
 .card{background:var(--light)}.bluecard{background:var(--blue);color:#fff}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
@@ -202,23 +211,98 @@ async function home(){
   ME=d.user||d.me||ME;
   d.me=ME;
   d.summary=d.summary||{totalKaryawan:0,hadir:0,pulang:0,lokasiLapangan:0};
+  d.pending=Number(d.pending||0);
 
- let roleMenu='';
- if(ME.ROLE==='SDM'||ME.ROLE==='ADMIN') roleMenu=`<div class="bluecard"><h2 style="margin:0 0 12px">Dashboard SDM</h2><div class="stats"><div class="stat"><b>${d.summary.totalKaryawan}</b><span>Total</span></div><div class="stat"><b>${d.summary.hadir}</b><span>Hadir</span></div><div class="stat"><b>${d.summary.pulang}</b><span>Pulang</span></div><div class="stat"><b>${d.summary.lokasiLapangan}</b><span>Lapangan</span></div></div></div>`;
- $('page').innerHTML=`<div class="hero"><div class="welcome"><div class="avatar">👤</div><div class="hello"><small>Selamat Datang,</small><b>${esc(ME.nama||ME.NAMA)}</b><span>${esc(ME.JABATAN||'')}</span></div><div class="clock"><b id="time"></b><div id="date"></div></div></div><div class="location">📍 <span id="loc">Lokasi akan dicek saat absensi</span></div></div>
- ${roleMenu}
- <div class="card"><h2 class="section-title">Menu</h2><div class="grid">
- ${menu('🕘','Absensi','attendance()')}${menu('📝','Ajukan Cuti','requestForm()')}${menu('📋','Pengajuan','requests()')}
- ${menu('🏖️','Izin','requestForm("IZIN")')}${menu('🏥','Sakit','requestForm("SAKIT")')}${menu('✈️','Perjalanan Dinas','requestForm("DINAS")')}
- </div></div>
- ${d.pending?`<div class="bluecard"><div class="row"><div><b>${d.pending} pengajuan menunggu</b><div class="muted" style="color:#dce8ff">Perlu ditindaklanjuti</div></div><button class="btn primary" onclick="approvals()">Buka</button></div></div>`:''}
- ${ME.ROLE==='SDM'||ME.ROLE==='ADMIN'?`<div class="bluecard"><div class="row"><b>Riwayat Absensi SDM</b><button class="btn primary" onclick="historyView()">Buka</button></div></div>`:''}
- <div class="card"><div class="row"><div><b>Status Hari Ini</b><div class="muted">Masuk: ${d.hasIn?'✓ sudah':'— belum'} · Pulang: ${d.hasOut?'✓ sudah':'— belum'}</div></div><button class="btn green" onclick="attendance()">ABSEN</button></div></div>`;
- startClock();
+  const role=String(ME.role||ME.ROLE||'').toUpperCase();
+  const today=d.today||[];
+  const approvalLabel=role==='MANAJER'
+    ? 'Menunggu persetujuan Anda sebagai Manager'
+    : 'Sudah disetujui Manager, menunggu verifikasi SDM';
+
+  let roleMenu='';
+  if(role==='SDM'||role==='ADMIN'){
+    roleMenu=`<div class="bluecard">
+      <h2 style="margin:0 0 12px">📊 Dashboard ${role}</h2>
+      <div class="stats">
+        <div class="stat"><b>${d.summary.totalKaryawan}</b><span>Total</span></div>
+        <div class="stat"><b>${d.summary.hadir}</b><span>Hadir</span></div>
+        <div class="stat"><b>${d.summary.pulang}</b><span>Pulang</span></div>
+        <div class="stat"><b>${d.summary.lokasiLapangan}</b><span>Lapangan</span></div>
+      </div>
+    </div>`;
+  }
+
+  const pendingNotice=d.pending>0 ? `<div class="notice">
+    <div class="row">
+      <div><span class="count">${d.pending}</span> <strong>Pengajuan perlu diproses</strong>
+      <div class="muted">${esc(approvalLabel)}</div></div>
+      <button class="btn primary" onclick="approvals()">Lihat</button>
+    </div>
+  </div>` : '';
+
+  const todayHtml=today.length
+    ? today.map(r=>`<div class="row" style="padding:8px 0;border-bottom:1px solid #e8ebf0">
+        <span><b>${esc(r.jenis)}</b><br><small class="muted">${esc(r.tipe||'')}</small></span>
+        <b>${esc(r.jam)}</b>
+      </div>`).join('')
+    : '<p class="muted">Belum ada absensi hari ini.</p>';
+
+  $('page').innerHTML=`<div class="hero">
+    <div class="welcome">
+      <div class="avatar">👤</div>
+      <div class="hello"><small>Selamat Datang,</small><b>${esc(ME.nama||ME.NAMA)}</b><span>${esc(ME.jabatan||ME.JABATAN||'')}</span></div>
+      <div class="clock"><b id="time"></b><div id="date"></div></div>
+    </div>
+    <div class="location">
+      📍 <div><b>Lokasi Anda</b><div id="loc">Mengecek lokasi GPS...</div></div>
+    </div>
+    <div class="locationBox">
+      <div id="locationDetail">Lokasi akan ditampilkan saat GPS tersedia.</div>
+      <div class="locationActions">
+        <button onclick="refreshDashboardLocation()">↻ Perbarui lokasi</button>
+        <button onclick="openMyLocation()">🗺️ Buka Maps</button>
+      </div>
+    </div>
+  </div>
+  ${roleMenu}
+  ${pendingNotice}
+  <div class="card"><h2 class="section-title">Menu</h2><div class="grid">
+    ${menu('🕘','Absensi','attendance()')}${menu('📝','Ajukan Cuti','requestForm()')}${menu('📋','Pengajuan','requests()')}
+    ${menu('🏖️','Izin','requestForm("IZIN")')}${menu('🏥','Sakit','requestForm("SAKIT")')}${menu('✈️','Perjalanan Dinas','requestForm("DINAS")')}
+  </div></div>
+  ${role==='SDM'||role==='ADMIN'?`<div class="bluecard"><div class="row"><b>Riwayat Absensi SDM</b><button class="btn primary" onclick="historyView()">Buka</button></div></div>`:''}
+  <div class="card"><div class="row"><div><b>Status Hari Ini</b><div class="muted">Masuk: ${d.hasIn?'✓ sudah':'— belum'} · Pulang: ${d.hasOut?'✓ sudah':'— belum'}</div></div><button class="btn green" onclick="attendance()">ABSEN</button></div>
+    <div style="margin-top:12px">${todayHtml}</div>
+  </div>`;
+  startClock();
+  refreshDashboardLocation();
  }catch(e){toast(e.message)}
 }
 function menu(i,t,a){return `<button class="menu" onclick="${a}"><span class="icon">${i}</span><span>${t}</span></button>`}
 function startClock(){const f=()=>{const n=new Date();$('time').textContent=n.toLocaleTimeString('id-ID');$('date').textContent=n.toLocaleDateString('id-ID',{weekday:'long'});};f();timer=setInterval(f,1000)}
+let dashboardLocation=null;
+async function refreshDashboardLocation(){
+  const loc=$('loc'), detail=$('locationDetail');
+  if(!loc||!detail)return;
+  loc.textContent='Mencari lokasi...';
+  detail.textContent='Meminta izin lokasi GPS...';
+  try{
+    const p=await getGPS(false);
+    dashboardLocation=p;
+    loc.innerHTML=`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · akurasi ±${Math.round(p.acc)} m`;
+    detail.innerHTML=`Koordinat: <b>${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}</b><br><small>Akurasi GPS ±${Math.round(p.acc)} meter</small>`;
+  }catch(e){
+    dashboardLocation=null;
+    loc.textContent='Lokasi tidak tersedia';
+    detail.innerHTML='❌ '+esc(e.message)+'<br><small>Aktifkan GPS dan izinkan akses lokasi.</small>';
+  }
+}
+function openMyLocation(){
+  if(!dashboardLocation)return toast('Lokasi belum tersedia. Tekan Perbarui lokasi.');
+  const {lat,lng}=dashboardLocation;
+  window.open(`https://www.google.com/maps?q=${lat},${lng}`,'_blank','noopener');
+}
+
 let cameraStream=null, selfieData='';
 async function attendance(){
  $('page').innerHTML=`<div class="card"><h2>📷 Absensi dengan Selfie</h2><p class="muted">Ambil foto selfie sebelum absen. Foto disimpan sebagai bukti absensi. GPS juga wajib aktif.</p>
@@ -239,13 +323,57 @@ async function doAttendance(jenis){try{if(!selfieData){toast('Ambil foto selfie 
 function requestForm(type='CUTI'){$('page').innerHTML=`<div class="card"><h2>📝 Pengajuan</h2><div class="field"><label>Jenis</label><select id="j"><option>CUTI</option><option>IZIN</option><option>SAKIT</option><option>DINAS</option></select></div><div class="field"><label>Tanggal Mulai</label><input id="tm" type="date"></div><div class="field"><label>Tanggal Selesai</label><input id="ts" type="date"></div><div class="field"><label>Alasan</label><textarea id="al" placeholder="Tuliskan alasan..."></textarea></div><div class="field"><label>Link lampiran (opsional)</label><input id="lu" placeholder="https://drive.google.com/..."></div><button class="wide" onclick="submitReq()">KIRIM PENGAJUAN</button></div>`;$('j').value=type}
 async function submitReq(){try{const r=await gas('submitRequest',TOKEN,{jenis:$('j').value,tglMulai:$('tm').value,tglSelesai:$('ts').value,alasan:$('al').value,lampiranUrl:$('lu').value});toast('Pengajuan terkirim: '+r.id);home()}catch(e){toast(e.message)}}
 async function requests(){
-  $('page').innerHTML=`<div class="card"><h2>📋 Pengajuan Saya</h2>
-  <p class="muted">Fitur daftar pengajuan membutuhkan action <b>myRequests</b> pada Code.gs. Saat ini backend yang Anda kirim belum menyediakan action tersebut.</p>
-  <button class="wide" onclick="requestForm()">+ BUAT PENGAJUAN</button></div>`;
+  try{
+    const rows=await gas('getMyRequests',TOKEN);
+    $('page').innerHTML=`<div class="card"><div class="row"><h2 style="margin:0">📋 Pengajuan Saya</h2><button class="btn gray" onclick="requestForm()">+ Buat</button></div>
+      ${rows.length ? rows.map(r=>`<div class="approvalItem">
+        <div class="row"><b>${esc(r.jenis)}</b>${badge(r.statusAkhir||r.statusManager||'MENUNGGU')}</div>
+        <div class="approvalMeta">
+          <span>📅 ${esc(r.mulai)} s/d ${esc(r.selesai)}</span>
+          <span>👤 Manager: ${esc(r.managerUsername||'-')}</span>
+        </div>
+        <p>${esc(r.alasan)}</p>
+        <div class="muted">Manager: ${esc(r.statusManager||'-')} · SDM: ${esc(r.statusSdm||'-')} · Akhir: ${esc(r.statusAkhir||'-')}</div>
+        ${r.catatanManager?`<div class="muted" style="margin-top:6px">Catatan Manager: ${esc(r.catatanManager)}</div>`:''}
+        ${r.catatanSdm?`<div class="muted" style="margin-top:6px">Catatan SDM: ${esc(r.catatanSdm)}</div>`:''}
+      </div>`).join(''):'<p class="muted" style="margin-top:18px">Belum ada pengajuan.</p>'}
+    </div>`;
+  }catch(e){toast(e.message)}
 }
 function badge(s){const c=String(s).includes('DITOLAK')?'no':String(s).includes('DISETUJUI')?'ok':'wait';return `<span class="badge ${c}">${esc(s)}</span>`}
-async function approvals(){try{const rows=await gas('getPendingApprovals',TOKEN);$('page').innerHTML=`<div class="card"><h2>📥 Pengajuan Menunggu</h2>${rows.length?rows.map(r=>`<div class="card" style="background:#fff;border:1px solid #e4e8ef"><b>${esc(r.nama)} — ${esc(r.jenis)}</b><div class="muted">${esc(r.mulai)} s/d ${esc(r.selesai)}</div><p>${esc(r.alasan)}</p><div class="actions"><button class="btn green" onclick="decision('${r.id}',true)">✓ ACC</button><button class="btn red" onclick="decision('${r.id}',false)">✕ TOLAK</button></div></div>`).join(''):'<p class="muted">Tidak ada pengajuan yang menunggu.</p>'}</div>`}catch(e){toast(e.message)}}
-async function decision(id,ok){const note=prompt(ok?'Catatan (opsional):':'Alasan penolakan:','');try{if(ME.ROLE==='MANAJER')await gas('approveManager',TOKEN,id,ok,note||'');else await gas('approveSdm',TOKEN,id,ok,note||'');toast(ok?'Berhasil disetujui':'Pengajuan ditolak');approvals()}catch(e){toast(e.message)}}
+async function approvals(){
+  try{
+    const rows=await gas('getPendingApprovals',TOKEN);
+    const role=String(ME.role||ME.ROLE||'').toUpperCase();
+    const title=role==='MANAJER'?'📥 Approval Manager':'📥 Approval SDM';
+    const subtitle=role==='MANAJER'
+      ? 'Pengajuan bawahan yang menunggu persetujuan Anda.'
+      : 'Pengajuan yang sudah disetujui Manager dan menunggu keputusan SDM/Admin.';
+    $('page').innerHTML=`<div class="card"><h2>${title}</h2><p class="muted">${subtitle}</p>
+      ${rows.length?rows.map(r=>`<div class="approvalItem">
+        <div class="row"><div><b>${esc(r.nama)}</b><div class="muted">${esc(r.jenis)}</div></div>${badge(r.statusAkhir||'MENUNGGU')}</div>
+        <div class="approvalMeta"><span>📅 ${esc(r.mulai)} s/d ${esc(r.selesai)}</span><span>📌 ${esc(role==='MANAJER'?'Approval tahap 1':'Approval tahap 2')}</span></div>
+        <p><b>Alasan:</b> ${esc(r.alasan)}</p>
+        <div class="actions">
+          <button class="btn green" onclick="decision('${r.id}',true)">✓ SETUJUI</button>
+          <button class="btn red" onclick="decision('${r.id}',false)">✕ TOLAK</button>
+        </div>
+      </div>`).join(''):'<p class="muted">Tidak ada pengajuan yang menunggu persetujuan Anda.</p>'}
+    </div>`;
+  }catch(e){toast(e.message)}
+}
+async function decision(id,ok){
+  const note=prompt(ok?'Catatan approval (opsional):':'Alasan penolakan (wajib):','');
+  if(!ok && !String(note||'').trim())return toast('Alasan penolakan wajib diisi.');
+  try{
+    const role=String(ME.role||ME.ROLE||'').toUpperCase();
+    if(role==='MANAJER') await gas('approveManager',TOKEN,id,ok,note||'');
+    else if(role==='SDM'||role==='ADMIN') await gas('approveSdm',TOKEN,id,ok,note||'');
+    else throw new Error('Anda tidak memiliki hak approval.');
+    toast(ok?'Pengajuan berhasil disetujui':'Pengajuan ditolak');
+    approvals();
+  }catch(e){toast(e.message)}
+}
 async function historyView(){try{const emp=await gas('getEmployees',TOKEN);$('page').innerHTML=`<div class="card"><h2>📊 Riwayat Absensi</h2><div class="field"><label>Karyawan</label><select id="fn"><option value="">Semua Karyawan</option>${emp.map(x=>`<option value="${esc(x.nik)}">${esc(x.nama)} — ${esc(x.nik)}</option>`).join('')}</select></div><div class="field"><label>Bulan</label><input id="fm" type="month" value="${new Date().toISOString().slice(0,7)}"></div><div class="field"><label>Status</label><select id="fs"><option value="">Semua</option><option>VALID</option></select></div><button class="wide" onclick="loadHistory()">TAMPILKAN</button><div id="hr" style="margin-top:18px"></div></div>`;loadHistory()}catch(e){toast(e.message)}}
 async function loadHistory(){try{const rows=await gas('getAttendanceHistory',TOKEN,{nik:$('fn').value,month:$('fm').value,status:$('fs').value});$('hr').innerHTML=`<div class="row"><b>${rows.length} data</b><button class="btn gray" onclick="exportCSV()">⬇ CSV</button></div><div class="tablewrap" style="margin-top:10px"><table class="table"><tr><th>Tanggal</th><th>Jam</th><th>Nama</th><th>Jenis</th><th>Lokasi</th><th>Jarak</th><th>Status</th></tr>${rows.map(r=>`<tr><td>${esc(r.tanggal)}</td><td>${esc(r.jam)}</td><td>${esc(r.nama)}</td><td>${esc(r.jenis)}</td><td>${esc(r.tipe)}</td><td>${esc(r.jarak)} m</td><td>${badge(r.status)}</td></tr>`).join('')}</table></div>`;window._history=rows}catch(e){toast(e.message)}}
 function exportCSV(){const rows=window._history||[];if(!rows.length)return toast('Tidak ada data');const headers=['TANGGAL','JAM','NIK','NAMA','JENIS','LATITUDE','LONGITUDE','JARAK_KANTOR_M','TIPE_ABSEN','STATUS'];const csv=[headers.join(','),...rows.map(r=>headers.map(h=>`"${String(r[h]??'').replace(/"/g,'""')}"`).join(','))].join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='riwayat_absensi.csv';a.click()}
