@@ -1,94 +1,683 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#294b8f">
 <title>Teams BAZNAS Sragen</title>
+
 <style>
 :root{
---blue:#294b8f;--blue2:#35589c;--light:#edf7ff;--white:#fff;
---text:#253044;--muted:#718096;--green:#18a558;--red:#d64545;
---orange:#f0a51a;--border:#e4e8ef;--surface:#f7f9fc
+  --blue:#294b8f;
+  --blue2:#35589c;
+  --light:#edf7ff;
+  --text:#253044;
+  --muted:#718096;
+  --green:#18a558;
+  --red:#d64545;
+  --orange:#f0a51a;
+  --border:#e4e8ef;
+  --bg:#eef1f5;
+  --white:#fff;
 }
-*{box-sizing:border-box}
-html{min-height:100%;-webkit-text-size-adjust:100%}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef1f5;color:var(--text);min-height:100%;overflow-x:hidden}
-button,input,select,textarea{font:inherit}
-button{border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
-button:active{transform:translateY(1px)}
-input,select,textarea{font-size:16px}
-.app{width:100%;max-width:760px;min-height:100vh;margin:auto;background:#fff;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
-.top{background:var(--blue);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:30;padding-top:max(14px,env(safe-area-inset-top))}
-.brand{font-size:20px;font-weight:700;line-height:1.2}
-.content{padding:16px 14px 24px}
-.hero{background:linear-gradient(145deg,#294b8f,#31579c);color:#fff;border-radius:0 0 26px 26px;padding:20px 16px 22px;margin:-16px -14px 16px;box-shadow:0 5px 15px #0002}
-.welcome{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
-.avatar{width:62px;height:62px;border-radius:50%;background:#fff2;display:grid;place-items:center;font-size:28px;flex:none}
-.hello{min-width:0}.hello small{opacity:.85}.hello b{font-size:23px;font-weight:500;display:block;margin:3px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hello span{font-size:13px;opacity:.9}
-.clock{text-align:right;white-space:nowrap}.clock b{font-size:18px;font-weight:500}.clock div{font-size:12px;opacity:.85;margin-top:2px}
-.location{margin-top:20px;display:flex;gap:9px;align-items:flex-start;font-size:13px}
-.locationBox{margin-top:12px;background:#fff1;padding:11px 12px;border:1px solid #ffffff33;border-radius:14px}
-.locationBox b{display:block;font-size:13px;margin-bottom:4px}.locationBox small{display:block;opacity:.88;line-height:1.45}
-.locationActions{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}.locationActions button{font-size:12px;padding:8px 10px;border-radius:10px}
-.notice{border:1px solid #f0d48a;background:#fffaf0;color:#5e4700;border-radius:16px;padding:13px;margin-bottom:16px}
-.notice strong{display:block;margin-bottom:4px}.notice .count{font-size:25px;font-weight:800}
-.approvalItem{background:#fff;border:1px solid #e4e8ef;border-radius:16px;padding:14px;margin-top:10px}
-.approvalMeta{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.approvalMeta span{font-size:11px;padding:5px 8px;border-radius:999px;background:#edf0f5}
-.approvalItem p{margin:9px 0;line-height:1.45;font-size:13px}
 
-.card,.bluecard{border-radius:20px;padding:16px;box-shadow:0 5px 14px #0002;margin-bottom:16px}
-.card{background:var(--light)}.bluecard{background:var(--blue);color:#fff}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.menu{background:#fff;text-align:center;color:var(--text);padding:13px 5px;min-height:98px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 5px #0001}
-.menu:active{background:#f2f5fa}.icon{font-size:34px;display:block;line-height:1}.menu span:last-child{font-size:13px;line-height:1.25}
-.section-title{font-size:20px;text-align:center;margin:0 0 12px}
-.actions{display:flex;gap:9px;flex-wrap:wrap}
-.btn{min-height:44px;padding:11px 14px;border-radius:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
-.actions .btn{flex:1;min-width:130px}
-.btn.primary{background:#fff;color:var(--blue)}.btn.green{background:var(--green);color:#fff}.btn.red{background:var(--red);color:#fff}.btn.gray{background:#e8ebf0;color:#333}.btn:disabled{opacity:.45;cursor:not-allowed}
-.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);height:66px;background:var(--blue);display:flex;justify-content:space-around;align-items:center;color:#fff;z-index:40;padding-bottom:env(safe-area-inset-bottom);box-sizing:content-box}
-.nav{background:none;color:#fff;font-size:12px;text-align:center;min-width:62px;padding:5px 8px}.nav span{display:block;margin-top:1px}
-.fab{width:62px;height:62px;border-radius:50%;background:#a7bce6;border:7px solid var(--blue);font-size:26px;margin-top:-27px;padding:0}
-.login{min-height:100vh;display:grid;place-items:center;padding:18px;background:linear-gradient(145deg,#294b8f,#6d8fcb)}
-.loginbox{width:min(430px,100%);background:#fff;border-radius:24px;padding:24px 20px;box-shadow:0 20px 50px #0004}
-.logo{font-size:40px;text-align:center}.field{margin:11px 0}.field label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
-.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #d9dee7;border-radius:12px;outline:none;background:#fff;min-height:46px}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #294b8f18}
-.field textarea{min-height:96px;resize:vertical}.wide{width:100%;min-height:46px;padding:12px;border-radius:13px;background:var(--blue);color:#fff;font-weight:700}
-.hidden{display:none!important}.tablewrap{overflow-x:auto;border-radius:13px;-webkit-overflow-scrolling:touch}
-.table{width:100%;border-collapse:collapse;min-width:680px;background:#fff}.table th,.table td{padding:10px;border-bottom:1px solid #e6e9ef;text-align:left;font-size:13px}.table th{background:#f2f5fa;position:sticky;top:0}
-.badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.ok{background:#dff6e9;color:#08783b}.wait{background:#fff1cf;color:#9a6500}.no{background:#ffe1e1;color:#a51e1e}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.stat{background:#fff;border-radius:14px;padding:11px 6px;text-align:center}.stat b{font-size:21px;display:block}.stat span{font-size:12px}
-.cameraPreview{width:100%;aspect-ratio:3/4;background:#111;border-radius:18px;object-fit:cover;display:block;max-height:68vh}
-.cameraHint{font-size:13px;color:#718096;margin:8px 0 12px}.cameraActions{display:flex;gap:9px;margin-top:11px}.cameraActions .btn{flex:1}
-.selfie-ok{background:#e2f7ea;color:#167344;padding:10px 12px;border-radius:12px;font-size:13px;margin-top:10px}
-.toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:11px 14px;border-radius:12px;z-index:60;max-width:min(92%,520px);display:none;font-size:14px;box-shadow:0 6px 20px #0004}
-.modal{position:fixed;inset:0;background:#0007;display:grid;place-items:center;z-index:50;padding:14px}.modalbox{background:#fff;border-radius:20px;padding:18px;width:min(520px,100%);max-height:90vh;overflow:auto}
-.row{display:flex;gap:10px;align-items:center;justify-content:space-between}.row>*{min-width:0}.muted{color:var(--muted);font-size:13px}
-.tabs{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px}.tab{white-space:nowrap;padding:10px 13px;border-radius:999px;background:#edf0f5}.tab.active{background:var(--blue);color:#fff}
-@media(max-width:520px){
-.content{padding:14px 12px 20px}.hero{margin:-14px -12px 14px;padding:18px 13px 20px}
-.welcome{grid-template-columns:auto 1fr}.clock{grid-column:2;text-align:left;margin-top:-5px}.clock b{font-size:16px}
-.avatar{width:56px;height:56px;font-size:25px}.hello b{font-size:20px}.grid{gap:6px}.menu{min-height:92px;padding:11px 3px}
-.icon{font-size:31px}.menu span:last-child{font-size:12px}.stats{grid-template-columns:repeat(2,1fr)}
-.section-title{font-size:19px}.card,.bluecard{padding:14px;border-radius:18px}.actions .btn{min-width:100%;flex-basis:100%}
-.cameraActions .btn{min-width:0;flex-basis:0}.loginbox{padding:22px 17px}
+*{box-sizing:border-box}
+
+html{
+  min-height:100%;
+  -webkit-text-size-adjust:100%;
 }
-@media(max-width:350px){.hello b{font-size:18px}.grid{grid-template-columns:repeat(2,1fr)}.menu{min-height:88px}.bottom{height:62px}.nav{min-width:55px;padding-left:3px;padding-right:3px}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+button:active{
+  transform:scale(.98);
+}
+
+input,select,textarea{
+  font-size:16px;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* APP */
+
+.app{
+  width:100%;
+  max-width:760px;
+  min-height:100vh;
+  margin:auto;
+  background:#fff;
+  padding-bottom:82px;
+}
+
+.top{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:var(--blue);
+  color:#fff;
+  padding:14px 16px;
+  padding-top:max(14px,env(safe-area-inset-top));
+}
+
+.brand{
+  font-size:19px;
+  font-weight:700;
+}
+
+.content{
+  padding:14px;
+}
+
+/* HERO */
+
+.hero{
+  margin:-14px -14px 14px;
+  padding:18px 14px;
+  color:#fff;
+  background:var(--blue);
+  border-radius:0 0 22px 22px;
+}
+
+.welcome{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:10px;
+  align-items:center;
+}
+
+.avatar{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  background:#ffffff20;
+  display:grid;
+  place-items:center;
+  font-size:25px;
+}
+
+.hello{
+  min-width:0;
+}
+
+.hello small{
+  opacity:.8;
+}
+
+.hello b{
+  display:block;
+  font-size:20px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin:3px 0;
+}
+
+.hello span{
+  font-size:12px;
+  opacity:.85;
+}
+
+.clock{
+  text-align:right;
+  white-space:nowrap;
+}
+
+.clock b{
+  font-size:16px;
+  font-weight:500;
+}
+
+.clock div{
+  font-size:11px;
+  opacity:.8;
+  margin-top:2px;
+}
+
+.location{
+  margin-top:16px;
+  display:flex;
+  gap:8px;
+  font-size:13px;
+}
+
+.locationBox{
+  margin-top:10px;
+  padding:10px;
+  border:1px solid #ffffff30;
+  border-radius:12px;
+  background:#ffffff12;
+  font-size:12px;
+}
+
+.locationActions{
+  display:flex;
+  gap:6px;
+  margin-top:7px;
+}
+
+.locationActions button{
+  padding:7px 9px;
+  border-radius:9px;
+  background:#ffffff18;
+  color:#fff;
+  font-size:11px;
+}
+
+/* CARD */
+
+.card,
+.bluecard,
+.notice{
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+}
+
+.bluecard{
+  background:var(--blue);
+  color:#fff;
+}
+
+.notice{
+  background:#fff9e9;
+  border:1px solid #efd486;
+  color:#624b00;
+}
+
+.notice .count{
+  font-size:24px;
+  font-weight:800;
+}
+
+.section-title{
+  text-align:center;
+  font-size:18px;
+  margin:0 0 10px;
+}
+
+/* MENU */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+
+.menu{
+  min-height:88px;
+  padding:10px 4px;
+  background:#fff;
+  color:var(--text);
+  border:1px solid #edf0f4;
+  border-radius:13px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+}
+
+.menu:active{
+  background:#f1f4f8;
+}
+
+.icon{
+  font-size:29px;
+  line-height:1;
+}
+
+.menu span:last-child{
+  font-size:12px;
+  text-align:center;
+}
+
+/* STATS */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+}
+
+.stat{
+  background:#fff;
+  color:var(--text);
+  border-radius:11px;
+  padding:9px 4px;
+  text-align:center;
+}
+
+.stat b{
+  display:block;
+  font-size:19px;
+}
+
+.stat span{
+  font-size:11px;
+  color:var(--muted);
+}
+
+/* BUTTON */
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  min-height:42px;
+  padding:10px 13px;
+  border-radius:11px;
+  font-weight:700;
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.actions .btn{
+  flex:1;
+  min-width:130px;
+}
+
+.btn.primary{
+  background:#fff;
+  color:var(--blue);
+}
+
+.btn.green{
+  background:var(--green);
+  color:#fff;
+}
+
+.btn.red{
+  background:var(--red);
+  color:#fff;
+}
+
+.btn.gray{
+  background:#e9edf2;
+  color:#333;
+}
+
+.btn.blue{
+  background:var(--blue);
+  color:#fff;
+}
+
+.btn.orange{
+  background:var(--orange);
+  color:#fff;
+}
+
+.btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+/* FORM */
+
+.field{
+  margin:10px 0;
+}
+
+.field label{
+  display:block;
+  margin-bottom:5px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  min-height:44px;
+  padding:10px;
+  border:1px solid #d9dee7;
+  border-radius:10px;
+  outline:none;
+  background:#fff;
+}
+
+.field textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:var(--blue);
+}
+
+.wide{
+  width:100%;
+  min-height:44px;
+  padding:10px;
+  border-radius:11px;
+  background:var(--blue);
+  color:#fff;
+  font-weight:700;
+}
+
+/* LOGIN */
+
+.login{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:16px;
+  background:var(--blue);
+}
+
+.loginbox{
+  width:min(420px,100%);
+  background:#fff;
+  border-radius:20px;
+  padding:22px 18px;
+}
+
+.logo{
+  text-align:center;
+  font-size:38px;
+}
+
+.loginbox h2{
+  text-align:center;
+  color:var(--blue);
+  margin:8px 0;
+}
+
+/* APPROVAL */
+
+.approvalItem{
+  padding:12px;
+  margin-top:9px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:#fff;
+}
+
+.approvalMeta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin:7px 0;
+}
+
+.approvalMeta span{
+  padding:4px 7px;
+  border-radius:20px;
+  background:#edf0f5;
+  font-size:10px;
+}
+
+.approvalItem p{
+  font-size:13px;
+  line-height:1.4;
+  margin:8px 0;
+}
+
+/* BADGE */
+
+.badge{
+  display:inline-block;
+  padding:4px 7px;
+  border-radius:20px;
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.ok{
+  background:#dff6e9;
+  color:#08783b;
+}
+
+.wait{
+  background:#fff1cf;
+  color:#9a6500;
+}
+
+.no{
+  background:#ffe1e1;
+  color:#a51e1e;
+}
+
+/* CAMERA */
+
+.cameraPreview{
+  width:100%;
+  aspect-ratio:3/4;
+  max-height:65vh;
+  object-fit:cover;
+  display:block;
+  background:#111;
+  border-radius:15px;
+}
+
+.cameraHint{
+  margin:7px 0 10px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.cameraActions{
+  display:flex;
+  gap:7px;
+}
+
+.cameraActions .btn{
+  flex:1;
+}
+
+.selfie-ok{
+  margin-top:8px;
+  padding:9px;
+  background:#e2f7ea;
+  color:#167344;
+  border-radius:10px;
+  font-size:12px;
+}
+
+/* TABLE */
+
+.tablewrap{
+  overflow:auto;
+  border-radius:10px;
+}
+
+.table{
+  width:100%;
+  min-width:650px;
+  border-collapse:collapse;
+}
+
+.table th,
+.table td{
+  padding:8px;
+  border-bottom:1px solid #e7eaf0;
+  font-size:12px;
+  text-align:left;
+}
+
+.table th{
+  background:#f2f5f8;
+}
+
+/* BOTTOM */
+
+.bottom{
+  position:fixed;
+  z-index:30;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:min(760px,100%);
+  height:64px;
+  padding-bottom:env(safe-area-inset-bottom);
+  background:var(--blue);
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+}
+
+.nav{
+  min-width:62px;
+  padding:5px;
+  background:none;
+  color:#fff;
+  font-size:12px;
+  text-align:center;
+}
+
+.nav span{
+  display:block;
+  margin-top:2px;
+}
+
+.fab{
+  width:58px;
+  height:58px;
+  min-width:58px;
+  margin-top:-24px;
+  border-radius:50%;
+  background:#a7bce6;
+  border:6px solid var(--blue);
+  font-size:24px;
+}
+
+/* OTHER */
+
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.row > *{
+  min-width:0;
+}
+
+.muted{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.toast{
+  display:none;
+  position:fixed;
+  z-index:100;
+  left:50%;
+  bottom:76px;
+  transform:translateX(-50%);
+  max-width:92%;
+  padding:10px 13px;
+  background:#222;
+  color:#fff;
+  border-radius:10px;
+  font-size:13px;
+}
+
+@media(max-width:520px){
+
+  .content{
+    padding:12px;
+  }
+
+  .hero{
+    margin:-12px -12px 12px;
+  }
+
+  .welcome{
+    grid-template-columns:auto 1fr;
+  }
+
+  .clock{
+    grid-column:2;
+    text-align:left;
+    margin-top:-5px;
+  }
+
+  .grid{
+    gap:6px;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .actions .btn{
+    min-width:100%;
+    flex-basis:100%;
+  }
+
+  .cameraActions .btn{
+    min-width:0;
+    flex-basis:0;
+  }
+}
+
+@media(max-width:350px){
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .hello b{
+    font-size:18px;
+  }
+
+  .bottom{
+    height:60px;
+  }
+}
 </style>
 </head>
+
 <body>
-<div id="app"></div><div id="toast" class="toast"></div>
+
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+
 <script>
-let TOKEN=localStorage.getItem('baznas_token')||'', ME=null, timer=null;
-const $=id=>document.getElementById(id);
-function toast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2800)}
-/*
- * URL Web App Google Apps Script.
- * Ganti dengan URL hasil Deploy > Web app dari Code.gs.
- */
-const API_URL = 'https://script.google.com/macros/s/AKfycbwAx06c0c2tRDtJ-fSWEWGuCurQplwgM5yvelen--uKi7nNt6__EYBRovTuVQXxlXWDdA/exec';
+'use strict';
+
+/* =========================================================
+   CONFIG
+========================================================= */
+
+const API_URL =
+'https://script.google.com/macros/s/AKfycbwAx06c0c2tRDtJ-fSWEWGuCurQplwgM5yvelen--uKi7nNt6__EYBRovTuVQXxlXWDdA/exec';
 
 const ACTION_MAP = {
   login:'login',
@@ -105,281 +694,2271 @@ const ACTION_MAP = {
   getEmployees:'employees'
 };
 
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+let TOKEN = localStorage.getItem('baznas_token') || '';
+let ME = null;
+let clockTimer = null;
+let cameraStream = null;
+let selfieData = '';
+let dashboardLocation = null;
+let apiBusy = false;
+
+/* =========================================================
+   HELPER
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+function esc(value){
+  return String(value ?? '')
+    .replace(/[&<>"']/g,m=>({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#039;'
+    }[m]));
+}
+
+function toast(message){
+  const el = $('toast');
+  if(!el)return;
+
+  el.textContent = message;
+  el.style.display = 'block';
+
+  clearTimeout(el._timer);
+
+  el._timer = setTimeout(()=>{
+    el.style.display = 'none';
+  },2600);
+}
+
+function stopClock(){
+  clearInterval(clockTimer);
+  clockTimer = null;
+}
+
+function stopCamera(){
+  if(cameraStream){
+    cameraStream.getTracks().forEach(track=>track.stop());
+    cameraStream = null;
+  }
+}
+
+/* =========================================================
+   API
+========================================================= */
+
 async function gas(fn,...args){
-  if(!API_URL || API_URL.includes('PASTE_GOOGLE_APPS_SCRIPT')){
-    throw new Error('API_URL belum diatur. Isi URL Web App Google Apps Script terlebih dahulu.');
+
+  if(!API_URL || API_URL.includes('PASTE_')){
+    throw new Error('API_URL belum diatur.');
+  }
+
+  if(apiBusy){
+    throw new Error('Sedang memproses. Tunggu sebentar.');
   }
 
   const action = ACTION_MAP[fn] || fn;
   let params = {};
 
-  // Adaptasi parameter frontend lama ke kontrak Code.gs yang Anda kirim.
-  if(fn==='login') params={username:args[0],password:args[1]};
-  else if(fn==='logout'||fn==='getMe'||fn==='getDashboard'||fn==='getPendingApprovals'||fn==='getEmployees'){
-    params={token:args[0]};
-  }
-  else if(fn==='submitAttendance'){
-    const [token,payload]=args;
-    params={
-      token,
-      jenis:payload?.jenis,
-      latitude:payload?.lat,
-      longitude:payload?.lng,
-      accuracy:payload?.acc,
-      keterangan:payload?.keterangan||'',
-      photoData:payload?.photoData||''
-    };
-  }
-  else if(fn==='submitRequest'){
-    const [token,payload]=args;
-    params={
-      token,
-      payload:{
-        jenis:payload?.jenis,
-        mulai:payload?.tglMulai,
-        selesai:payload?.tglSelesai,
-        alasan:payload?.alasan,
-        lampiran:payload?.lampiranUrl||''
-      }
-    };
-  }
-  else if(fn==='approveManager'||fn==='approveSdm'){
-    params={
-      token:args[0],
-      id:args[1],
-      approved:args[2],
-      note:args[3]||''
-    };
-  }
-  else if(fn==='getAttendanceHistory'){
-    const [token,filter]=args;
-    params={
-      token,
-      month:filter?.month||'',
-      nik:filter?.nik||'',
-      status:filter?.status||''
-    };
-  }else{
-    throw new Error('API action belum dipetakan: '+fn);
+  switch(fn){
+
+    case 'login':
+      params = {
+        username:args[0],
+        password:args[1]
+      };
+      break;
+
+    case 'logout':
+    case 'getMe':
+    case 'getDashboard':
+    case 'getPendingApprovals':
+    case 'getEmployees':
+      params = {
+        token:args[0]
+      };
+      break;
+
+    case 'submitAttendance':{
+      const [token,payload] = args;
+
+      params = {
+        token,
+        jenis:payload?.jenis || '',
+        latitude:payload?.lat || '',
+        longitude:payload?.lng || '',
+        accuracy:payload?.acc || '',
+        keterangan:payload?.keterangan || '',
+        photoData:payload?.photoData || ''
+      };
+      break;
+    }
+
+    case 'submitRequest':{
+      const [token,payload] = args;
+
+      params = {
+        token,
+        payload:{
+          jenis:payload?.jenis || '',
+          mulai:payload?.tglMulai || '',
+          selesai:payload?.tglSelesai || '',
+          alasan:payload?.alasan || '',
+          lampiran:payload?.lampiranUrl || ''
+        }
+      };
+      break;
+    }
+
+    case 'approveManager':
+    case 'approveSdm':
+      params = {
+        token:args[0],
+        id:args[1],
+        approved:args[2],
+        note:args[3] || ''
+      };
+      break;
+
+    case 'getAttendanceHistory':{
+      const [token,filter] = args;
+
+      params = {
+        token,
+        month:filter?.month || '',
+        nik:filter?.nik || '',
+        status:filter?.status || ''
+      };
+      break;
+    }
+
+    default:
+      throw new Error('API action tidak dikenali: '+fn);
   }
 
-  let response;
+  apiBusy = true;
+
   try{
-    response=await fetch(API_URL,{
+
+    const response = await fetch(API_URL,{
       method:'POST',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({action,params}),
+      headers:{
+        'Content-Type':'text/plain;charset=utf-8'
+      },
+      body:JSON.stringify({
+        action,
+        params
+      }),
       redirect:'follow'
     });
-  }catch(e){
-    throw new Error('Tidak dapat terhubung ke server. Periksa URL API dan koneksi internet.');
+
+    const text = await response.text();
+
+    let data;
+
+    try{
+      data = JSON.parse(text);
+    }catch{
+      throw new Error(
+        'Respons server bukan JSON. Periksa Web App Google Apps Script.'
+      );
+    }
+
+    if(!response.ok || data.ok === false){
+      throw new Error(
+        data.error ||
+        data.message ||
+        `Server error (${response.status})`
+      );
+    }
+
+    return data.data;
+
+  }catch(error){
+
+    if(error.message.includes('Failed to fetch')){
+      throw new Error(
+        'Tidak dapat terhubung ke server. Periksa koneksi internet dan URL API.'
+      );
+    }
+
+    throw error;
+
+  }finally{
+    apiBusy = false;
   }
-
-  const text=await response.text();
-  let data;
-  try{data=JSON.parse(text)}
-  catch(e){throw new Error('Respons server bukan JSON. Periksa deployment Web App Code.gs.')}
-
-  if(!response.ok || data.ok===false){
-    throw new Error(data.error||data.message||`Server error (${response.status})`);
-  }
-
-  return data.data;
 }
 
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+/* =========================================================
+   LOGIN
+========================================================= */
+
 function loginView(){
- $('app').innerHTML=`<div class="login"><div class="loginbox">
- <div class="logo">🏢</div><h2 style="text-align:center;color:#294b8f">Teams BAZNAS Sragen</h2>
- <p class="muted" style="text-align:center">Sistem Absensi & Administrasi Karyawan</p>
- <div class="field"><label>Username</label><input id="u" autocomplete="username"></div>
- <div class="field"><label>Password</label><input id="p" type="password" autocomplete="current-password"></div>
- <button class="wide" onclick="doLogin()">MASUK</button>
- <p class="muted" style="text-align:center;margin-top:15px">Gunakan akun yang terdaftar pada sistem.</p>
- </div></div>`;
+
+  stopCamera();
+  stopClock();
+
+  $('app').innerHTML = `
+    <div class="login">
+      <div class="loginbox">
+
+        <div class="logo">🏢</div>
+
+        <h2>Teams BAZNAS Sragen</h2>
+
+        <p class="muted" style="text-align:center">
+          Sistem Absensi & Administrasi Karyawan
+        </p>
+
+        <div class="field">
+          <label>Username</label>
+          <input
+            id="u"
+            autocomplete="username"
+            placeholder="Masukkan username">
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <input
+            id="p"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Masukkan password">
+        </div>
+
+        <button
+          class="wide"
+          onclick="doLogin()">
+          MASUK
+        </button>
+
+        <p class="muted" style="text-align:center;margin-top:14px">
+          Gunakan akun yang terdaftar pada sistem.
+        </p>
+
+      </div>
+    </div>
+  `;
 }
-async function doLogin(){try{const r=await gas('login',$('u').value,$('p').value);TOKEN=r.token;localStorage.setItem('baznas_token',TOKEN);ME=r.user;render()}catch(e){toast(e.message)}}
-async function boot(){if(!TOKEN){loginView();return}try{const d=await gas('getMe',TOKEN);ME=d.user||d.me||d;render()}catch(e){TOKEN='';localStorage.removeItem('baznas_token');loginView()}}
-function render(){clearInterval(timer); $('app').innerHTML=`<div class="app"><div class="top"><div class="brand">Teams BAZNAS Sragen</div></div><div id="page" class="content"></div><div class="bottom">
-<button class="nav" onclick="home()">🏠<span>Beranda</span></button>
-<button class="nav fab" onclick="attendance()">📷</button>
-<button class="nav" onclick="profile()">👤<span>Profil</span></button>
-</div></div>`;home()}
+
+async function doLogin(){
+
+  const username = $('u')?.value.trim();
+  const password = $('p')?.value;
+
+  if(!username || !password){
+    toast('Username dan password wajib diisi.');
+    return;
+  }
+
+  try{
+
+    const result = await gas(
+      'login',
+      username,
+      password
+    );
+
+    TOKEN = result.token;
+
+    ME = result.user;
+
+    localStorage.setItem(
+      'baznas_token',
+      TOKEN
+    );
+
+    render();
+
+  }catch(error){
+
+    toast(error.message);
+
+  }
+}
+
+/* =========================================================
+   BOOT
+========================================================= */
+
+async function boot(){
+
+  if(!TOKEN){
+    loginView();
+    return;
+  }
+
+  try{
+
+    const data = await gas(
+      'getMe',
+      TOKEN
+    );
+
+    ME = data.user || data.me || data;
+
+    render();
+
+  }catch(error){
+
+    TOKEN = '';
+    ME = null;
+
+    localStorage.removeItem(
+      'baznas_token'
+    );
+
+    loginView();
+  }
+}
+
+/* =========================================================
+   MAIN APP
+========================================================= */
+
+function render(){
+
+  stopClock();
+  stopCamera();
+
+  $('app').innerHTML = `
+    <div class="app">
+
+      <div class="top">
+        <div class="brand">
+          Teams BAZNAS Sragen
+        </div>
+      </div>
+
+      <main
+        id="page"
+        class="content">
+      </main>
+
+      <nav class="bottom">
+
+        <button
+          class="nav"
+          onclick="home()">
+          🏠
+          <span>Beranda</span>
+        </button>
+
+        <button
+          class="nav fab"
+          onclick="attendance()">
+          📷
+        </button>
+
+        <button
+          class="nav"
+          onclick="profile()">
+          👤
+          <span>Profil</span>
+        </button>
+
+      </nav>
+
+    </div>
+  `;
+
+  home();
+}
+
+/* =========================================================
+   HOME
+========================================================= */
+
 async function home(){
- try{
-  const d=await gas('getDashboard',TOKEN);
-  ME=d.user||d.me||ME;
-  d.me=ME;
-  d.summary=d.summary||{totalKaryawan:0,hadir:0,pulang:0,lokasiLapangan:0};
-  d.pending=Number(d.pending||0);
 
-  const role=String(ME.role||ME.ROLE||'').toUpperCase();
-  const today=d.today||[];
-  const approvalLabel=role==='MANAJER'
-    ? 'Menunggu persetujuan Anda sebagai Manager'
-    : 'Sudah disetujui Manager, menunggu verifikasi SDM';
+  stopCamera();
 
-  let roleMenu='';
-  if(role==='SDM'||role==='ADMIN'){
-    roleMenu=`<div class="bluecard">
-      <h2 style="margin:0 0 12px">📊 Dashboard ${role}</h2>
-      <div class="stats">
-        <div class="stat"><b>${d.summary.totalKaryawan}</b><span>Total</span></div>
-        <div class="stat"><b>${d.summary.hadir}</b><span>Hadir</span></div>
-        <div class="stat"><b>${d.summary.pulang}</b><span>Pulang</span></div>
-        <div class="stat"><b>${d.summary.lokasiLapangan}</b><span>Lapangan</span></div>
+  try{
+
+    const d = await gas(
+      'getDashboard',
+      TOKEN
+    );
+
+    ME = d.user || d.me || ME;
+
+    const summary = d.summary || {
+      totalKaryawan:0,
+      hadir:0,
+      pulang:0,
+      lokasiLapangan:0
+    };
+
+    const pending = Number(
+      d.pending || 0
+    );
+
+    const role = String(
+      ME?.role ||
+      ME?.ROLE ||
+      ''
+    ).toUpperCase();
+
+    const today = Array.isArray(d.today)
+      ? d.today
+      : [];
+
+    let dashboard = '';
+
+    if(role === 'SDM' || role === 'ADMIN'){
+
+      dashboard = `
+        <div class="bluecard">
+
+          <h3 style="margin:0 0 10px">
+            📊 Dashboard ${role}
+          </h3>
+
+          <div class="stats">
+
+            <div class="stat">
+              <b>${summary.totalKaryawan}</b>
+              <span>Total</span>
+            </div>
+
+            <div class="stat">
+              <b>${summary.hadir}</b>
+              <span>Hadir</span>
+            </div>
+
+            <div class="stat">
+              <b>${summary.pulang}</b>
+              <span>Pulang</span>
+            </div>
+
+            <div class="stat">
+              <b>${summary.lokasiLapangan}</b>
+              <span>Lapangan</span>
+            </div>
+
+          </div>
+        </div>
+      `;
+    }
+
+    let pendingHtml = '';
+
+    if(pending > 0){
+
+      const label =
+        role === 'MANAJER'
+        ? 'Menunggu persetujuan Anda sebagai Manager'
+        : 'Sudah disetujui Manager, menunggu verifikasi SDM';
+
+      pendingHtml = `
+        <div class="notice">
+
+          <div class="row">
+
+            <div>
+              <span class="count">
+                ${pending}
+              </span>
+
+              <strong>
+                Pengajuan perlu diproses
+              </strong>
+
+              <div class="muted">
+                ${esc(label)}
+              </div>
+            </div>
+
+            <button
+              class="btn primary"
+              onclick="approvals()">
+              Lihat
+            </button>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    const todayHtml = today.length
+      ? today.map(row=>`
+        <div
+          class="row"
+          style="padding:7px 0;border-bottom:1px solid #eee">
+
+          <span>
+            <b>${esc(row.jenis)}</b><br>
+            <small class="muted">
+              ${esc(row.tipe || '')}
+            </small>
+          </span>
+
+          <b>${esc(row.jam)}</b>
+
+        </div>
+      `).join('')
+      : `
+        <p class="muted">
+          Belum ada absensi hari ini.
+        </p>
+      `;
+
+    $('page').innerHTML = `
+
+      <section class="hero">
+
+        <div class="welcome">
+
+          <div class="avatar">
+            👤
+          </div>
+
+          <div class="hello">
+
+            <small>
+              Selamat Datang,
+            </small>
+
+            <b>
+              ${esc(ME?.nama || ME?.NAMA || '-')}
+            </b>
+
+            <span>
+              ${esc(ME?.jabatan || ME?.JABATAN || '')}
+            </span>
+
+          </div>
+
+          <div class="clock">
+
+            <b id="time"></b>
+
+            <div id="date"></div>
+
+          </div>
+
+        </div>
+
+        <div class="location">
+
+          📍
+
+          <div>
+            <b>Lokasi Anda</b>
+
+            <div id="loc">
+              Lokasi belum dicek
+            </div>
+          </div>
+
+        </div>
+
+        <div class="locationBox">
+
+          <div id="locationDetail">
+            Tekan perbarui untuk mendapatkan lokasi GPS.
+          </div>
+
+          <div class="locationActions">
+
+            <button onclick="refreshDashboardLocation()">
+              ↻ Perbarui
+            </button>
+
+            <button onclick="openMyLocation()">
+              🗺️ Maps
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      ${dashboard}
+
+      ${pendingHtml}
+
+      <div class="card">
+
+        <h2 class="section-title">
+          Menu
+        </h2>
+
+        <div class="grid">
+
+          ${menu('🕘','Absensi','attendance()')}
+
+          ${menu('📝','Ajukan Cuti','requestForm()')}
+
+          ${menu('📋','Pengajuan','requests()')}
+
+          ${menu('🏖️','Izin','requestForm("IZIN")')}
+
+          ${menu('🏥','Sakit','requestForm("SAKIT")')}
+
+          ${menu('✈️','Perjalanan Dinas','requestForm("DINAS")')}
+
+        </div>
+
       </div>
-    </div>`;
+
+      ${
+        role === 'SDM' || role === 'ADMIN'
+        ? `
+          <div class="bluecard">
+
+            <div class="row">
+
+              <b>
+                Riwayat Absensi SDM
+              </b>
+
+              <button
+                class="btn primary"
+                onclick="historyView()">
+                Buka
+              </button>
+
+            </div>
+
+          </div>
+        `
+        : ''
+      }
+
+      <div class="card">
+
+        <div class="row">
+
+          <div>
+
+            <b>
+              Status Hari Ini
+            </b>
+
+            <div class="muted">
+
+              Masuk:
+              ${d.hasIn ? '✓ sudah' : '— belum'}
+
+              ·
+
+              Pulang:
+              ${d.hasOut ? '✓ sudah' : '— belum'}
+
+            </div>
+
+          </div>
+
+          <button
+            class="btn green"
+            onclick="attendance()">
+            ABSEN
+          </button>
+
+        </div>
+
+        <div style="margin-top:10px">
+          ${todayHtml}
+        </div>
+
+      </div>
+    `;
+
+    startClock();
+
+    /*
+     * GPS dashboard dibuat setelah UI tampil.
+     * Jadi halaman tetap terasa cepat.
+     */
+    setTimeout(
+      refreshDashboardLocation,
+      100
+    );
+
+  }catch(error){
+
+    toast(error.message);
+
   }
-
-  const pendingNotice=d.pending>0 ? `<div class="notice">
-    <div class="row">
-      <div><span class="count">${d.pending}</span> <strong>Pengajuan perlu diproses</strong>
-      <div class="muted">${esc(approvalLabel)}</div></div>
-      <button class="btn primary" onclick="approvals()">Lihat</button>
-    </div>
-  </div>` : '';
-
-  const todayHtml=today.length
-    ? today.map(r=>`<div class="row" style="padding:8px 0;border-bottom:1px solid #e8ebf0">
-        <span><b>${esc(r.jenis)}</b><br><small class="muted">${esc(r.tipe||'')}</small></span>
-        <b>${esc(r.jam)}</b>
-      </div>`).join('')
-    : '<p class="muted">Belum ada absensi hari ini.</p>';
-
-  $('page').innerHTML=`<div class="hero">
-    <div class="welcome">
-      <div class="avatar">👤</div>
-      <div class="hello"><small>Selamat Datang,</small><b>${esc(ME.nama||ME.NAMA)}</b><span>${esc(ME.jabatan||ME.JABATAN||'')}</span></div>
-      <div class="clock"><b id="time"></b><div id="date"></div></div>
-    </div>
-    <div class="location">
-      📍 <div><b>Lokasi Anda</b><div id="loc">Mengecek lokasi GPS...</div></div>
-    </div>
-    <div class="locationBox">
-      <div id="locationDetail">Lokasi akan ditampilkan saat GPS tersedia.</div>
-      <div class="locationActions">
-        <button onclick="refreshDashboardLocation()">↻ Perbarui lokasi</button>
-        <button onclick="openMyLocation()">🗺️ Buka Maps</button>
-      </div>
-    </div>
-  </div>
-  ${roleMenu}
-  ${pendingNotice}
-  <div class="card"><h2 class="section-title">Menu</h2><div class="grid">
-    ${menu('🕘','Absensi','attendance()')}${menu('📝','Ajukan Cuti','requestForm()')}${menu('📋','Pengajuan','requests()')}
-    ${menu('🏖️','Izin','requestForm("IZIN")')}${menu('🏥','Sakit','requestForm("SAKIT")')}${menu('✈️','Perjalanan Dinas','requestForm("DINAS")')}
-  </div></div>
-  ${role==='SDM'||role==='ADMIN'?`<div class="bluecard"><div class="row"><b>Riwayat Absensi SDM</b><button class="btn primary" onclick="historyView()">Buka</button></div></div>`:''}
-  <div class="card"><div class="row"><div><b>Status Hari Ini</b><div class="muted">Masuk: ${d.hasIn?'✓ sudah':'— belum'} · Pulang: ${d.hasOut?'✓ sudah':'— belum'}</div></div><button class="btn green" onclick="attendance()">ABSEN</button></div>
-    <div style="margin-top:12px">${todayHtml}</div>
-  </div>`;
-  startClock();
-  refreshDashboardLocation();
- }catch(e){toast(e.message)}
 }
-function menu(i,t,a){return `<button class="menu" onclick="${a}"><span class="icon">${i}</span><span>${t}</span></button>`}
-function startClock(){const f=()=>{const n=new Date();$('time').textContent=n.toLocaleTimeString('id-ID');$('date').textContent=n.toLocaleDateString('id-ID',{weekday:'long'});};f();timer=setInterval(f,1000)}
-let dashboardLocation=null;
+
+function menu(icon,title,action){
+
+  return `
+    <button
+      class="menu"
+      onclick="${action}">
+
+      <span class="icon">
+        ${icon}
+      </span>
+
+      <span>
+        ${title}
+      </span>
+
+    </button>
+  `;
+}
+
+/* =========================================================
+   CLOCK
+========================================================= */
+
+function startClock(){
+
+  stopClock();
+
+  const update = ()=>{
+
+    const now = new Date();
+
+    const time = $('time');
+    const date = $('date');
+
+    if(!time || !date){
+      stopClock();
+      return;
+    }
+
+    time.textContent =
+      now.toLocaleTimeString(
+        'id-ID'
+      );
+
+    date.textContent =
+      now.toLocaleDateString(
+        'id-ID',
+        {
+          weekday:'long',
+          day:'numeric',
+          month:'long',
+          year:'numeric'
+        }
+      );
+  };
+
+  update();
+
+  clockTimer = setInterval(
+    update,
+    1000
+  );
+}
+
+/* =========================================================
+   GPS
+========================================================= */
+
+function getGPS(){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      if(!navigator.geolocation){
+
+        reject(
+          new Error(
+            'Browser tidak mendukung GPS.'
+          )
+        );
+
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+
+        position=>{
+
+          resolve({
+            lat:position.coords.latitude,
+            lng:position.coords.longitude,
+            acc:position.coords.accuracy
+          });
+
+        },
+
+        error=>{
+
+          let message =
+            'GPS gagal digunakan.';
+
+          if(error.code === 1){
+            message =
+              'Izin lokasi ditolak.';
+          }
+
+          if(error.code === 2){
+            message =
+              'Lokasi tidak tersedia.';
+          }
+
+          if(error.code === 3){
+            message =
+              'GPS timeout. Coba lagi.';
+          }
+
+          reject(
+            new Error(message)
+          );
+        },
+
+        {
+          enableHighAccuracy:true,
+          timeout:12000,
+          maximumAge:0
+        }
+      );
+    }
+  );
+}
+
 async function refreshDashboardLocation(){
-  const loc=$('loc'), detail=$('locationDetail');
-  if(!loc||!detail)return;
-  loc.textContent='Mencari lokasi...';
-  detail.textContent='Meminta izin lokasi GPS...';
+
+  const loc = $('loc');
+  const detail = $('locationDetail');
+
+  if(!loc || !detail)return;
+
+  loc.textContent =
+    'Mencari lokasi...';
+
+  detail.textContent =
+    'Meminta akses GPS...';
+
   try{
-    const p=await getGPS(false);
-    dashboardLocation=p;
-    loc.innerHTML=`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · akurasi ±${Math.round(p.acc)} m`;
-    detail.innerHTML=`Koordinat: <b>${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}</b><br><small>Akurasi GPS ±${Math.round(p.acc)} meter</small>`;
-  }catch(e){
-    dashboardLocation=null;
-    loc.textContent='Lokasi tidak tersedia';
-    detail.innerHTML='❌ '+esc(e.message)+'<br><small>Aktifkan GPS dan izinkan akses lokasi.</small>';
+
+    const p = await getGPS();
+
+    dashboardLocation = p;
+
+    loc.textContent =
+      `${p.lat.toFixed(6)}, ${p.lng.toFixed(6)} · ±${Math.round(p.acc)} m`;
+
+    detail.innerHTML = `
+      Koordinat:
+      <b>
+        ${p.lat.toFixed(6)},
+        ${p.lng.toFixed(6)}
+      </b>
+      <br>
+      <small>
+        Akurasi GPS ±${Math.round(p.acc)} meter
+      </small>
+    `;
+
+  }catch(error){
+
+    dashboardLocation = null;
+
+    loc.textContent =
+      'Lokasi tidak tersedia';
+
+    detail.innerHTML =
+      '❌ ' +
+      esc(error.message) +
+      '<br><small>Aktifkan GPS dan izinkan lokasi.</small>';
   }
 }
+
 function openMyLocation(){
-  if(!dashboardLocation)return toast('Lokasi belum tersedia. Tekan Perbarui lokasi.');
-  const {lat,lng}=dashboardLocation;
-  window.open(`https://www.google.com/maps?q=${lat},${lng}`,'_blank','noopener');
+
+  if(!dashboardLocation){
+
+    toast(
+      'Lokasi belum tersedia.'
+    );
+
+    return;
+  }
+
+  const {
+    lat,
+    lng
+  } = dashboardLocation;
+
+  window.open(
+    `https://www.google.com/maps?q=${lat},${lng}`,
+    '_blank'
+  );
 }
 
-let cameraStream=null, selfieData='';
+/* =========================================================
+   ATTENDANCE / CAMERA
+========================================================= */
+
 async function attendance(){
- $('page').innerHTML=`<div class="card"><h2>📷 Absensi dengan Selfie</h2><p class="muted">Ambil foto selfie sebelum absen. Foto disimpan sebagai bukti absensi. GPS juga wajib aktif.</p>
- <video id="camera" class="cameraPreview" autoplay playsinline muted></video>
- <div class="cameraHint">Posisikan wajah di tengah kamera, lalu tekan <b>Ambil Foto</b>.</div>
- <canvas id="snapshot" class="hidden"></canvas><div id="selfieStatus" class="selfie-ok hidden">✓ Foto selfie siap digunakan</div>
- <div id="gps" class="card" style="margin:12px 0;background:#fff">Mengecek GPS...</div>
- <div class="cameraActions"><button class="btn" style="background:#edf0f5" onclick="startCamera()">↻ Kamera</button><button class="btn" style="background:#f0a51a;color:#fff" onclick="takeSelfie()">📸 Ambil Foto</button></div>
- <div class="actions" style="margin-top:12px"><button id="inbtn" class="btn green" onclick="doAttendance('MASUK')" disabled>ABSEN MASUK</button><button id="outbtn" class="btn" style="background:#294b8f;color:#fff" onclick="doAttendance('PULANG')" disabled>ABSEN PULANG</button></div></div>`;
- getGPS(false).then(p=>$('gps').innerHTML=`📍 ${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}<br><span class="muted">Akurasi ±${Math.round(p.acc)} meter</span>`).catch(e=>$('gps').innerHTML='❌ '+esc(e.message));
- startCamera();
+
+  stopClock();
+  stopCamera();
+
+  selfieData = '';
+
+  $('page').innerHTML = `
+
+    <div class="card">
+
+      <h2 style="margin-top:0">
+        📷 Absensi dengan Selfie
+      </h2>
+
+      <p class="muted">
+        Ambil foto selfie sebelum melakukan absensi.
+        GPS wajib aktif.
+      </p>
+
+      <video
+        id="camera"
+        class="cameraPreview"
+        autoplay
+        playsinline
+        muted>
+      </video>
+
+      <div class="cameraHint">
+
+        Posisikan wajah di tengah kamera,
+        kemudian tekan
+        <b>Ambil Foto</b>.
+
+      </div>
+
+      <canvas
+        id="snapshot"
+        class="hidden">
+      </canvas>
+
+      <div
+        id="selfieStatus"
+        class="selfie-ok hidden">
+
+        ✓ Foto selfie siap digunakan
+
+      </div>
+
+      <div
+        id="gps"
+        class="card"
+        style="margin:10px 0">
+
+        Mengecek GPS...
+
+      </div>
+
+      <div class="cameraActions">
+
+        <button
+          class="btn gray"
+          onclick="startCamera()">
+
+          ↻ Kamera
+
+        </button>
+
+        <button
+          class="btn orange"
+          onclick="takeSelfie()">
+
+          📸 Ambil Foto
+
+        </button>
+
+      </div>
+
+      <div
+        class="actions"
+        style="margin-top:10px">
+
+        <button
+          id="inbtn"
+          class="btn green"
+          onclick="doAttendance('MASUK')"
+          disabled>
+
+          ABSEN MASUK
+
+        </button>
+
+        <button
+          id="outbtn"
+          class="btn blue"
+          onclick="doAttendance('PULANG')"
+          disabled>
+
+          ABSEN PULANG
+
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+  getGPS()
+    .then(p=>{
+
+      const gps = $('gps');
+
+      if(gps){
+
+        gps.innerHTML = `
+          📍 ${p.lat.toFixed(6)},
+          ${p.lng.toFixed(6)}
+          <br>
+          <span class="muted">
+            Akurasi ±${Math.round(p.acc)} meter
+          </span>
+        `;
+      }
+
+    })
+    .catch(error=>{
+
+      const gps = $('gps');
+
+      if(gps){
+
+        gps.innerHTML =
+          '❌ ' +
+          esc(error.message);
+      }
+    });
+
+  startCamera();
 }
-async function startCamera(){try{stopCamera();selfieData='';if($('selfieStatus'))$('selfieStatus').classList.add('hidden');if($('inbtn'))$('inbtn').disabled=true;if($('outbtn'))$('outbtn').disabled=true;const v=$('camera');if(!v)return;if(!navigator.mediaDevices?.getUserMedia)throw new Error('getUserMedia tidak tersedia');cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'user'},width:{ideal:720},height:{ideal:960}},audio:false});v.srcObject=cameraStream;}catch(e){toast('Kamera tidak dapat diakses. Izinkan kamera dan gunakan URL HTTPS/Google Apps Script Web App.');}}
-function stopCamera(){if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null}}
-function takeSelfie(){const v=$('camera'),c=$('snapshot');if(!v||!v.srcObject||v.readyState<2){toast('Kamera belum siap.');return}const maxW=720,scale=Math.min(1,maxW/v.videoWidth);c.width=Math.round(v.videoWidth*scale);c.height=Math.round(v.videoHeight*scale);c.getContext('2d').drawImage(v,0,0,c.width,c.height);selfieData=c.toDataURL('image/jpeg',0.72);$('selfieStatus').classList.remove('hidden');$('inbtn').disabled=false;$('outbtn').disabled=false;stopCamera();toast('Foto selfie berhasil diambil.')}
-function getGPS(watch){return new Promise((res,rej)=>{if(!navigator.geolocation)return rej(new Error('Browser tidak mendukung GPS.'));navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy}),e=>rej(new Error('GPS gagal: '+e.message)),{enableHighAccuracy:true,timeout:15000,maximumAge:0})})}
-async function doAttendance(jenis){try{if(!selfieData){toast('Ambil foto selfie terlebih dahulu.');return}const p=await getGPS();const btn=jenis==='MASUK'?$('inbtn'):$('outbtn');if(btn)btn.disabled=true;const r=await gas('submitAttendance',TOKEN,{jenis,lat:p.lat,lng:p.lng,keterangan:'',photoData:selfieData});toast(`Absensi ${jenis.toLowerCase()} berhasil pukul ${r.jam||r.time||'-'}`);stopCamera();home()}catch(e){toast(e.message);if($('inbtn'))$('inbtn').disabled=!selfieData;if($('outbtn'))$('outbtn').disabled=!selfieData}}
-function requestForm(type='CUTI'){$('page').innerHTML=`<div class="card"><h2>📝 Pengajuan</h2><div class="field"><label>Jenis</label><select id="j"><option>CUTI</option><option>IZIN</option><option>SAKIT</option><option>DINAS</option></select></div><div class="field"><label>Tanggal Mulai</label><input id="tm" type="date"></div><div class="field"><label>Tanggal Selesai</label><input id="ts" type="date"></div><div class="field"><label>Alasan</label><textarea id="al" placeholder="Tuliskan alasan..."></textarea></div><div class="field"><label>Link lampiran (opsional)</label><input id="lu" placeholder="https://drive.google.com/..."></div><button class="wide" onclick="submitReq()">KIRIM PENGAJUAN</button></div>`;$('j').value=type}
-async function submitReq(){try{const r=await gas('submitRequest',TOKEN,{jenis:$('j').value,tglMulai:$('tm').value,tglSelesai:$('ts').value,alasan:$('al').value,lampiranUrl:$('lu').value});toast('Pengajuan terkirim: '+r.id);home()}catch(e){toast(e.message)}}
+
+async function startCamera(){
+
+  try{
+
+    stopCamera();
+
+    selfieData = '';
+
+    $('selfieStatus')?.classList.add(
+      'hidden'
+    );
+
+    if($('inbtn'))
+      $('inbtn').disabled = true;
+
+    if($('outbtn'))
+      $('outbtn').disabled = true;
+
+    const video = $('camera');
+
+    if(!video)return;
+
+    if(!navigator.mediaDevices?.getUserMedia){
+
+      throw new Error(
+        'Kamera tidak didukung browser.'
+      );
+    }
+
+    cameraStream =
+      await navigator.mediaDevices.getUserMedia({
+
+        video:{
+          facingMode:{
+            ideal:'user'
+          },
+          width:{
+            ideal:640
+          },
+          height:{
+            ideal:853
+          }
+        },
+
+        audio:false
+      });
+
+    video.srcObject =
+      cameraStream;
+
+  }catch(error){
+
+    toast(
+      'Kamera tidak dapat diakses. ' +
+      'Gunakan HTTPS dan izinkan kamera.'
+    );
+  }
+}
+
+function takeSelfie(){
+
+  const video = $('camera');
+  const canvas = $('snapshot');
+
+  if(
+    !video ||
+    !video.srcObject ||
+    video.readyState < 2
+  ){
+
+    toast(
+      'Kamera belum siap.'
+    );
+
+    return;
+  }
+
+  const maxWidth = 640;
+
+  const scale =
+    Math.min(
+      1,
+      maxWidth / video.videoWidth
+    );
+
+  canvas.width =
+    Math.round(
+      video.videoWidth * scale
+    );
+
+  canvas.height =
+    Math.round(
+      video.videoHeight * scale
+    );
+
+  const ctx =
+    canvas.getContext('2d');
+
+  ctx.drawImage(
+    video,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  /*
+   * Quality 0.65 cukup untuk bukti selfie
+   * dan jauh lebih kecil daripada foto full-res.
+   */
+  selfieData =
+    canvas.toDataURL(
+      'image/jpeg',
+      0.65
+    );
+
+  $('selfieStatus')
+    ?.classList.remove('hidden');
+
+  if($('inbtn'))
+    $('inbtn').disabled = false;
+
+  if($('outbtn'))
+    $('outbtn').disabled = false;
+
+  stopCamera();
+
+  toast(
+    'Foto selfie berhasil diambil.'
+  );
+}
+
+async function doAttendance(jenis){
+
+  if(!selfieData){
+
+    toast(
+      'Ambil foto selfie terlebih dahulu.'
+    );
+
+    return;
+  }
+
+  const button =
+    jenis === 'MASUK'
+    ? $('inbtn')
+    : $('outbtn');
+
+  try{
+
+    if(button)
+      button.disabled = true;
+
+    const position =
+      await getGPS();
+
+    const result =
+      await gas(
+        'submitAttendance',
+        TOKEN,
+        {
+          jenis,
+          lat:position.lat,
+          lng:position.lng,
+          acc:position.acc,
+          keterangan:'',
+          photoData:selfieData
+        }
+      );
+
+    toast(
+      `Absensi ${jenis.toLowerCase()} berhasil pukul ${
+        result?.jam ||
+        result?.time ||
+        '-'
+      }`
+    );
+
+    stopCamera();
+
+    setTimeout(
+      home,
+      500
+    );
+
+  }catch(error){
+
+    toast(
+      error.message
+    );
+
+    if(button)
+      button.disabled = false;
+  }
+}
+
+/* =========================================================
+   REQUEST FORM
+========================================================= */
+
+function requestForm(type='CUTI'){
+
+  $('page').innerHTML = `
+
+    <div class="card">
+
+      <h2 style="margin-top:0">
+        📝 Pengajuan
+      </h2>
+
+      <div class="field">
+
+        <label>
+          Jenis
+        </label>
+
+        <select id="j">
+
+          <option value="CUTI">
+            CUTI
+          </option>
+
+          <option value="IZIN">
+            IZIN
+          </option>
+
+          <option value="SAKIT">
+            SAKIT
+          </option>
+
+          <option value="DINAS">
+            DINAS
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          Tanggal Mulai
+        </label>
+
+        <input
+          id="tm"
+          type="date">
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          Tanggal Selesai
+        </label>
+
+        <input
+          id="ts"
+          type="date">
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          Alasan
+        </label>
+
+        <textarea
+          id="al"
+          placeholder="Tuliskan alasan...">
+        </textarea>
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          Link lampiran (opsional)
+        </label>
+
+        <input
+          id="lu"
+          placeholder="https://drive.google.com/...">
+
+      </div>
+
+      <button
+        class="wide"
+        onclick="submitReq()">
+
+        KIRIM PENGAJUAN
+
+      </button>
+
+    </div>
+  `;
+
+  $('j').value =
+    type;
+}
+
+async function submitReq(){
+
+  const jenis =
+    $('j').value;
+
+  const mulai =
+    $('tm').value;
+
+  const selesai =
+    $('ts').value;
+
+  const alasan =
+    $('al').value.trim();
+
+  if(!mulai || !selesai){
+
+    toast(
+      'Tanggal wajib diisi.'
+    );
+
+    return;
+  }
+
+  if(!alasan){
+
+    toast(
+      'Alasan wajib diisi.'
+    );
+
+    return;
+  }
+
+  try{
+
+    const result =
+      await gas(
+        'submitRequest',
+        TOKEN,
+        {
+          jenis,
+          tglMulai:mulai,
+          tglSelesai:selesai,
+          alasan,
+          lampiranUrl:$('lu').value.trim()
+        }
+      );
+
+    toast(
+      'Pengajuan berhasil dikirim: ' +
+      (result?.id || '-')
+    );
+
+    setTimeout(
+      home,
+      500
+    );
+
+  }catch(error){
+
+    toast(
+      error.message
+    );
+  }
+}
+
+/* =========================================================
+   MY REQUESTS
+========================================================= */
+
 async function requests(){
+
   try{
-    const rows=await gas('getMyRequests',TOKEN);
-    $('page').innerHTML=`<div class="card"><div class="row"><h2 style="margin:0">📋 Pengajuan Saya</h2><button class="btn gray" onclick="requestForm()">+ Buat</button></div>
-      ${rows.length ? rows.map(r=>`<div class="approvalItem">
-        <div class="row"><b>${esc(r.jenis)}</b>${badge(r.statusAkhir||r.statusManager||'MENUNGGU')}</div>
-        <div class="approvalMeta">
-          <span>📅 ${esc(r.mulai)} s/d ${esc(r.selesai)}</span>
-          <span>👤 Manager: ${esc(r.managerUsername||'-')}</span>
+
+    const rows =
+      await gas(
+        'getMyRequests',
+        TOKEN
+      );
+
+    const data =
+      Array.isArray(rows)
+      ? rows
+      : [];
+
+    $('page').innerHTML = `
+
+      <div class="card">
+
+        <div class="row">
+
+          <h2 style="margin:0">
+            📋 Pengajuan Saya
+          </h2>
+
+          <button
+            class="btn gray"
+            onclick="requestForm()">
+
+            + Buat
+
+          </button>
+
         </div>
-        <p>${esc(r.alasan)}</p>
-        <div class="muted">Manager: ${esc(r.statusManager||'-')} · SDM: ${esc(r.statusSdm||'-')} · Akhir: ${esc(r.statusAkhir||'-')}</div>
-        ${r.catatanManager?`<div class="muted" style="margin-top:6px">Catatan Manager: ${esc(r.catatanManager)}</div>`:''}
-        ${r.catatanSdm?`<div class="muted" style="margin-top:6px">Catatan SDM: ${esc(r.catatanSdm)}</div>`:''}
-      </div>`).join(''):'<p class="muted" style="margin-top:18px">Belum ada pengajuan.</p>'}
-    </div>`;
-  }catch(e){toast(e.message)}
+
+        ${
+          data.length
+          ? data.map(requestCard).join('')
+          : `
+            <p class="muted"
+               style="margin-top:18px">
+
+              Belum ada pengajuan.
+
+            </p>
+          `
+        }
+
+      </div>
+    `;
+
+  }catch(error){
+
+    toast(
+      error.message
+    );
+  }
 }
-function badge(s){const c=String(s).includes('DITOLAK')?'no':String(s).includes('DISETUJUI')?'ok':'wait';return `<span class="badge ${c}">${esc(s)}</span>`}
+
+function requestCard(r){
+
+  return `
+
+    <div class="approvalItem">
+
+      <div class="row">
+
+        <b>
+          ${esc(r.jenis)}
+        </b>
+
+        ${badge(
+          r.statusAkhir ||
+          r.statusManager ||
+          'MENUNGGU'
+        )}
+
+      </div>
+
+      <div class="approvalMeta">
+
+        <span>
+          📅 ${esc(r.mulai)}
+          s/d
+          ${esc(r.selesai)}
+        </span>
+
+        <span>
+          👤 Manager:
+          ${esc(r.managerUsername || '-')}
+        </span>
+
+      </div>
+
+      <p>
+        ${esc(r.alasan)}
+      </p>
+
+      <div class="muted">
+
+        Manager:
+        ${esc(r.statusManager || '-')}
+
+        · SDM:
+        ${esc(r.statusSdm || '-')}
+
+        · Akhir:
+        ${esc(r.statusAkhir || '-')}
+
+      </div>
+
+      ${
+        r.catatanManager
+        ? `
+          <div class="muted"
+               style="margin-top:5px">
+
+            Catatan Manager:
+            ${esc(r.catatanManager)}
+
+          </div>
+        `
+        : ''
+      }
+
+      ${
+        r.catatanSdm
+        ? `
+          <div class="muted"
+               style="margin-top:5px">
+
+            Catatan SDM:
+            ${esc(r.catatanSdm)}
+
+          </div>
+        `
+        : ''
+      }
+
+    </div>
+  `;
+}
+
+/* =========================================================
+   BADGE
+========================================================= */
+
+function badge(status){
+
+  const s =
+    String(status || '');
+
+  let cls =
+    'wait';
+
+  if(s.includes('DITOLAK'))
+    cls = 'no';
+
+  else if(s.includes('DISETUJUI'))
+    cls = 'ok';
+
+  return `
+    <span class="badge ${cls}">
+      ${esc(s)}
+    </span>
+  `;
+}
+
+/* =========================================================
+   APPROVAL
+========================================================= */
+
 async function approvals(){
+
   try{
-    const rows=await gas('getPendingApprovals',TOKEN);
-    const role=String(ME.role||ME.ROLE||'').toUpperCase();
-    const title=role==='MANAJER'?'📥 Approval Manager':'📥 Approval SDM';
-    const subtitle=role==='MANAJER'
-      ? 'Pengajuan bawahan yang menunggu persetujuan Anda.'
-      : 'Pengajuan yang sudah disetujui Manager dan menunggu keputusan SDM/Admin.';
-    $('page').innerHTML=`<div class="card"><h2>${title}</h2><p class="muted">${subtitle}</p>
-      ${rows.length?rows.map(r=>`<div class="approvalItem">
-        <div class="row"><div><b>${esc(r.nama)}</b><div class="muted">${esc(r.jenis)}</div></div>${badge(r.statusAkhir||'MENUNGGU')}</div>
-        <div class="approvalMeta"><span>📅 ${esc(r.mulai)} s/d ${esc(r.selesai)}</span><span>📌 ${esc(role==='MANAJER'?'Approval tahap 1':'Approval tahap 2')}</span></div>
-        <p><b>Alasan:</b> ${esc(r.alasan)}</p>
-        <div class="actions">
-          <button class="btn green" onclick="decision('${r.id}',true)">✓ SETUJUI</button>
-          <button class="btn red" onclick="decision('${r.id}',false)">✕ TOLAK</button>
+
+    const rows =
+      await gas(
+        'getPendingApprovals',
+        TOKEN
+      );
+
+    const data =
+      Array.isArray(rows)
+      ? rows
+      : [];
+
+    const role =
+      String(
+        ME?.role ||
+        ME?.ROLE ||
+        ''
+      ).toUpperCase();
+
+    const manager =
+      role === 'MANAJER';
+
+    $('page').innerHTML = `
+
+      <div class="card">
+
+        <h2>
+          📥
+          ${
+            manager
+            ? 'Approval Manager'
+            : 'Approval SDM'
+          }
+        </h2>
+
+        <p class="muted">
+
+          ${
+            manager
+            ? 'Pengajuan bawahan yang menunggu persetujuan Anda.'
+            : 'Pengajuan yang telah disetujui Manager.'
+          }
+
+        </p>
+
+        ${
+          data.length
+          ? data.map(r=>`
+
+            <div class="approvalItem">
+
+              <div class="row">
+
+                <div>
+
+                  <b>
+                    ${esc(r.nama)}
+                  </b>
+
+                  <div class="muted">
+                    ${esc(r.jenis)}
+                  </div>
+
+                </div>
+
+                ${badge(
+                  r.statusAkhir ||
+                  'MENUNGGU'
+                )}
+
+              </div>
+
+              <div class="approvalMeta">
+
+                <span>
+                  📅 ${esc(r.mulai)}
+                  s/d
+                  ${esc(r.selesai)}
+                </span>
+
+                <span>
+                  📌
+                  ${
+                    manager
+                    ? 'Approval tahap 1'
+                    : 'Approval tahap 2'
+                  }
+                </span>
+
+              </div>
+
+              <p>
+                <b>Alasan:</b>
+                ${esc(r.alasan)}
+              </p>
+
+              <div class="actions">
+
+                <button
+                  class="btn green"
+                  onclick="decision('${esc(r.id)}',true)">
+
+                  ✓ SETUJUI
+
+                </button>
+
+                <button
+                  class="btn red"
+                  onclick="decision('${esc(r.id)}',false)">
+
+                  ✕ TOLAK
+
+                </button>
+
+              </div>
+
+            </div>
+
+          `).join('')
+          : `
+            <p class="muted">
+              Tidak ada pengajuan yang menunggu persetujuan Anda.
+            </p>
+          `
+        }
+
+      </div>
+    `;
+
+  }catch(error){
+
+    toast(
+      error.message
+    );
+  }
+}
+
+async function decision(id,approved){
+
+  const note =
+    prompt(
+      approved
+      ? 'Catatan approval (opsional):'
+      : 'Alasan penolakan (wajib):',
+      ''
+    );
+
+  if(
+    !approved &&
+    !String(note || '').trim()
+  ){
+
+    toast(
+      'Alasan penolakan wajib diisi.'
+    );
+
+    return;
+  }
+
+  try{
+
+    const role =
+      String(
+        ME?.role ||
+        ME?.ROLE ||
+        ''
+      ).toUpperCase();
+
+    if(role === 'MANAJER'){
+
+      await gas(
+        'approveManager',
+        TOKEN,
+        id,
+        approved,
+        note || ''
+      );
+
+    }else if(
+      role === 'SDM' ||
+      role === 'ADMIN'
+    ){
+
+      await gas(
+        'approveSdm',
+        TOKEN,
+        id,
+        approved,
+        note || ''
+      );
+
+    }else{
+
+      throw new Error(
+        'Anda tidak memiliki hak approval.'
+      );
+    }
+
+    toast(
+      approved
+      ? 'Pengajuan berhasil disetujui.'
+      : 'Pengajuan berhasil ditolak.'
+    );
+
+    setTimeout(
+      approvals,
+      400
+    );
+
+  }catch(error){
+
+    toast(
+      error.message
+    );
+  }
+}
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+async function historyView(){
+
+  try{
+
+    const employees =
+      await gas(
+        'getEmployees',
+        TOKEN
+      );
+
+    const data =
+      Array.isArray(employees)
+      ? employees
+      : [];
+
+    const month =
+      new Date()
+        .toISOString()
+        .slice(0,7);
+
+    $('page').innerHTML = `
+
+      <div class="card">
+
+        <h2>
+          📊 Riwayat Absensi
+        </h2>
+
+        <div class="field">
+
+          <label>
+            Karyawan
+          </label>
+
+          <select id="fn">
+
+            <option value="">
+              Semua Karyawan
+            </option>
+
+            ${
+              data.map(x=>`
+
+                <option
+                  value="${esc(x.nik)}">
+
+                  ${esc(x.nama)}
+                  —
+                  ${esc(x.nik)}
+
+                </option>
+
+              `).join('')
+            }
+
+          </select>
+
         </div>
-      </div>`).join(''):'<p class="muted">Tidak ada pengajuan yang menunggu persetujuan Anda.</p>'}
-    </div>`;
-  }catch(e){toast(e.message)}
+
+        <div class="field">
+
+          <label>
+            Bulan
+          </label>
+
+          <input
+            id="fm"
+            type="month"
+            value="${month}">
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Status
+          </label>
+
+          <select id="fs">
+
+            <option value="">
+              Semua
+            </option>
+
+            <option value="VALID">
+              VALID
+            </option>
+
+          </select>
+
+        </div>
+
+        <button
+          class="wide"
+          onclick="loadHistory()">
+
+          TAMPILKAN
+
+        </button>
+
+        <div
+          id="hr"
+          style="margin-top:16px">
+
+        </div>
+
+      </div>
+    `;
+
+    loadHistory();
+
+  }catch(error){
+
+    toast(
+      error.message
+    );
+  }
 }
-async function decision(id,ok){
-  const note=prompt(ok?'Catatan approval (opsional):':'Alasan penolakan (wajib):','');
-  if(!ok && !String(note||'').trim())return toast('Alasan penolakan wajib diisi.');
+
+async function loadHistory(){
+
   try{
-    const role=String(ME.role||ME.ROLE||'').toUpperCase();
-    if(role==='MANAJER') await gas('approveManager',TOKEN,id,ok,note||'');
-    else if(role==='SDM'||role==='ADMIN') await gas('approveSdm',TOKEN,id,ok,note||'');
-    else throw new Error('Anda tidak memiliki hak approval.');
-    toast(ok?'Pengajuan berhasil disetujui':'Pengajuan ditolak');
-    approvals();
-  }catch(e){toast(e.message)}
+
+    const rows =
+      await gas(
+        'getAttendanceHistory',
+        TOKEN,
+        {
+          nik:$('fn').value,
+          month:$('fm').value,
+          status:$('fs').value
+        }
+      );
+
+    const data =
+      Array.isArray(rows)
+      ? rows
+      : [];
+
+    window._history =
+      data;
+
+    $('hr').innerHTML = `
+
+      <div class="row">
+
+        <b>
+          ${data.length} data
+        </b>
+
+        <button
+          class="btn gray"
+          onclick="exportCSV()">
+
+          ⬇ CSV
+
+        </button>
+
+      </div>
+
+      <div
+        class="tablewrap"
+        style="margin-top:9px">
+
+        <table class="table">
+
+          <thead>
+
+            <tr>
+              <th>Tanggal</th>
+              <th>Jam</th>
+              <th>Nama</th>
+              <th>Jenis</th>
+              <th>Lokasi</th>
+              <th>Jarak</th>
+              <th>Status</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${
+              data.map(r=>`
+
+                <tr>
+
+                  <td>
+                    ${esc(r.tanggal)}
+                  </td>
+
+                  <td>
+                    ${esc(r.jam)}
+                  </td>
+
+                  <td>
+                    ${esc(r.nama)}
+                  </td>
+
+                  <td>
+                    ${esc(r.jenis)}
+                  </td>
+
+                  <td>
+                    ${esc(r.tipe)}
+                  </td>
+
+                  <td>
+                    ${esc(r.jarak)} m
+                  </td>
+
+                  <td>
+                    ${badge(r.status)}
+                  </td>
+
+                </tr>
+
+              `).join('')
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+    `;
+
+  }catch(error){
+
+    toast(
+      error.message
+    );
+  }
 }
-async function historyView(){try{const emp=await gas('getEmployees',TOKEN);$('page').innerHTML=`<div class="card"><h2>📊 Riwayat Absensi</h2><div class="field"><label>Karyawan</label><select id="fn"><option value="">Semua Karyawan</option>${emp.map(x=>`<option value="${esc(x.nik)}">${esc(x.nama)} — ${esc(x.nik)}</option>`).join('')}</select></div><div class="field"><label>Bulan</label><input id="fm" type="month" value="${new Date().toISOString().slice(0,7)}"></div><div class="field"><label>Status</label><select id="fs"><option value="">Semua</option><option>VALID</option></select></div><button class="wide" onclick="loadHistory()">TAMPILKAN</button><div id="hr" style="margin-top:18px"></div></div>`;loadHistory()}catch(e){toast(e.message)}}
-async function loadHistory(){try{const rows=await gas('getAttendanceHistory',TOKEN,{nik:$('fn').value,month:$('fm').value,status:$('fs').value});$('hr').innerHTML=`<div class="row"><b>${rows.length} data</b><button class="btn gray" onclick="exportCSV()">⬇ CSV</button></div><div class="tablewrap" style="margin-top:10px"><table class="table"><tr><th>Tanggal</th><th>Jam</th><th>Nama</th><th>Jenis</th><th>Lokasi</th><th>Jarak</th><th>Status</th></tr>${rows.map(r=>`<tr><td>${esc(r.tanggal)}</td><td>${esc(r.jam)}</td><td>${esc(r.nama)}</td><td>${esc(r.jenis)}</td><td>${esc(r.tipe)}</td><td>${esc(r.jarak)} m</td><td>${badge(r.status)}</td></tr>`).join('')}</table></div>`;window._history=rows}catch(e){toast(e.message)}}
-function exportCSV(){const rows=window._history||[];if(!rows.length)return toast('Tidak ada data');const headers=['TANGGAL','JAM','NIK','NAMA','JENIS','LATITUDE','LONGITUDE','JARAK_KANTOR_M','TIPE_ABSEN','STATUS'];const csv=[headers.join(','),...rows.map(r=>headers.map(h=>`"${String(r[h]??'').replace(/"/g,'""')}"`).join(','))].join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='riwayat_absensi.csv';a.click()}
-function profile(){$('page').innerHTML=`<div class="card"><h2>👤 Profil</h2><p><b>${esc(ME.nama||ME.NAMA)}</b></p><p class="muted">${esc(ME.nik||ME.NIK)} · ${esc(ME.jabatan||ME.JABATAN)} · ${esc(ME.divisi||ME.DIVISI)}</p><p>Tipe absensi: <b>${esc(ME.tipe||ME.TIPE_ABSEN)}</b></p><p>Role: <b>${esc(ME.role||ME.ROLE)}</b></p><p>Sisa cuti: <b>${esc(ME.sisaCuti??ME.SISA_CUTI)}</b></p><button class="btn red" onclick="doLogout()">Keluar</button></div>`}
-async function doLogout(){stopCamera();try{await gas('logout',TOKEN)}catch(e){}TOKEN='';localStorage.removeItem('baznas_token');loginView()}
+
+/* =========================================================
+   EXPORT CSV
+========================================================= */
+
+function exportCSV(){
+
+  const rows =
+    window._history || [];
+
+  if(!rows.length){
+
+    toast(
+      'Tidak ada data.'
+    );
+
+    return;
+  }
+
+  const headers = [
+    'TANGGAL',
+    'JAM',
+    'NIK',
+    'NAMA',
+    'JENIS',
+    'LATITUDE',
+    'LONGITUDE',
+    'JARAK_KANTOR_M',
+    'TIPE_ABSEN',
+    'STATUS'
+  ];
+
+  const csvRows = [
+    headers.join(',')
+  ];
+
+  rows.forEach(row=>{
+
+    csvRows.push(
+      headers.map(header=>{
+
+        const value =
+          String(
+            row[header] ?? ''
+          ).replace(
+            /"/g,
+            '""'
+          );
+
+        return `"${value}"`;
+
+      }).join(',')
+    );
+  });
+
+  const blob =
+    new Blob(
+      [csvRows.join('\n')],
+      {
+        type:'text/csv;charset=utf-8'
+      }
+    );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const link =
+    document.createElement('a');
+
+  link.href = url;
+
+  link.download =
+    'riwayat_absensi.csv';
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  link.remove();
+
+  setTimeout(
+    ()=>URL.revokeObjectURL(url),
+    1000
+  );
+}
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function profile(){
+
+  stopCamera();
+
+  $('page').innerHTML = `
+
+    <div class="card">
+
+      <h2>
+        👤 Profil
+      </h2>
+
+      <p>
+        <b>
+          ${esc(
+            ME?.nama ||
+            ME?.NAMA ||
+            '-'
+          )}
+        </b>
+      </p>
+
+      <p class="muted">
+
+        ${esc(
+          ME?.nik ||
+          ME?.NIK ||
+          '-'
+        )}
+
+        ·
+
+        ${esc(
+          ME?.jabatan ||
+          ME?.JABATAN ||
+          '-'
+        )}
+
+        ·
+
+        ${esc(
+          ME?.divisi ||
+          ME?.DIVISI ||
+          '-'
+        )}
+
+      </p>
+
+      <p>
+        Tipe absensi:
+        <b>
+          ${esc(
+            ME?.tipe ||
+            ME?.TIPE_ABSEN ||
+            '-'
+          )}
+        </b>
+      </p>
+
+      <p>
+        Role:
+        <b>
+          ${esc(
+            ME?.role ||
+            ME?.ROLE ||
+            '-'
+          )}
+        </b>
+      </p>
+
+      <p>
+        Sisa cuti:
+        <b>
+          ${esc(
+            ME?.sisaCuti ??
+            ME?.SISA_CUTI ??
+            '-'
+          )}
+        </b>
+      </p>
+
+      <button
+        class="btn red"
+        onclick="doLogout()">
+
+        Keluar
+
+      </button>
+
+    </div>
+  `;
+}
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function doLogout(){
+
+  stopCamera();
+  stopClock();
+
+  try{
+
+    await gas(
+      'logout',
+      TOKEN
+    );
+
+  }catch(error){
+    /* logout lokal tetap dilakukan */
+  }
+
+  TOKEN = '';
+  ME = null;
+
+  localStorage.removeItem(
+    'baznas_token'
+  );
+
+  loginView();
+}
+
+/* =========================================================
+   START
+========================================================= */
+
 boot();
+
 </script>
+
 </body>
 </html>
+```
