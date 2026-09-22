@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function me() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function admin() { return signedIn() && me().role == "admin" && me().active == true; }
+    function zmart() { return signedIn() && me().role == "zmart" && me().active == true; }
+
+    match /users/{uid} {
+      allow read: if admin() || (signedIn() && request.auth.uid == uid);
+      allow create: if admin();
+      allow update: if admin() || (signedIn() && request.auth.uid == uid);
+      allow delete: if admin();
+    }
+
+    match /bcl/{id} {
+      allow read: if admin() || zmart();
+      allow create, update, delete: if admin();
+    }
+
+    match /assignments/{id} {
+      allow read: if admin() || (zmart() && resource.data.zmartUid == request.auth.uid);
+      allow create, update, delete: if admin();
+      allow update: if admin() || (zmart() && resource.data.zmartUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status","completedAt"]));
+    }
+
+    match /deliveries/{id} {
+      allow read: if admin() || (zmart() && resource.data.zmartUid == request.auth.uid);
+      allow create: if zmart() && request.resource.data.zmartUid == request.auth.uid;
+      allow update: if admin();
+      allow delete: if admin();
+    }
+  }
+}
