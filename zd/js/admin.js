@@ -1,4 +1,3 @@
-```javascript
 import { auth, db, storage, app } from "./firebase.js";
 
 import {
@@ -1907,4 +1906,3 @@ function showUserForm() {
     };
 
 }
-```
