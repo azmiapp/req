@@ -1,0 +1,3679 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Keuangan Mustahik</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:linear-gradient(135deg,#e8f5e9,#f5f7fa);
+    color:#333;
+}
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+.login-page{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.login-card{
+    width:100%;
+    max-width:430px;
+    background:white;
+    border-radius:22px;
+    padding:35px 28px;
+    text-align:center;
+    box-shadow:0 15px 40px rgba(0,0,0,.12);
+}
+
+.login-icon{
+    font-size:60px;
+    margin-bottom:10px;
+}
+
+.login-card h1{
+    margin:0;
+    color:#2e7d32;
+    font-size:28px;
+}
+
+.login-card p{
+    color:#777;
+    font-size:14px;
+    margin:10px 0 25px;
+}
+
+.google-btn{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:#2e7d32;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.google-btn:hover{
+    opacity:.9;
+}
+
+/* =====================================================
+   APP
+===================================================== */
+
+#app{
+    display:none;
+}
+
+.header{
+    background:linear-gradient(135deg,#1b5e20,#2e7d32);
+    color:white;
+    padding:18px 25px;
+    position:sticky;
+    top:0;
+    z-index:100;
+    box-shadow:0 3px 12px rgba(0,0,0,.15);
+}
+
+.header-inner{
+    max-width:1400px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.brand-icon{
+    font-size:35px;
+}
+
+.brand h2{
+    margin:0;
+    font-size:20px;
+}
+
+.brand small{
+    opacity:.85;
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.role-badge{
+    padding:7px 12px;
+    border-radius:20px;
+    background:rgba(255,255,255,.18);
+    font-size:13px;
+}
+
+.logout-btn{
+    border:none;
+    background:#c62828;
+    color:white;
+    padding:9px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.main{
+    max-width:1400px;
+    margin:auto;
+    padding:25px;
+}
+
+.welcome{
+    margin-bottom:20px;
+}
+
+.welcome h2{
+    margin:0;
+    color:#1b5e20;
+}
+
+.welcome p{
+    margin:6px 0;
+    color:#777;
+}
+
+.dashboard{
+    display:none;
+}
+
+.dashboard.active{
+    display:block;
+}
+
+/* =====================================================
+   CARDS
+===================================================== */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.card-stat{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+}
+
+.card-stat .icon{
+    font-size:30px;
+    margin-bottom:10px;
+}
+
+.card-stat .title{
+    color:#777;
+    font-size:13px;
+}
+
+.card-stat .value{
+    font-size:23px;
+    font-weight:bold;
+    margin-top:7px;
+    color:#1b5e20;
+}
+
+/* =====================================================
+   PANEL
+===================================================== */
+
+.panel{
+    background:white;
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:22px;
+    box-shadow:0 5px 18px rgba(0,0,0,.07);
+}
+
+.panel-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:18px;
+}
+
+.panel-title h3{
+    margin:0;
+    color:#333;
+}
+
+/* =====================================================
+   FILTER
+===================================================== */
+
+.filters{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.filter-group label{
+    display:block;
+    font-size:13px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.filter-group select,
+.filter-group input{
+    width:100%;
+    padding:11px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    background:white;
+}
+
+.reset-btn{
+    border:none;
+    background:#607d8b;
+    color:white;
+    padding:11px 15px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+/* =====================================================
+   USER FILTER BULAN
+===================================================== */
+
+.user-filter-panel{
+    margin-bottom:22px;
+}
+
+.user-filter-row{
+    display:flex;
+    align-items:end;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.user-filter-group{
+    min-width:250px;
+    flex:1;
+}
+
+.user-filter-group label{
+    display:block;
+    font-size:13px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.user-filter-group select{
+    width:100%;
+    padding:11px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    background:white;
+}
+
+.user-filter-info{
+    margin-top:12px;
+    padding:12px 15px;
+    background:#f1f8e9;
+    border-left:4px solid #43a047;
+    border-radius:8px;
+    font-size:13px;
+    color:#33691e;
+}
+
+@media(max-width:650px){
+
+    .user-filter-row{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .user-filter-group{
+        width:100%;
+    }
+
+}
+
+/* =====================================================
+   FILTER INFO
+===================================================== */
+
+.filter-info{
+    margin-top:15px;
+    padding:12px 15px;
+    background:#f1f8e9;
+    border-left:4px solid #43a047;
+    border-radius:8px;
+    font-size:13px;
+    color:#33691e;
+}
+
+/* =====================================================
+   CHART
+===================================================== */
+
+.chart-container{
+    position:relative;
+    width:100%;
+    height:380px;
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.table-wrapper{
+    width:100%;
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:900px;
+}
+
+th{
+    background:#2e7d32;
+    color:white;
+    padding:12px;
+    text-align:left;
+    font-size:13px;
+}
+
+td{
+    padding:11px;
+    border-bottom:1px solid #eee;
+    font-size:13px;
+}
+
+tr:hover{
+    background:#f5f9f5;
+}
+
+/* =====================================================
+   USER FORM
+===================================================== */
+
+.user-form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+.form-group{
+    margin-bottom:5px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:6px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+.readonly{
+    background:#f1f3f4;
+}
+
+.save-btn{
+    width:100%;
+    border:none;
+    padding:14px;
+    margin-top:15px;
+    border-radius:9px;
+    background:#2e7d32;
+    color:white;
+    font-weight:bold;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.save-btn:disabled{
+    background:#999;
+}
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.status{
+    margin-top:15px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.success{
+    color:#2e7d32;
+}
+
+.error{
+    color:#c62828;
+}
+
+.loading{
+    color:#ef6c00;
+}
+
+/* =====================================================
+   ROLE
+===================================================== */
+
+.role-admin{
+    background:#e8f5e9;
+    color:#2e7d32;
+    padding:5px 9px;
+    border-radius:15px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.role-user{
+    background:#e3f2fd;
+    color:#1565c0;
+    padding:5px 9px;
+    border-radius:15px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.empty{
+    text-align:center;
+    padding:30px;
+    color:#888;
+}
+
+/* =====================================================
+   ADMIN HEADER
+===================================================== */
+
+.admin-title{
+    background:linear-gradient(135deg,#263238,#37474f);
+    color:white;
+    padding:18px;
+    border-radius:15px;
+    margin-bottom:20px;
+}
+
+.admin-title h2{
+    margin:0 0 5px;
+}
+
+.admin-title p{
+    margin:0;
+    opacity:.8;
+    font-size:13px;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:1000px){
+
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .filters{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:650px){
+
+    .header{
+        padding:15px;
+    }
+
+    .header-inner{
+        align-items:flex-start;
+    }
+
+    .brand h2{
+        font-size:17px;
+    }
+
+    .brand small{
+        font-size:11px;
+    }
+
+    .role-badge{
+        display:none;
+    }
+
+    .main{
+        padding:15px;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .filters{
+        grid-template-columns:1fr;
+    }
+
+    .user-form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .chart-container{
+        height:300px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- =====================================================
+     LOGIN
+===================================================== -->
+
+<div id="loginPage" class="login-page">
+
+    <div class="login-card">
+
+        <div class="login-icon">📊</div>
+
+        <h1>Keuangan Mustahik</h1>
+
+        <p>
+            Sistem Laporan Keuangan UMKM Mustahik
+        </p>
+
+        <button id="loginBtn" class="google-btn">
+            🔐 Login dengan Google
+        </button>
+
+        <div id="loginStatus" class="status"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     APP
+===================================================== -->
+
+<div id="app">
+
+<header class="header">
+
+    <div class="header-inner">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                📊
+            </div>
+
+            <div>
+
+                <h2>
+                    Keuangan Mustahik
+                </h2>
+
+                <small>
+                    Dashboard Laporan UMKM
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="header-right">
+
+            <span id="roleBadge" class="role-badge">
+                USER
+            </span>
+
+            <button id="logoutBtn" class="logout-btn">
+                🚪 Logout
+            </button>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="main">
+
+<div class="welcome">
+
+    <h2 id="welcomeName">
+        Selamat Datang
+    </h2>
+
+    <p id="welcomeEmail"></p>
+
+</div>
+
+
+<!-- =====================================================
+     USER DASHBOARD
+===================================================== -->
+
+<section id="userDashboard" class="dashboard">
+
+<!-- =====================================================
+     FILTER BULAN USER
+===================================================== -->
+
+<div class="panel user-filter-panel">
+
+    <div class="panel-title">
+        <h3>📅 Filter Dashboard</h3>
+    </div>
+
+    <div class="user-filter-row">
+
+        <div class="user-filter-group">
+
+            <label>Pilih Bulan / Tahun</label>
+
+            <select id="userFilterBulan">
+                <option value="">Memuat bulan...</option>
+            </select>
+
+        </div>
+
+        <button
+            id="userResetFilter"
+            class="reset-btn">
+
+            📅 Bulan Berjalan
+
+        </button>
+
+    </div>
+
+    <div
+        id="userFilterInfo"
+        class="user-filter-info">
+
+        Menampilkan data bulan berjalan.
+
+    </div>
+
+</div>
+
+<div class="cards">
+
+    <div class="card-stat">
+
+        <div class="icon">💰</div>
+
+        <div class="title">
+            Total Omset
+        </div>
+
+        <div id="uTotalOmset" class="value">
+            Rp 0
+        </div>
+
+    </div>
+
+
+    <div class="card-stat">
+
+        <div class="icon">🛒</div>
+
+        <div class="title">
+            Total Kulakan
+        </div>
+
+        <div id="uTotalKulakan" class="value">
+            Rp 0
+        </div>
+
+    </div>
+
+
+    <div class="card-stat">
+
+        <div class="icon">📈</div>
+
+        <div class="title">
+            Pendapatan Bersih
+        </div>
+
+        <div id="uTotalBersih" class="value">
+            Rp 0
+        </div>
+
+    </div>
+
+
+    <div class="card-stat">
+
+        <div class="icon">💵</div>
+
+        <div class="title">
+            Pendapatan Tambahan
+        </div>
+
+        <div id="uTotalTambahan" class="value">
+            Rp 0
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- FORM -->
+
+<div class="panel">
+
+    <div class="panel-title">
+
+        <h3>
+            📝 Input Laporan Keuangan
+        </h3>
+
+    </div>
+
+
+    <div class="user-form-grid">
+
+        <div class="form-group">
+
+            <label>Nama Mustahik</label>
+
+            <input
+                id="namaMustahik"
+                type="text">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Kecamatan</label>
+
+            <input
+                id="kecamatan"
+                type="text"
+                placeholder="Contoh: Sragen">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Bulan</label>
+
+            <select id="bulan">
+
+                <option value="">
+                    -- Pilih Bulan --
+                </option>
+
+                <option>Januari</option>
+                <option>Februari</option>
+                <option>Maret</option>
+                <option>April</option>
+                <option>Mei</option>
+                <option>Juni</option>
+                <option>Juli</option>
+                <option>Agustus</option>
+                <option>September</option>
+                <option>Oktober</option>
+                <option>November</option>
+                <option>Desember</option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Tahun</label>
+
+            <select id="tahun">
+
+                <option value="">
+                    -- Pilih Tahun --
+                </option>
+
+                <option>2025</option>
+                <option>2026</option>
+                <option>2027</option>
+                <option>2028</option>
+                <option>2029</option>
+                <option>2030</option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Omset</label>
+
+            <input
+                id="omset"
+                type="number"
+                min="0"
+                placeholder="0">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Kulakan</label>
+
+            <input
+                id="kulakan"
+                type="number"
+                min="0"
+                placeholder="0">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Pendapatan Bersih</label>
+
+            <input
+                id="pendapatanBersih"
+                class="readonly"
+                type="text"
+                readonly
+                value="Rp 0">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Pendapatan Tambahan</label>
+
+            <input
+                id="pendapatanTambahan"
+                type="number"
+                min="0"
+                placeholder="0">
+
+        </div>
+
+    </div>
+
+
+    <button id="saveBtn" class="save-btn">
+
+        💾 Simpan Laporan
+
+    </button>
+
+
+    <div id="saveStatus" class="status"></div>
+
+</div>
+
+
+<!-- RIWAYAT -->
+
+<div class="panel">
+
+    <div class="panel-title">
+
+        <h3>
+            📋 Riwayat Laporan Saya
+        </h3>
+
+        <button
+            onclick="loadUserDashboard()"
+            class="reset-btn">
+
+            🔄 Refresh
+
+        </button>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Tanggal</th>
+                    <th>Bulan</th>
+                    <th>Kecamatan</th>
+                    <th>Omset</th>
+                    <th>Kulakan</th>
+                    <th>Bersih</th>
+                    <th>Tambahan</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="userTableBody"></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</section>
+<div id="adminDashboard" style="display:none!important;">
+<select id="filterUser"></select>
+<select id="filterKecamatan"></select>
+<select id="filterBulan"></select>
+<input id="filterSearch">
+<button id="resetFilter"></button>
+<div id="adminTableBody"></div><div id="adminUserBody"></div>
+<div id="aTotalUser"></div><div id="fOmset"></div><div id="fKulakan"></div>
+<div id="fBersih"></div><div id="fTambahan"></div><div id="filterInfo"></div>
+<div id="chartTitle"></div><canvas id="financeChart"></canvas>
+</div>
+
+</main>
+
+</div>
+
+<script>
+
+/* =====================================================
+   FIREBASE CONFIG
+===================================================== */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyDFMqBgt1F3gGtXsTUo4NiqjkxE_QYf5Xs",
+
+    authDomain:
+        "zmart-8320a.firebaseapp.com",
+
+    projectId:
+        "zmart-8320a"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+
+
+/* =====================================================
+   GOOGLE APPS SCRIPT
+===================================================== */
+
+const SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbxNyV-LWL_DmPo7KJJzTL2xX4rNG3BKriZIKqwrXD0U44VxXuuoTIrTw7F3K9lMDnOi/exec";
+
+
+/* =====================================================
+   GLOBAL
+===================================================== */
+
+let currentUserData = null;
+
+let adminData = [];
+
+let adminUsers = [];
+
+let financeChart = null;
+
+
+/* =====================================================
+   USER DASHBOARD DATA
+===================================================== */
+
+let userDashboardData = [];
+
+let userSelectedBulan = "";
+
+
+/* =====================================================
+   ELEMENT
+===================================================== */
+
+const loginPage =
+    document.getElementById("loginPage");
+
+const app =
+    document.getElementById("app");
+
+const loginBtn =
+    document.getElementById("loginBtn");
+
+const logoutBtn =
+    document.getElementById("logoutBtn");
+
+
+/* =====================================================
+   RUPIAH
+===================================================== */
+
+function rupiah(value){
+
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            style:"currency",
+            currency:"IDR",
+            maximumFractionDigits:0
+        }
+    ).format(Number(value) || 0);
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(text){
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        text == null ? "" : text;
+
+    return div.innerHTML;
+
+}
+
+
+/* =====================================================
+   FORMAT TANGGAL
+=====================================================
+
+   Fungsi ini menangani:
+
+   2026-05-31T17:00:00.000Z
+
+   maupun:
+
+   31/05/2026 00:00
+
+===================================================== */
+
+function formatTanggal(value){
+
+    if(!value){
+        return "";
+    }
+
+    const text =
+        String(value).trim();
+
+    /*
+       Jika sudah format Indonesia
+    */
+
+    if(
+        /^\d{2}\/\d{2}\/\d{4}/.test(text)
+    ){
+        return text;
+    }
+
+    /*
+       Jika format ISO
+    */
+
+    const date =
+        new Date(text);
+
+    if(!isNaN(date.getTime())){
+
+        /*
+          Gunakan waktu Asia/Jakarta.
+          UTC +7
+        */
+
+        const formatter =
+            new Intl.DateTimeFormat(
+                "id-ID",
+                {
+                    timeZone:"Asia/Jakarta",
+                    day:"2-digit",
+                    month:"2-digit",
+                    year:"numeric",
+                    hour:"2-digit",
+                    minute:"2-digit",
+                    hour12:false
+                }
+            );
+
+        return formatter
+            .format(date)
+            .replace(",", "");
+
+    }
+
+    return text;
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+loginBtn.addEventListener(
+    "click",
+    async function(){
+
+        const provider =
+            new firebase.auth.GoogleAuthProvider();
+
+        const status =
+            document.getElementById(
+                "loginStatus"
+            );
+
+        try{
+
+            loginBtn.disabled = true;
+
+            loginBtn.innerText =
+                "⏳ Login...";
+
+            status.className =
+                "status loading";
+
+            status.innerText =
+                "Menghubungkan akun...";
+
+            await auth.signInWithPopup(
+                provider
+            );
+
+        }
+        catch(error){
+
+            console.error(error);
+
+            status.className =
+                "status error";
+
+            status.innerText =
+                "Login gagal: " +
+                error.message;
+
+            loginBtn.disabled = false;
+
+            loginBtn.innerText =
+                "🔐 Login dengan Google";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   AUTH STATE
+===================================================== */
+
+auth.onAuthStateChanged(
+    async function(user){
+
+        if(!user){
+
+            loginPage.style.display =
+                "flex";
+
+            app.style.display =
+                "none";
+
+            return;
+
+        }
+
+        try{
+
+            loginPage.style.display =
+                "none";
+
+            app.style.display =
+                "block";
+
+            await loadCurrentUser(user);
+
+        }
+        catch(error){
+
+            console.error(error);
+
+            alert(
+                "Gagal mengambil data user:\n\n" +
+                error.message
+            );
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   LOAD CURRENT USER
+===================================================== */
+
+async function loadCurrentUser(firebaseUser){
+
+    const url =
+        SCRIPT_URL +
+        "?action=getUser" +
+        "&uid=" +
+        encodeURIComponent(firebaseUser.uid) +
+        "&email=" +
+        encodeURIComponent(firebaseUser.email || "") +
+        "&nama=" +
+        encodeURIComponent(
+            firebaseUser.displayName || "User"
+        );
+
+    const response =
+        await fetch(url);
+
+    const result =
+        await response.json();
+
+    if(!result.success){
+
+        throw new Error(
+            result.message ||
+            "Gagal mengambil user"
+        );
+
+    }
+
+    currentUserData = result;
+
+    document.getElementById(
+        "welcomeName"
+    ).innerText =
+        "Selamat Datang, " +
+        (
+            result.nama ||
+            firebaseUser.displayName ||
+            "User"
+        );
+
+    document.getElementById(
+        "welcomeEmail"
+    ).innerText =
+        result.email ||
+        firebaseUser.email ||
+        "";
+
+    document.getElementById(
+        "roleBadge"
+    ).innerText =
+        (
+            result.role ||
+            "user"
+        ).toUpperCase();
+
+
+    if(
+        String(result.role)
+            .toLowerCase()
+            === "admin"
+    ){
+
+        window.location.href =
+            "dashboard-admin.html";
+
+        return;
+
+    }
+
+    showUserDashboard();
+
+    document.getElementById(
+        "namaMustahik"
+    ).value =
+        result.nama ||
+        firebaseUser.displayName ||
+        "";
+
+    if(result.kecamatan){
+
+        document.getElementById(
+            "kecamatan"
+        ).value =
+            result.kecamatan;
+
+    }
+
+    userSelectedBulan =
+        getCurrentBulanTahun();
+
+    await loadUserDashboard();
+
+}
+
+
+/* =====================================================
+   SHOW USER
+===================================================== */
+
+function showUserDashboard(){
+
+    document.getElementById(
+        "userDashboard"
+    ).classList.add("active");
+
+    document.getElementById(
+        "adminDashboard"
+    ).classList.remove("active");
+
+}
+
+
+/* =====================================================
+   SHOW ADMIN
+===================================================== */
+
+function showAdminDashboard(){
+
+    document.getElementById(
+        "adminDashboard"
+    ).classList.add("active");
+
+    document.getElementById(
+        "userDashboard"
+    ).classList.remove("active");
+
+}
+
+
+/* =====================================================
+   LOAD USER DASHBOARD
+===================================================== */
+
+async function loadUserDashboard(){
+
+    if(
+        !currentUserData ||
+        !currentUserData.uid
+    ){
+        return;
+    }
+
+    const url =
+        SCRIPT_URL +
+        "?action=userDashboard" +
+        "&uid=" +
+        encodeURIComponent(
+            currentUserData.uid
+        );
+
+    try{
+
+        const response =
+            await fetch(url);
+
+        const result =
+            await response.json();
+
+        if(!result.success){
+
+            throw new Error(
+                result.message ||
+                "Gagal memuat dashboard"
+            );
+
+        }
+
+        userDashboardData =
+            result.data || [];
+
+
+        populateUserBulanFilter();
+
+
+        if(!userSelectedBulan){
+
+            userSelectedBulan =
+                getCurrentBulanTahun();
+
+        }
+
+
+        const select =
+            document.getElementById(
+                "userFilterBulan"
+            );
+
+
+        const tersedia =
+            Array.from(
+                select.options
+            ).some(
+                function(option){
+
+                    return (
+                        option.value ===
+                        userSelectedBulan
+                    );
+
+                }
+            );
+
+
+        /*
+           Jika bulan berjalan belum ada
+           di dropdown, tetap gunakan bulan berjalan.
+           Dashboard akan menampilkan nilai 0.
+        */
+
+        if(!tersedia){
+
+            select.value = "";
+
+        }
+        else{
+
+            select.value =
+                userSelectedBulan;
+
+        }
+
+
+        applyUserFilter();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            "Gagal memuat dashboard user:\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   GET BULAN BERJALAN
+===================================================== */
+
+function getCurrentBulanTahun(){
+
+    const bulanNama = [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember"
+    ];
+
+    const sekarang =
+        new Date();
+
+    return (
+        bulanNama[
+            sekarang.getMonth()
+        ] +
+        " " +
+        sekarang.getFullYear()
+    );
+
+}
+
+
+/* =====================================================
+   POPULATE FILTER BULAN USER
+===================================================== */
+
+function populateUserBulanFilter(){
+
+    const select =
+        document.getElementById(
+            "userFilterBulan"
+        );
+
+
+    select.innerHTML =
+        `
+        <option value="">
+            Semua Bulan
+        </option>
+        `;
+
+
+    const bulanOrder = {
+
+        Januari:1,
+        Februari:2,
+        Maret:3,
+        April:4,
+        Mei:5,
+        Juni:6,
+        Juli:7,
+        Agustus:8,
+        September:9,
+        Oktober:10,
+        November:11,
+        Desember:12
+
+    };
+
+
+    const daftarBulan =
+        [
+            ...new Set(
+
+                userDashboardData
+                    .map(
+                        function(row){
+
+                            return (
+                                row.bulanTahun ||
+                                ""
+                            );
+
+                        }
+                    )
+                    .filter(Boolean)
+
+            )
+        ];
+
+
+    daftarBulan
+        .sort(
+            function(a,b){
+
+                const pa =
+                    String(a).split(" ");
+
+                const pb =
+                    String(b).split(" ");
+
+                const ya =
+                    Number(pa[1]) || 0;
+
+                const yb =
+                    Number(pb[1]) || 0;
+
+
+                if(ya !== yb){
+
+                    return yb - ya;
+
+                }
+
+
+                return (
+                    (bulanOrder[pb[0]] || 0)
+                    -
+                    (bulanOrder[pa[0]] || 0)
+                );
+
+            }
+        )
+        .forEach(
+            function(item){
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    item;
+
+                option.textContent =
+                    item;
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+}
+
+
+/* =====================================================
+   APPLY USER FILTER
+===================================================== */
+
+function applyUserFilter(){
+
+    const bulan =
+        userSelectedBulan;
+
+
+    let filtered =
+        userDashboardData.slice();
+
+
+    if(bulan){
+
+        filtered =
+            filtered.filter(
+                function(row){
+
+                    return (
+                        String(
+                            row.bulanTahun || ""
+                        ) ===
+                        String(bulan)
+                    );
+
+                }
+            );
+
+    }
+
+
+    let totalOmset = 0;
+
+    let totalKulakan = 0;
+
+    let totalBersih = 0;
+
+    let totalTambahan = 0;
+
+
+    filtered.forEach(
+        function(row){
+
+            totalOmset +=
+                Number(row.omset) || 0;
+
+            totalKulakan +=
+                Number(row.kulakan) || 0;
+
+            // Pendapatan Bersih = 10% dari Omset
+            // Tidak mengambil nilai pendapatanBersih lama dari database.
+            totalBersih =
+                totalOmset * 0.10;
+
+            totalTambahan +=
+                Number(
+                    row.pendapatanTambahan
+                ) || 0;
+
+        }
+    );
+
+
+    document.getElementById(
+        "uTotalOmset"
+    ).innerText =
+        rupiah(totalOmset);
+
+
+    document.getElementById(
+        "uTotalKulakan"
+    ).innerText =
+        rupiah(totalKulakan);
+
+
+    document.getElementById(
+        "uTotalBersih"
+    ).innerText =
+        rupiah(totalBersih);
+
+
+    document.getElementById(
+        "uTotalTambahan"
+    ).innerText =
+        rupiah(totalTambahan);
+
+
+    const info =
+        document.getElementById(
+            "userFilterInfo"
+        );
+
+
+    if(bulan){
+
+        info.innerHTML =
+            `
+            <b>Menampilkan Dashboard:</b>
+            ${escapeHTML(bulan)}
+            &nbsp; | &nbsp;
+            <b>${filtered.length}</b>
+            laporan
+            `;
+
+    }
+    else{
+
+        info.innerHTML =
+            `
+            <b>Menampilkan:</b>
+            Semua Bulan
+            &nbsp; | &nbsp;
+            <b>${filtered.length}</b>
+            laporan
+            `;
+
+    }
+
+
+    renderUserTable(filtered);
+
+}
+
+
+/* =====================================================
+   RENDER USER TABLE
+===================================================== */
+
+function renderUserTable(rows){
+
+    const body =
+        document.getElementById(
+            "userTableBody"
+        );
+
+
+    body.innerHTML = "";
+
+
+    if(
+        !rows ||
+        rows.length === 0
+    ){
+
+        body.innerHTML =
+            `
+            <tr>
+
+                <td
+                    colspan="7"
+                    class="empty">
+
+                    Belum ada laporan pada periode ini.
+
+                </td>
+
+            </tr>
+            `;
+
+        return;
+
+    }
+
+
+    rows
+        .slice()
+        .reverse()
+        .forEach(
+            function(row){
+
+                body.innerHTML +=
+                `
+                <tr>
+
+                    <td>
+                        ${escapeHTML(
+                            formatTanggal(
+                                row.waktu
+                            )
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            row.bulanTahun || ""
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            row.kecamatan || ""
+                        )}
+                    </td>
+
+                    <td>
+                        ${rupiah(
+                            row.omset
+                        )}
+                    </td>
+
+                    <td>
+                        ${rupiah(
+                            row.kulakan
+                        )}
+                    </td>
+
+                    <td>
+                        ${rupiah(
+                            row.pendapatanBersih
+                        )}
+                    </td>
+
+                    <td>
+                        ${rupiah(
+                            row.pendapatanTambahan
+                        )}
+                    </td>
+
+                </tr>
+                `;
+
+            }
+        );
+
+}
+
+
+/* =====================================================
+   HITUNG BERSIH
+===================================================== */
+
+function hitungBersih(){
+
+    const omset =
+        Number(
+            document.getElementById(
+                "omset"
+            ).value
+        ) || 0;
+
+    // Pendapatan Bersih = 10% dari Omset
+    // Kulakan tidak mengurangi Pendapatan Bersih.
+    const bersih = omset * 0.10;
+
+    document.getElementById(
+        "pendapatanBersih"
+    ).value =
+        rupiah(bersih);
+
+}
+
+document.getElementById(
+    "omset"
+).addEventListener(
+    "input",
+    hitungBersih
+);
+
+/* =====================================================
+   SAVE DATA
+===================================================== */
+
+document.getElementById(
+    "saveBtn"
+).addEventListener(
+    "click",
+    saveData
+);
+
+
+async function saveData(){
+
+    const user =
+        auth.currentUser;
+
+    if(!user){
+
+        alert(
+            "Silakan login terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+
+    const nama =
+        document.getElementById(
+            "namaMustahik"
+        ).value.trim();
+
+    const kecamatan =
+        document.getElementById(
+            "kecamatan"
+        ).value.trim();
+
+    const bulan =
+        document.getElementById(
+            "bulan"
+        ).value;
+
+    const tahun =
+        document.getElementById(
+            "tahun"
+        ).value;
+
+    const omset =
+        Number(
+            document.getElementById(
+                "omset"
+            ).value
+        ) || 0;
+
+    const kulakan =
+        Number(
+            document.getElementById(
+                "kulakan"
+            ).value
+        ) || 0;
+
+    const tambahan =
+        Number(
+            document.getElementById(
+                "pendapatanTambahan"
+            ).value
+        ) || 0;
+
+
+    if(!nama){
+
+        alert(
+            "Nama Mustahik wajib diisi."
+        );
+
+        return;
+
+    }
+
+    if(!kecamatan){
+
+        alert(
+            "Kecamatan wajib diisi."
+        );
+
+        return;
+
+    }
+
+    if(!bulan){
+
+        alert(
+            "Silakan pilih bulan."
+        );
+
+        return;
+
+    }
+
+    if(!tahun){
+
+        alert(
+            "Silakan pilih tahun."
+        );
+
+        return;
+
+    }
+
+
+    const bulanTahun =
+        bulan + " " + tahun;
+
+    // Pendapatan Bersih = 10% dari Omset
+    // Kulakan tidak digunakan dalam perhitungan ini.
+    const bersih =
+        omset * 0.10;
+
+    const saveBtn =
+        document.getElementById(
+            "saveBtn"
+        );
+
+    const status =
+        document.getElementById(
+            "saveStatus"
+        );
+
+
+    try{
+
+        saveBtn.disabled = true;
+
+        saveBtn.innerText =
+            "⏳ Menyimpan...";
+
+        status.className =
+            "status loading";
+
+        status.innerText =
+            "Sedang menyimpan data...";
+
+
+        const token =
+            await user.getIdToken();
+
+
+        const payload = {
+
+            idToken:token,
+
+            uid:user.uid,
+
+            email:user.email,
+
+            namaMustahik:nama,
+
+            bulanTahun:bulanTahun,
+
+            kecamatan:kecamatan,
+
+            omset:omset,
+
+            kulakan:kulakan,
+
+            pendapatanBersih:bersih,
+
+            pendapatanTambahan:tambahan
+
+        };
+
+
+        const response =
+            await fetch(
+                SCRIPT_URL,
+                {
+                    method:"POST",
+                    body:
+                        new URLSearchParams(
+                            payload
+                        )
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if(!result.success){
+
+            throw new Error(
+                result.message
+            );
+
+        }
+
+
+        status.className =
+            "status success";
+
+        status.innerText =
+            "✅ " +
+            result.message;
+
+
+        document.getElementById(
+            "bulan"
+        ).value = "";
+
+        document.getElementById(
+            "tahun"
+        ).value = "";
+
+        document.getElementById(
+            "omset"
+        ).value = "";
+
+        document.getElementById(
+            "kulakan"
+        ).value = "";
+
+        document.getElementById(
+            "pendapatanTambahan"
+        ).value = "";
+
+        document.getElementById(
+            "pendapatanBersih"
+        ).value =
+            "Rp 0";
+
+
+        await loadUserDashboard();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        status.className =
+            "status error";
+
+        status.innerText =
+            "❌ Gagal menyimpan";
+
+        alert(
+            "Gagal menyimpan data:\n\n" +
+            error.message
+        );
+
+    }
+    finally{
+
+        saveBtn.disabled = false;
+
+        saveBtn.innerText =
+            "💾 Simpan Laporan";
+
+    }
+
+}
+
+
+/* =====================================================
+   LOAD ADMIN
+===================================================== */
+
+async function loadAdminDashboard(){
+
+    if(
+        !currentUserData ||
+        !currentUserData.uid
+    ){
+        return;
+    }
+
+    try{
+
+        const url =
+            SCRIPT_URL +
+            "?action=adminDashboard" +
+            "&uid=" +
+            encodeURIComponent(
+                currentUserData.uid
+            );
+
+
+        const response =
+            await fetch(url);
+
+        const result =
+            await response.json();
+
+
+        if(!result.success){
+
+            throw new Error(
+                result.message
+            );
+
+        }
+
+
+        adminData =
+            result.data || [];
+
+        adminUsers =
+            result.users || [];
+
+
+        document.getElementById(
+            "aTotalUser"
+        ).innerText =
+            result.summary.totalUser;
+
+
+        document.getElementById(
+            "aTotalLaporan"
+        ).innerText =
+            result.summary.totalLaporan;
+
+
+        document.getElementById(
+            "aTotalOmset"
+        ).innerText =
+            rupiah(
+                result.summary.totalOmset
+            );
+
+
+        // Card Pendapatan Bersih Admin = 10% dari total Omset
+        document.getElementById(
+            "aTotalBersih"
+        ).innerText =
+            rupiah(
+                (Number(result.summary.totalOmset) || 0) * 0.10
+            );
+
+
+        populateUserFilter();
+
+        populateKecamatanFilter(
+            result.filters
+                ? result.filters.kecamatan
+                : []
+        );
+
+        populateBulanFilter(
+            result.filters
+                ? result.filters.bulanTahun
+                : []
+        );
+
+        renderAdminUsers();
+
+        applyAdminFilter();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            "Gagal memuat dashboard admin:\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   USER FILTER
+===================================================== */
+
+function populateUserFilter(){
+
+    const select =
+        document.getElementById(
+            "filterUser"
+        );
+
+    const oldValue =
+        select.value;
+
+
+    select.innerHTML =
+        `
+        <option value="">
+            Semua User
+        </option>
+        `;
+
+
+    adminUsers
+        .filter(function(user){
+
+            return (
+                String(user.role || "user")
+                    .toLowerCase()
+                !== "admin"
+            );
+
+        })
+        .sort(function(a,b){
+
+            return String(a.nama || "")
+                .localeCompare(
+                    String(b.nama || ""),
+                    "id"
+                );
+
+        })
+        .forEach(function(user){
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                user.uid;
+
+            option.textContent =
+                user.nama ||
+                user.email ||
+                user.uid;
+
+            select.appendChild(option);
+
+        });
+
+
+    if(
+        Array.from(
+            select.options
+        ).some(function(option){
+
+            return option.value === oldValue;
+
+        })
+    ){
+
+        select.value =
+            oldValue;
+
+    }
+
+}
+
+
+/* =====================================================
+   KECAMATAN FILTER
+===================================================== */
+
+function populateKecamatanFilter(
+    kecamatanList
+){
+
+    const select =
+        document.getElementById(
+            "filterKecamatan"
+        );
+
+    const oldValue =
+        select.value;
+
+
+    select.innerHTML =
+        `
+        <option value="">
+            Semua Kecamatan
+        </option>
+        `;
+
+
+    [...new Set(kecamatanList || [])]
+        .filter(Boolean)
+        .sort(function(a,b){
+
+            return String(a)
+                .localeCompare(
+                    String(b),
+                    "id"
+                );
+
+        })
+        .forEach(function(kec){
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value = kec;
+
+            option.textContent = kec;
+
+            select.appendChild(option);
+
+        });
+
+
+    if(
+        Array.from(
+            select.options
+        ).some(function(option){
+
+            return option.value === oldValue;
+
+        })
+    ){
+
+        select.value =
+            oldValue;
+
+    }
+
+}
+
+
+/* =====================================================
+   BULAN FILTER
+===================================================== */
+
+function populateBulanFilter(
+    bulanList
+){
+
+    const select =
+        document.getElementById(
+            "filterBulan"
+        );
+
+    const oldValue =
+        select.value;
+
+
+    select.innerHTML =
+        `
+        <option value="">
+            Semua Bulan
+        </option>
+        `;
+
+
+    const bulanOrder = {
+
+        Januari:1,
+        Februari:2,
+        Maret:3,
+        April:4,
+        Mei:5,
+        Juni:6,
+        Juli:7,
+        Agustus:8,
+        September:9,
+        Oktober:10,
+        November:11,
+        Desember:12
+
+    };
+
+
+    [...new Set(bulanList || [])]
+        .filter(Boolean)
+        .sort(function(a,b){
+
+            const pa =
+                String(a).split(" ");
+
+            const pb =
+                String(b).split(" ");
+
+            const ya =
+                Number(pa[1]) || 0;
+
+            const yb =
+                Number(pb[1]) || 0;
+
+
+            if(ya !== yb){
+
+                return yb - ya;
+
+            }
+
+
+            return (
+                (bulanOrder[pb[0]] || 0)
+                -
+                (bulanOrder[pa[0]] || 0)
+            );
+
+        })
+        .forEach(function(item){
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                item;
+
+            option.textContent =
+                item;
+
+            select.appendChild(
+                option
+            );
+
+        });
+
+
+    if(
+        Array.from(
+            select.options
+        ).some(function(option){
+
+            return option.value === oldValue;
+
+        })
+    ){
+
+        select.value =
+            oldValue;
+
+    }
+
+}
+
+
+/* =====================================================
+   UPDATE BULAN SESUAI USER
+=====================================================
+
+   Jika user dipilih,
+   daftar bulan akan mengikuti
+   bulan yang benar-benar dimiliki
+   user tersebut.
+
+===================================================== */
+
+function updateBulanFilterByUser(){
+
+    const uid =
+        document.getElementById(
+            "filterUser"
+        ).value;
+
+
+    const select =
+        document.getElementById(
+            "filterBulan"
+        );
+
+
+    const oldValue =
+        select.value;
+
+
+    let sourceData =
+        adminData;
+
+
+    if(uid){
+
+        sourceData =
+            adminData.filter(
+                function(row){
+
+                    return row.uid === uid;
+
+                }
+            );
+
+    }
+
+
+    const bulanSet = {};
+
+
+    sourceData.forEach(
+        function(row){
+
+            if(row.bulanTahun){
+
+                bulanSet[
+                    row.bulanTahun
+                ] = true;
+
+            }
+
+        }
+    );
+
+
+    populateBulanFilter(
+        Object.keys(bulanSet)
+    );
+
+
+    if(
+        Object.keys(bulanSet)
+            .includes(oldValue)
+    ){
+
+        select.value =
+            oldValue;
+
+    }
+    else{
+
+        select.value = "";
+
+    }
+
+}
+
+
+/* =====================================================
+   APPLY FILTER ADMIN
+===================================================== */
+
+function applyAdminFilter(){
+
+    const uid =
+        document.getElementById(
+            "filterUser"
+        ).value;
+
+
+    const kecamatan =
+        document.getElementById(
+            "filterKecamatan"
+        ).value;
+
+
+    const bulan =
+        document.getElementById(
+            "filterBulan"
+        ).value;
+
+
+    const search =
+        document.getElementById(
+            "filterSearch"
+        ).value
+        .toLowerCase()
+        .trim();
+
+
+    const filtered =
+        adminData.filter(
+            function(row){
+
+                if(
+                    uid &&
+                    String(row.uid) !==
+                    String(uid)
+                ){
+
+                    return false;
+
+                }
+
+
+                if(
+                    kecamatan &&
+                    String(row.kecamatan) !==
+                    String(kecamatan)
+                ){
+
+                    return false;
+
+                }
+
+
+                if(
+                    bulan &&
+                    String(row.bulanTahun) !==
+                    String(bulan)
+                ){
+
+                    return false;
+
+                }
+
+
+                if(search){
+
+                    const text =
+                        (
+                            row.namaMustahik +
+                            " " +
+                            row.email +
+                            " " +
+                            row.kecamatan
+                        )
+                        .toLowerCase();
+
+
+                    if(
+                        !text.includes(search)
+                    ){
+
+                        return false;
+
+                    }
+
+                }
+
+
+                return true;
+
+            }
+        );
+
+
+    /* =================================================
+       RENDER TABEL
+    ================================================= */
+
+    renderAdminTable(filtered);
+
+
+    /* =================================================
+       HITUNG SUMMARY FILTER
+    ================================================= */
+
+    let omset = 0;
+    let kulakan = 0;
+    let bersih = 0;
+    let tambahan = 0;
+
+
+    filtered.forEach(
+        function(row){
+
+            omset +=
+                Number(row.omset) || 0;
+
+            kulakan +=
+                Number(row.kulakan) || 0;
+
+            // Pendapatan Bersih = 10% dari Omset
+            // untuk seluruh hasil filter.
+            bersih =
+                omset * 0.10;
+
+            tambahan +=
+                Number(
+                    row.pendapatanTambahan
+                ) || 0;
+
+        }
+    );
+
+
+    document.getElementById(
+        "fOmset"
+    ).innerText =
+        rupiah(omset);
+
+
+    document.getElementById(
+        "fKulakan"
+    ).innerText =
+        rupiah(kulakan);
+
+
+    document.getElementById(
+        "fBersih"
+    ).innerText =
+        rupiah(bersih);
+
+
+    document.getElementById(
+        "fTambahan"
+    ).innerText =
+        rupiah(tambahan);
+
+
+    /* =================================================
+       FILTER INFO
+    ================================================= */
+
+    const userSelect =
+        document.getElementById(
+            "filterUser"
+        );
+
+    const userText =
+        userSelect.options[
+            userSelect.selectedIndex
+        ]
+        ? userSelect.options[
+            userSelect.selectedIndex
+        ].text
+        : "Semua User";
+
+
+    const kecText =
+        kecamatan ||
+        "Semua Kecamatan";
+
+
+    const bulanText =
+        bulan ||
+        "Semua Bulan";
+
+
+    document.getElementById(
+        "filterInfo"
+    ).innerHTML =
+        `
+        <b>Filter aktif:</b>
+        ${escapeHTML(userText)}
+        &nbsp; | &nbsp;
+        ${escapeHTML(kecText)}
+        &nbsp; | &nbsp;
+        ${escapeHTML(bulanText)}
+        &nbsp; | &nbsp;
+        <b>${filtered.length}</b> data
+        `;
+
+
+    /* =================================================
+       CHART
+    ================================================= */
+
+    renderChart(filtered);
+
+}
+
+
+/* =====================================================
+   RENDER ADMIN TABLE
+===================================================== */
+
+function renderAdminTable(rows){
+
+    const body =
+        document.getElementById(
+            "adminTableBody"
+        );
+
+    body.innerHTML = "";
+
+
+    if(
+        !rows ||
+        rows.length === 0
+    ){
+
+        body.innerHTML =
+            `
+            <tr>
+
+                <td
+                    colspan="9"
+                    class="empty">
+
+                    Tidak ada data sesuai filter.
+
+                </td>
+
+            </tr>
+            `;
+
+        return;
+
+    }
+
+
+    rows
+        .slice()
+        .reverse()
+        .forEach(function(row){
+
+            body.innerHTML +=
+            `
+            <tr>
+
+                <td>
+                    ${escapeHTML(
+                        formatTanggal(
+                            row.waktu
+                        )
+                    )}
+                </td>
+
+                <td>
+                    <b>
+                        ${escapeHTML(
+                            row.namaMustahik
+                        )}
+                    </b>
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        row.bulanTahun
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        row.email
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        row.kecamatan
+                    )}
+                </td>
+
+                <td>
+                    ${rupiah(row.omset)}
+                </td>
+
+                <td>
+                    ${rupiah(row.kulakan)}
+                </td>
+
+                <td>
+                    ${rupiah(
+                        row.pendapatanBersih
+                    )}
+                </td>
+
+                <td>
+                    ${rupiah(
+                        row.pendapatanTambahan
+                    )}
+                </td>
+
+            </tr>
+            `;
+
+        });
+
+}
+
+
+/* =====================================================
+   RENDER USER ADMIN
+===================================================== */
+
+function renderAdminUsers(){
+
+    const body =
+        document.getElementById(
+            "adminUserBody"
+        );
+
+    body.innerHTML = "";
+
+
+    if(
+        !adminUsers ||
+        adminUsers.length === 0
+    ){
+
+        body.innerHTML =
+            `
+            <tr>
+
+                <td
+                    colspan="5"
+                    class="empty">
+
+                    Belum ada user.
+
+                </td>
+
+            </tr>
+            `;
+
+        return;
+
+    }
+
+
+    adminUsers.forEach(
+        function(user){
+
+            const role =
+                String(
+                    user.role ||
+                    "user"
+                ).toLowerCase();
+
+
+            const roleHTML =
+                role === "admin"
+
+                ?
+
+                `
+                <span class="role-admin">
+                    ADMIN
+                </span>
+                `
+
+                :
+
+                `
+                <span class="role-user">
+                    USER
+                </span>
+                `;
+
+
+            body.innerHTML +=
+            `
+            <tr>
+
+                <td>
+                    <b>
+                        ${escapeHTML(
+                            user.nama
+                        )}
+                    </b>
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        user.email
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        user.kecamatan
+                    )}
+                </td>
+
+                <td>
+                    ${roleHTML}
+                </td>
+
+                <td>
+                    ${user.jumlahLaporan || 0}
+                </td>
+
+            </tr>
+            `;
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   RENDER CHART
+===================================================== */
+
+function renderChart(rows){
+
+    const grouped = {};
+
+
+    rows.forEach(
+        function(row){
+
+            const key =
+                row.bulanTahun ||
+                "Tidak diketahui";
+
+
+            if(!grouped[key]){
+
+                grouped[key] = {
+
+                    omset:0,
+
+                    kulakan:0,
+
+                    bersih:0,
+
+                    tambahan:0
+
+                };
+
+            }
+
+
+            grouped[key].omset +=
+                Number(row.omset) || 0;
+
+
+            grouped[key].kulakan +=
+                Number(row.kulakan) || 0;
+
+
+            grouped[key].bersih +=
+                Number(
+                    row.pendapatanBersih
+                ) || 0;
+
+
+            grouped[key].tambahan +=
+                Number(
+                    row.pendapatanTambahan
+                ) || 0;
+
+        }
+    );
+
+
+    const bulanOrder = {
+
+        Januari:1,
+        Februari:2,
+        Maret:3,
+        April:4,
+        Mei:5,
+        Juni:6,
+        Juli:7,
+        Agustus:8,
+        September:9,
+        Oktober:10,
+        November:11,
+        Desember:12
+
+    };
+
+
+    const labels =
+        Object.keys(grouped)
+        .sort(function(a,b){
+
+            const pa =
+                String(a).split(" ");
+
+            const pb =
+                String(b).split(" ");
+
+            const ya =
+                Number(pa[1]) || 0;
+
+            const yb =
+                Number(pb[1]) || 0;
+
+
+            if(ya !== yb){
+
+                return ya - yb;
+
+            }
+
+
+            return (
+                (bulanOrder[pa[0]] || 0)
+                -
+                (bulanOrder[pb[0]] || 0)
+            );
+
+        });
+
+
+    const omset =
+        labels.map(
+            key =>
+                grouped[key].omset
+        );
+
+
+    const kulakan =
+        labels.map(
+            key =>
+                grouped[key].kulakan
+        );
+
+
+    const bersih =
+        labels.map(
+            key =>
+                grouped[key].bersih
+        );
+
+
+    const tambahan =
+        labels.map(
+            key =>
+                grouped[key].tambahan
+        );
+
+
+    /* =================================================
+       JUDUL GRAFIK SESUAI USER
+    ================================================= */
+
+    const userSelect =
+        document.getElementById(
+            "filterUser"
+        );
+
+
+    const selectedUserText =
+        userSelect.options[
+            userSelect.selectedIndex
+        ]
+        ? userSelect.options[
+            userSelect.selectedIndex
+        ].text
+        : "Semua User";
+
+
+    const kecamatan =
+        document.getElementById(
+            "filterKecamatan"
+        ).value;
+
+
+    const bulan =
+        document.getElementById(
+            "filterBulan"
+        ).value;
+
+
+    let title =
+        "📊 Grafik Keuangan";
+
+
+    if(
+        userSelect.value
+    ){
+
+        title +=
+            " - " +
+            selectedUserText;
+
+    }
+    else{
+
+        title +=
+            " - Semua User";
+
+    }
+
+
+    if(kecamatan){
+
+        title +=
+            " | " +
+            kecamatan;
+
+    }
+
+
+    if(bulan){
+
+        title +=
+            " | " +
+            bulan;
+
+    }
+
+
+    document.getElementById(
+        "chartTitle"
+    ).innerText =
+        title;
+
+
+    /* =================================================
+       DESTROY CHART
+    ================================================= */
+
+    if(financeChart){
+
+        financeChart.destroy();
+
+        financeChart = null;
+
+    }
+
+
+    const ctx =
+        document.getElementById(
+            "financeChart"
+        );
+
+
+    financeChart =
+        new Chart(
+            ctx,
+            {
+
+                type:"bar",
+
+                data:{
+
+                    labels:labels,
+
+                    datasets:[
+
+                        {
+                            label:"Omset",
+                            data:omset,
+                            borderWidth:1
+                        },
+
+                        {
+                            label:"Kulakan",
+                            data:kulakan,
+                            borderWidth:1
+                        },
+
+                        {
+                            label:"Pendapatan Bersih",
+                            data:bersih,
+                            borderWidth:1
+                        },
+
+                        {
+                            label:"Pendapatan Tambahan",
+                            data:tambahan,
+                            borderWidth:1
+                        }
+
+                    ]
+
+                },
+
+                options:{
+
+                    responsive:true,
+
+                    maintainAspectRatio:false,
+
+                    interaction:{
+                        mode:"index",
+                        intersect:false
+                    },
+
+                    scales:{
+
+                        y:{
+
+                            beginAtZero:true,
+
+                            ticks:{
+
+                                callback:
+                                    function(value){
+
+                                        return rupiah(
+                                            value
+                                        );
+
+                                    }
+
+                            }
+
+                        }
+
+                    },
+
+                    plugins:{
+
+                        legend:{
+                            position:"top"
+                        },
+
+                        tooltip:{
+
+                            callbacks:{
+
+                                label:
+                                    function(context){
+
+                                        return (
+                                            context.dataset.label +
+                                            ": " +
+                                            rupiah(
+                                                context.raw
+                                            )
+                                        );
+
+                                    }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+}
+
+
+/* =====================================================
+   USER FILTER BULAN
+===================================================== */
+
+document.getElementById(
+    "userFilterBulan"
+).addEventListener(
+    "change",
+    function(){
+
+        userSelectedBulan =
+            this.value;
+
+        applyUserFilter();
+
+    }
+);
+
+
+/* =====================================================
+   USER RESET KE BULAN BERJALAN
+===================================================== */
+
+document.getElementById(
+    "userResetFilter"
+).addEventListener(
+    "click",
+    function(){
+
+        userSelectedBulan =
+            getCurrentBulanTahun();
+
+
+        const select =
+            document.getElementById(
+                "userFilterBulan"
+            );
+
+
+        const tersedia =
+            Array.from(
+                select.options
+            ).some(
+                function(option){
+
+                    return (
+                        option.value ===
+                        userSelectedBulan
+                    );
+
+                }
+            );
+
+
+        if(tersedia){
+
+            select.value =
+                userSelectedBulan;
+
+        }
+        else{
+
+            select.value = "";
+
+        }
+
+
+        applyUserFilter();
+
+    }
+);
+
+
+/* =====================================================
+   FILTER USER
+===================================================== */
+
+document.getElementById(
+    "filterUser"
+).addEventListener(
+    "change",
+    function(){
+
+        /*
+          Ketika user berubah,
+          bulan otomatis menyesuaikan
+          data user tersebut.
+        */
+
+        updateBulanFilterByUser();
+
+        applyAdminFilter();
+
+    }
+);
+
+
+/* =====================================================
+   FILTER KECAMATAN
+===================================================== */
+
+document.getElementById(
+    "filterKecamatan"
+).addEventListener(
+    "change",
+    applyAdminFilter
+);
+
+
+/* =====================================================
+   FILTER BULAN
+===================================================== */
+
+document.getElementById(
+    "filterBulan"
+).addEventListener(
+    "change",
+    applyAdminFilter
+);
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+document.getElementById(
+    "filterSearch"
+).addEventListener(
+    "input",
+    applyAdminFilter
+);
+
+
+/* =====================================================
+   RESET FILTER
+===================================================== */
+
+document.getElementById(
+    "resetFilter"
+).addEventListener(
+    "click",
+    function(){
+
+        document.getElementById(
+            "filterUser"
+        ).value = "";
+
+        document.getElementById(
+            "filterKecamatan"
+        ).value = "";
+
+        document.getElementById(
+            "filterBulan"
+        ).value = "";
+
+        document.getElementById(
+            "filterSearch"
+        ).value = "";
+
+
+        /*
+          Kembalikan daftar bulan
+          seluruh user.
+        */
+
+        const allMonths = {};
+
+        adminData.forEach(
+            function(row){
+
+                if(row.bulanTahun){
+
+                    allMonths[
+                        row.bulanTahun
+                    ] = true;
+
+                }
+
+            }
+        );
+
+
+        populateBulanFilter(
+            Object.keys(allMonths)
+        );
+
+
+        applyAdminFilter();
+
+    }
+);
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+logoutBtn.addEventListener(
+    "click",
+    async function(){
+
+        try{
+
+            await auth.signOut();
+
+            currentUserData = null;
+
+            adminData = [];
+
+            adminUsers = [];
+
+            userDashboardData = [];
+
+            userSelectedBulan = "";
+
+
+            if(financeChart){
+
+                financeChart.destroy();
+
+                financeChart = null;
+
+            }
+
+        }
+        catch(error){
+
+            console.error(error);
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
