@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Keuangan Mustahik</title>
+<title>Laporan Keuangan Z-Mart</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -181,39 +181,96 @@ body{
 }
 
 /* =====================================================
-   CARDS
+   MODERN FINANCE DASHBOARD
+   STAT CARDS
 ===================================================== */
 
 .cards{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:18px;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:16px;
     margin-bottom:25px;
 }
 
 .card-stat{
-    background:white;
-    border-radius:15px;
-    padding:20px;
-    box-shadow:0 5px 18px rgba(0,0,0,.08);
+    position:relative;
+    overflow:hidden;
+    background:#fff;
+    border:1px solid rgba(15,23,42,.06);
+    border-radius:18px;
+    padding:18px;
+    min-width:0;
+    min-height:150px;
+    box-shadow:0 6px 20px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.04);
+    transition:transform .2s ease,box-shadow .2s ease;
+}
+
+.card-stat:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 28px rgba(15,23,42,.10),0 2px 6px rgba(15,23,42,.05);
+}
+
+.card-stat::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:4px;
+    background:#2e7d32;
 }
 
 .card-stat .icon{
-    font-size:30px;
-    margin-bottom:10px;
+    width:42px;
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:12px;
+    font-size:21px;
+    margin-bottom:14px;
 }
 
 .card-stat .title{
-    color:#777;
-    font-size:13px;
+    color:#64748b;
+    font-size:12px;
+    font-weight:600;
+    line-height:1.3;
+    margin-bottom:5px;
+}
+
+.card-stat .subtitle{
+    color:#94a3b8;
+    font-size:10px;
+    font-weight:500;
+    line-height:1.3;
+    margin-bottom:6px;
 }
 
 .card-stat .value{
-    font-size:23px;
-    font-weight:bold;
-    margin-top:7px;
-    color:#1b5e20;
+    color:#0f172a;
+    font-size:21px;
+    font-weight:800;
+    line-height:1.2;
+    margin:0;
+    word-break:break-word;
 }
+
+.card-stat:nth-child(1)::before{background:#16a34a;}
+.card-stat:nth-child(1) .icon{background:#dcfce7;}
+.card-stat:nth-child(1) .value{color:#15803d;}
+
+.card-stat:nth-child(2)::before{background:#f59e0b;}
+.card-stat:nth-child(2) .icon{background:#fef3c7;}
+.card-stat:nth-child(2) .value{color:#d97706;}
+
+.card-stat:nth-child(3)::before{background:#2563eb;}
+.card-stat:nth-child(3) .icon{background:#dbeafe;}
+.card-stat:nth-child(3) .value{color:#2563eb;}
+
+.card-stat:nth-child(4)::before{background:#9333ea;}
+.card-stat:nth-child(4) .icon{background:#f3e8ff;}
+.card-stat:nth-child(4) .value{color:#7e22ce;}
 
 /* =====================================================
    PANEL
@@ -321,19 +378,6 @@ body{
     color:#33691e;
 }
 
-@media(max-width:650px){
-
-    .user-filter-row{
-        flex-direction:column;
-        align-items:stretch;
-    }
-
-    .user-filter-group{
-        width:100%;
-    }
-
-}
-
 /* =====================================================
    FILTER INFO
 ===================================================== */
@@ -420,9 +464,42 @@ tr:hover{
     border-radius:8px;
 }
 
+.form-group input:focus,
+.form-group select:focus{
+    outline:none;
+    border-color:#2e7d32;
+    box-shadow:0 0 0 3px rgba(46,125,50,.10);
+}
+
 .readonly{
     background:#f1f3f4;
 }
+
+/* =====================================================
+   AUTOCOMPLETE NAMA MUSTAHIK
+===================================================== */
+
+.nama-input-wrapper{
+    position:relative;
+}
+
+.nama-input-wrapper input{
+    padding-right:42px;
+}
+
+.nama-hint{
+    margin-top:5px;
+    font-size:11px;
+    color:#777;
+}
+
+.nama-hint strong{
+    color:#2e7d32;
+}
+
+/* =====================================================
+   SAVE
+===================================================== */
 
 .save-btn{
     width:100%;
@@ -435,6 +512,10 @@ tr:hover{
     font-weight:bold;
     font-size:15px;
     cursor:pointer;
+}
+
+.save-btn:hover{
+    background:#1b5e20;
 }
 
 .save-btn:disabled{
@@ -560,7 +641,44 @@ tr:hover{
     }
 
     .cards{
-        grid-template-columns:1fr;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:10px;
+        margin-bottom:20px;
+    }
+
+    .card-stat{
+        min-height:128px;
+        padding:14px;
+        border-radius:15px;
+    }
+
+    .card-stat::before{
+        height:3px;
+    }
+
+    .card-stat .icon{
+        width:36px;
+        height:36px;
+        border-radius:10px;
+        font-size:18px;
+        margin-bottom:10px;
+    }
+
+    .card-stat .title{
+        font-size:10.5px;
+        line-height:1.3;
+        margin-bottom:4px;
+    }
+
+    .card-stat .subtitle{
+        font-size:9px;
+        line-height:1.25;
+        margin-bottom:5px;
+    }
+
+    .card-stat .value{
+        font-size:15px;
+        line-height:1.25;
     }
 
     .filters{
@@ -573,6 +691,15 @@ tr:hover{
 
     .chart-container{
         height:300px;
+    }
+
+    .user-filter-row{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .user-filter-group{
+        width:100%;
     }
 
 }
@@ -683,17 +810,27 @@ tr:hover{
 <div class="panel user-filter-panel">
 
     <div class="panel-title">
-        <h3>📅 Filter Dashboard</h3>
+
+        <h3>
+            📅 Filter Dashboard
+        </h3>
+
     </div>
 
     <div class="user-filter-row">
 
         <div class="user-filter-group">
 
-            <label>Pilih Bulan / Tahun</label>
+            <label>
+                Pilih Bulan / Tahun
+            </label>
 
             <select id="userFilterBulan">
-                <option value="">Memuat bulan...</option>
+
+                <option value="">
+                    Memuat bulan...
+                </option>
+
             </select>
 
         </div>
@@ -718,18 +855,29 @@ tr:hover{
 
 </div>
 
+
+<!-- =====================================================
+     STAT CARDS
+===================================================== -->
+
 <div class="cards">
 
     <div class="card-stat">
 
-        <div class="icon">💰</div>
+        <div class="icon">
+            💰
+        </div>
 
         <div class="title">
             Total Omset
         </div>
 
-        <div id="uTotalOmset" class="value">
+        <div
+            id="uTotalOmset"
+            class="value">
+
             Rp 0
+
         </div>
 
     </div>
@@ -737,14 +885,20 @@ tr:hover{
 
     <div class="card-stat">
 
-        <div class="icon">🛒</div>
+        <div class="icon">
+            🛒
+        </div>
 
         <div class="title">
             Total Kulakan
         </div>
 
-        <div id="uTotalKulakan" class="value">
+        <div
+            id="uTotalKulakan"
+            class="value">
+
             Rp 0
+
         </div>
 
     </div>
@@ -752,14 +906,24 @@ tr:hover{
 
     <div class="card-stat">
 
-        <div class="icon">📈</div>
+        <div class="icon">
+            📈
+        </div>
 
         <div class="title">
             Pendapatan Bersih
         </div>
 
-        <div id="uTotalBersih" class="value">
+        <div class="subtitle">
+            10% dari Omset
+        </div>
+
+        <div
+            id="uTotalBersih"
+            class="value">
+
             Rp 0
+
         </div>
 
     </div>
@@ -767,14 +931,20 @@ tr:hover{
 
     <div class="card-stat">
 
-        <div class="icon">💵</div>
+        <div class="icon">
+            💵
+        </div>
 
         <div class="title">
             Pendapatan Tambahan
         </div>
 
-        <div id="uTotalTambahan" class="value">
+        <div
+            id="uTotalTambahan"
+            class="value">
+
             Rp 0
+
         </div>
 
     </div>
@@ -782,7 +952,9 @@ tr:hover{
 </div>
 
 
-<!-- FORM -->
+<!-- =====================================================
+     FORM LAPORAN
+===================================================== -->
 
 <div class="panel">
 
@@ -797,32 +969,65 @@ tr:hover{
 
     <div class="user-form-grid">
 
+        <!-- NAMA MUSTAHIK -->
+
         <div class="form-group">
 
-            <label>Nama Mustahik</label>
+            <label>
+                Nama Mustahik
+            </label>
 
-            <input
-                id="namaMustahik"
-                type="text">
+            <div class="nama-input-wrapper">
+
+                <input
+                    id="namaMustahik"
+                    type="text"
+                    list="daftarMustahik"
+                    autocomplete="off"
+                    placeholder="Ketik nama mustahik">
+
+                <datalist
+                    id="daftarMustahik">
+                </datalist>
+
+            </div>
+
+            <div class="nama-hint">
+                💡 Nama yang pernah digunakan akan muncul
+                otomatis saat mengetik.
+            </div>
 
         </div>
 
 
+        <!-- KECAMATAN -->
+
         <div class="form-group">
 
-            <label>Kecamatan</label>
+            <label>
+                Kecamatan
+            </label>
 
             <input
                 id="kecamatan"
                 type="text"
                 placeholder="Contoh: Sragen">
 
+            <div class="nama-hint">
+                Kecamatan akan otomatis terisi jika
+                nama Mustahik ditemukan.
+            </div>
+
         </div>
 
 
+        <!-- BULAN -->
+
         <div class="form-group">
 
-            <label>Bulan</label>
+            <label>
+                Bulan
+            </label>
 
             <select id="bulan">
 
@@ -844,13 +1049,19 @@ tr:hover{
                 <option>Desember</option>
 
             </select>
+            
 
         </div>
+        <div class="form-group"> <label>Tanggal Pengisian</label> <input id="tanggalPengisian" type="date"> </div>
 
+
+        <!-- TAHUN -->
 
         <div class="form-group">
 
-            <label>Tahun</label>
+            <label>
+                Tahun
+            </label>
 
             <select id="tahun">
 
@@ -870,9 +1081,13 @@ tr:hover{
         </div>
 
 
+        <!-- OMSET -->
+
         <div class="form-group">
 
-            <label>Omset</label>
+            <label>
+                Omset
+            </label>
 
             <input
                 id="omset"
@@ -883,9 +1098,13 @@ tr:hover{
         </div>
 
 
+        <!-- KULAKAN -->
+
         <div class="form-group">
 
-            <label>Kulakan</label>
+            <label>
+                Kulakan
+            </label>
 
             <input
                 id="kulakan"
@@ -896,9 +1115,13 @@ tr:hover{
         </div>
 
 
+        <!-- BERSIH -->
+
         <div class="form-group">
 
-            <label>Pendapatan Bersih</label>
+            <label>
+                Pendapatan Bersih
+            </label>
 
             <input
                 id="pendapatanBersih"
@@ -910,9 +1133,13 @@ tr:hover{
         </div>
 
 
+        <!-- TAMBAHAN -->
+
         <div class="form-group">
 
-            <label>Pendapatan Tambahan</label>
+            <label>
+                Pendapatan Tambahan
+            </label>
 
             <input
                 id="pendapatanTambahan"
@@ -925,19 +1152,26 @@ tr:hover{
     </div>
 
 
-    <button id="saveBtn" class="save-btn">
+    <button
+        id="saveBtn"
+        class="save-btn">
 
         💾 Simpan Laporan
 
     </button>
 
 
-    <div id="saveStatus" class="status"></div>
+    <div
+        id="saveStatus"
+        class="status">
+    </div>
 
 </div>
 
 
-<!-- RIWAYAT -->
+<!-- =====================================================
+     RIWAYAT
+===================================================== -->
 
 <div class="panel">
 
@@ -978,7 +1212,9 @@ tr:hover{
 
             </thead>
 
-            <tbody id="userTableBody"></tbody>
+            <tbody
+                id="userTableBody">
+            </tbody>
 
         </table>
 
@@ -987,21 +1223,58 @@ tr:hover{
 </div>
 
 </section>
-<div id="adminDashboard" style="display:none!important;">
-<select id="filterUser"></select>
-<select id="filterKecamatan"></select>
-<select id="filterBulan"></select>
-<input id="filterSearch">
-<button id="resetFilter"></button>
-<div id="adminTableBody"></div><div id="adminUserBody"></div>
-<div id="aTotalUser"></div><div id="fOmset"></div><div id="fKulakan"></div>
-<div id="fBersih"></div><div id="fTambahan"></div><div id="filterInfo"></div>
-<div id="chartTitle"></div><canvas id="financeChart"></canvas>
+
+
+<!-- =====================================================
+     ADMIN DATA PLACEHOLDER
+===================================================== -->
+
+<div
+    id="adminDashboard"
+    style="display:none!important;">
+
+    <select id="filterUser"></select>
+
+    <select id="filterKecamatan"></select>
+
+    <select id="filterBulan"></select>
+
+    <input id="filterSearch">
+
+    <button id="resetFilter"></button>
+
+    <div id="adminTableBody"></div>
+
+    <div id="adminUserBody"></div>
+
+    <div id="aTotalUser"></div>
+
+    <div id="aTotalLaporan"></div>
+
+    <div id="aTotalOmset"></div>
+
+    <div id="aTotalBersih"></div>
+
+    <div id="fOmset"></div>
+
+    <div id="fKulakan"></div>
+
+    <div id="fBersih"></div>
+
+    <div id="fTambahan"></div>
+
+    <div id="filterInfo"></div>
+
+    <div id="chartTitle"></div>
+
+    <canvas id="financeChart"></canvas>
+
 </div>
 
 </main>
 
 </div>
+
 
 <script>
 
@@ -1022,9 +1295,12 @@ const firebaseConfig = {
 
 };
 
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(
+    firebaseConfig
+);
 
-const auth = firebase.auth();
+const auth =
+    firebase.auth();
 
 
 /* =====================================================
@@ -1047,11 +1323,6 @@ let adminUsers = [];
 
 let financeChart = null;
 
-
-/* =====================================================
-   USER DASHBOARD DATA
-===================================================== */
-
 let userDashboardData = [];
 
 let userSelectedBulan = "";
@@ -1062,16 +1333,24 @@ let userSelectedBulan = "";
 ===================================================== */
 
 const loginPage =
-    document.getElementById("loginPage");
+    document.getElementById(
+        "loginPage"
+    );
 
 const app =
-    document.getElementById("app");
+    document.getElementById(
+        "app"
+    );
 
 const loginBtn =
-    document.getElementById("loginBtn");
+    document.getElementById(
+        "loginBtn"
+    );
 
 const logoutBtn =
-    document.getElementById("logoutBtn");
+    document.getElementById(
+        "logoutBtn"
+    );
 
 
 /* =====================================================
@@ -1087,7 +1366,9 @@ function rupiah(value){
             currency:"IDR",
             maximumFractionDigits:0
         }
-    ).format(Number(value) || 0);
+    ).format(
+        Number(value) || 0
+    );
 
 }
 
@@ -1099,10 +1380,14 @@ function rupiah(value){
 function escapeHTML(text){
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     div.textContent =
-        text == null ? "" : text;
+        text == null
+            ? ""
+            : text;
 
     return div.innerHTML;
 
@@ -1111,16 +1396,6 @@ function escapeHTML(text){
 
 /* =====================================================
    FORMAT TANGGAL
-=====================================================
-
-   Fungsi ini menangani:
-
-   2026-05-31T17:00:00.000Z
-
-   maupun:
-
-   31/05/2026 00:00
-
 ===================================================== */
 
 function formatTanggal(value){
@@ -1132,40 +1407,37 @@ function formatTanggal(value){
     const text =
         String(value).trim();
 
-    /*
-       Jika sudah format Indonesia
-    */
-
     if(
-        /^\d{2}\/\d{2}\/\d{4}/.test(text)
+        /^\d{2}\/\d{2}\/\d{4}/
+            .test(text)
     ){
-        return text;
-    }
 
-    /*
-       Jika format ISO
-    */
+        return text;
+
+    }
 
     const date =
         new Date(text);
 
     if(!isNaN(date.getTime())){
 
-        /*
-          Gunakan waktu Asia/Jakarta.
-          UTC +7
-        */
-
         const formatter =
             new Intl.DateTimeFormat(
                 "id-ID",
                 {
-                    timeZone:"Asia/Jakarta",
+                    timeZone:
+                        "Asia/Jakarta",
+
                     day:"2-digit",
+
                     month:"2-digit",
+
                     year:"numeric",
+
                     hour:"2-digit",
+
                     minute:"2-digit",
+
                     hour12:false
                 }
             );
@@ -1190,7 +1462,8 @@ loginBtn.addEventListener(
     async function(){
 
         const provider =
-            new firebase.auth.GoogleAuthProvider();
+            new firebase.auth
+                .GoogleAuthProvider();
 
         const status =
             document.getElementById(
@@ -1199,7 +1472,8 @@ loginBtn.addEventListener(
 
         try{
 
-            loginBtn.disabled = true;
+            loginBtn.disabled =
+                true;
 
             loginBtn.innerText =
                 "⏳ Login...";
@@ -1210,9 +1484,10 @@ loginBtn.addEventListener(
             status.innerText =
                 "Menghubungkan akun...";
 
-            await auth.signInWithPopup(
-                provider
-            );
+            await auth
+                .signInWithPopup(
+                    provider
+                );
 
         }
         catch(error){
@@ -1226,7 +1501,8 @@ loginBtn.addEventListener(
                 "Login gagal: " +
                 error.message;
 
-            loginBtn.disabled = false;
+            loginBtn.disabled =
+                false;
 
             loginBtn.innerText =
                 "🔐 Login dengan Google";
@@ -1264,7 +1540,9 @@ auth.onAuthStateChanged(
             app.style.display =
                 "block";
 
-            await loadCurrentUser(user);
+            await loadCurrentUser(
+                user
+            );
 
         }
         catch(error){
@@ -1286,25 +1564,34 @@ auth.onAuthStateChanged(
    LOAD CURRENT USER
 ===================================================== */
 
-async function loadCurrentUser(firebaseUser){
+async function loadCurrentUser(
+    firebaseUser
+){
 
     const url =
         SCRIPT_URL +
         "?action=getUser" +
         "&uid=" +
-        encodeURIComponent(firebaseUser.uid) +
+        encodeURIComponent(
+            firebaseUser.uid
+        ) +
         "&email=" +
-        encodeURIComponent(firebaseUser.email || "") +
+        encodeURIComponent(
+            firebaseUser.email || ""
+        ) +
         "&nama=" +
         encodeURIComponent(
-            firebaseUser.displayName || "User"
+            firebaseUser.displayName ||
+            "User"
         );
+
 
     const response =
         await fetch(url);
 
     const result =
         await response.json();
+
 
     if(!result.success){
 
@@ -1315,7 +1602,10 @@ async function loadCurrentUser(firebaseUser){
 
     }
 
-    currentUserData = result;
+
+    currentUserData =
+        result;
+
 
     document.getElementById(
         "welcomeName"
@@ -1327,12 +1617,14 @@ async function loadCurrentUser(firebaseUser){
             "User"
         );
 
+
     document.getElementById(
         "welcomeEmail"
     ).innerText =
         result.email ||
         firebaseUser.email ||
         "";
+
 
     document.getElementById(
         "roleBadge"
@@ -1356,7 +1648,9 @@ async function loadCurrentUser(firebaseUser){
 
     }
 
+
     showUserDashboard();
+
 
     document.getElementById(
         "namaMustahik"
@@ -1364,6 +1658,7 @@ async function loadCurrentUser(firebaseUser){
         result.nama ||
         firebaseUser.displayName ||
         "";
+
 
     if(result.kecamatan){
 
@@ -1374,8 +1669,10 @@ async function loadCurrentUser(firebaseUser){
 
     }
 
+
     userSelectedBulan =
         getCurrentBulanTahun();
+
 
     await loadUserDashboard();
 
@@ -1417,6 +1714,395 @@ function showAdminDashboard(){
 
 
 /* =====================================================
+   LOCAL STORAGE NAMA MUSTAHIK
+===================================================== */
+
+const NAMA_STORAGE_KEY =
+    "keuanganMustahik_nama";
+
+
+function getNamaLocal(){
+
+    try{
+
+        return JSON.parse(
+            localStorage.getItem(
+                NAMA_STORAGE_KEY
+            ) || "[]"
+        );
+
+    }
+    catch(error){
+
+        return [];
+
+    }
+
+}
+
+
+function saveNamaLocal(nama){
+
+    nama =
+        String(nama || "")
+            .trim();
+
+    if(!nama){
+        return;
+    }
+
+
+    let daftar =
+        getNamaLocal();
+
+
+    const sudahAda =
+        daftar.some(
+            function(item){
+
+                return String(item)
+                    .toLowerCase()
+                    === nama.toLowerCase();
+
+            }
+        );
+
+
+    if(!sudahAda){
+
+        daftar.push(nama);
+
+    }
+
+
+    daftar =
+        daftar
+            .filter(Boolean)
+            .sort(
+                function(a,b){
+
+                    return a.localeCompare(
+                        b,
+                        "id"
+                    );
+
+                }
+            );
+
+
+    localStorage.setItem(
+        NAMA_STORAGE_KEY,
+        JSON.stringify(daftar)
+    );
+
+}
+
+
+/* =====================================================
+   BUILD DATABASE NAMA MUSTAHIK
+===================================================== */
+
+function getDaftarNamaMustahik(){
+
+    const namaMap = {};
+
+
+    /*
+       1. Nama dari localStorage
+    */
+
+    getNamaLocal()
+        .forEach(
+            function(nama){
+
+                if(nama){
+
+                    namaMap[
+                        String(nama)
+                            .toLowerCase()
+                    ] = nama;
+
+                }
+
+            }
+        );
+
+
+    /*
+       2. Nama dari laporan Google Sheets
+    */
+
+    userDashboardData.forEach(
+        function(row){
+
+            const nama =
+                String(
+                    row.namaMustahik ||
+                    ""
+                ).trim();
+
+            if(nama){
+
+                namaMap[
+                    nama.toLowerCase()
+                ] = nama;
+
+            }
+
+        }
+    );
+
+
+    /*
+       3. Nama akun user
+    */
+
+    if(
+        currentUserData &&
+        currentUserData.nama
+    ){
+
+        const nama =
+            String(
+                currentUserData.nama
+            ).trim();
+
+        if(nama){
+
+            namaMap[
+                nama.toLowerCase()
+            ] = nama;
+
+        }
+
+    }
+
+
+    return Object.values(
+        namaMap
+    ).sort(
+        function(a,b){
+
+            return a.localeCompare(
+                b,
+                "id"
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   POPULATE AUTOCOMPLETE
+===================================================== */
+
+function populateNamaMustahik(){
+
+    const datalist =
+        document.getElementById(
+            "daftarMustahik"
+        );
+
+
+    if(!datalist){
+        return;
+    }
+
+
+    datalist.innerHTML = "";
+
+
+    const daftar =
+        getDaftarNamaMustahik();
+
+
+    daftar.forEach(
+        function(nama){
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                nama;
+
+            datalist.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   CARI KECAMATAN BERDASARKAN NAMA
+===================================================== */
+
+function cariKecamatanNama(
+    nama
+){
+
+    nama =
+        String(nama || "")
+            .trim()
+            .toLowerCase();
+
+
+    if(!nama){
+        return "";
+    }
+
+
+    /*
+       Cari dari data laporan
+    */
+
+    for(
+        let i = userDashboardData.length - 1;
+        i >= 0;
+        i--
+    ){
+
+        const row =
+            userDashboardData[i];
+
+
+        const namaRow =
+            String(
+                row.namaMustahik ||
+                ""
+            )
+            .trim()
+            .toLowerCase();
+
+
+        if(
+            namaRow === nama &&
+            row.kecamatan
+        ){
+
+            return String(
+                row.kecamatan
+            ).trim();
+
+        }
+
+    }
+
+
+    return "";
+
+}
+
+
+/* =====================================================
+   PILIH NAMA MUSTAHIK
+===================================================== */
+
+document.getElementById(
+    "namaMustahik"
+).addEventListener(
+    "change",
+    function(){
+
+        const nama =
+            this.value.trim();
+
+
+        if(!nama){
+            return;
+        }
+
+
+        /*
+           Simpan nama ke browser
+        */
+
+        saveNamaLocal(
+            nama
+        );
+
+
+        /*
+           Update autocomplete
+        */
+
+        populateNamaMustahik();
+
+
+        /*
+           Cari kecamatan
+        */
+
+        const kecamatan =
+            cariKecamatanNama(
+                nama
+            );
+
+
+        if(kecamatan){
+
+            document.getElementById(
+                "kecamatan"
+            ).value =
+                kecamatan;
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   AUTOCOMPLETE SAAT MENGETIK
+===================================================== */
+
+document.getElementById(
+    "namaMustahik"
+).addEventListener(
+    "input",
+    function(){
+
+        const nama =
+            this.value.trim();
+
+
+        if(!nama){
+            return;
+        }
+
+
+        /*
+           Jika nama cocok dengan
+           data sebelumnya, kecamatan
+           otomatis diisi.
+        */
+
+        const kecamatan =
+            cariKecamatanNama(
+                nama
+            );
+
+
+        if(kecamatan){
+
+            document.getElementById(
+                "kecamatan"
+            ).value =
+                kecamatan;
+
+        }
+
+    }
+);
+
+
+/* =====================================================
    LOAD USER DASHBOARD
 ===================================================== */
 
@@ -1426,8 +2112,11 @@ async function loadUserDashboard(){
         !currentUserData ||
         !currentUserData.uid
     ){
+
         return;
+
     }
+
 
     const url =
         SCRIPT_URL +
@@ -1437,13 +2126,16 @@ async function loadUserDashboard(){
             currentUserData.uid
         );
 
+
     try{
 
         const response =
             await fetch(url);
 
+
         const result =
             await response.json();
+
 
         if(!result.success){
 
@@ -1454,9 +2146,41 @@ async function loadUserDashboard(){
 
         }
 
+
         userDashboardData =
             result.data || [];
 
+
+        /*
+           Ambil nama dari Google Sheets
+           lalu gabungkan dengan localStorage.
+        */
+
+        userDashboardData.forEach(
+            function(row){
+
+                if(row.namaMustahik){
+
+                    saveNamaLocal(
+                        row.namaMustahik
+                    );
+
+                }
+
+            }
+        );
+
+
+        /*
+           Refresh autocomplete
+        */
+
+        populateNamaMustahik();
+
+
+        /*
+           Filter bulan
+        */
 
         populateUserBulanFilter();
 
@@ -1489,12 +2213,6 @@ async function loadUserDashboard(){
                 }
             );
 
-
-        /*
-           Jika bulan berjalan belum ada
-           di dropdown, tetap gunakan bulan berjalan.
-           Dashboard akan menampilkan nilai 0.
-        */
 
         if(!tersedia){
 
@@ -1533,6 +2251,7 @@ async function loadUserDashboard(){
 function getCurrentBulanTahun(){
 
     const bulanNama = [
+
         "Januari",
         "Februari",
         "Maret",
@@ -1545,10 +2264,13 @@ function getCurrentBulanTahun(){
         "Oktober",
         "November",
         "Desember"
+
     ];
+
 
     const sekarang =
         new Date();
+
 
     return (
         bulanNama[
@@ -1629,6 +2351,7 @@ function populateUserBulanFilter(){
 
                 const pb =
                     String(b).split(" ");
+
 
                 const ya =
                     Number(pa[1]) || 0;
@@ -1713,8 +2436,6 @@ function applyUserFilter(){
 
     let totalKulakan = 0;
 
-    let totalBersih = 0;
-
     let totalTambahan = 0;
 
 
@@ -1724,13 +2445,10 @@ function applyUserFilter(){
             totalOmset +=
                 Number(row.omset) || 0;
 
+
             totalKulakan +=
                 Number(row.kulakan) || 0;
 
-            // Pendapatan Bersih = 10% dari Omset
-            // Tidak mengambil nilai pendapatanBersih lama dari database.
-            totalBersih =
-                totalOmset * 0.10;
 
             totalTambahan +=
                 Number(
@@ -1739,6 +2457,15 @@ function applyUserFilter(){
 
         }
     );
+
+
+    /*
+       Pendapatan Bersih = 10%
+       dari total omset
+    */
+
+    const totalBersih =
+        totalOmset * 0.10;
 
 
     document.getElementById(
@@ -1797,7 +2524,9 @@ function applyUserFilter(){
     }
 
 
-    renderUserTable(filtered);
+    renderUserTable(
+        filtered
+    );
 
 }
 
@@ -1806,7 +2535,9 @@ function applyUserFilter(){
    RENDER USER TABLE
 ===================================================== */
 
-function renderUserTable(rows){
+function renderUserTable(
+    rows
+){
 
     const body =
         document.getElementById(
@@ -1862,13 +2593,15 @@ function renderUserTable(rows){
 
                     <td>
                         ${escapeHTML(
-                            row.bulanTahun || ""
+                            row.bulanTahun ||
+                            ""
                         )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            row.kecamatan || ""
+                            row.kecamatan ||
+                            ""
                         )}
                     </td>
 
@@ -1918,9 +2651,10 @@ function hitungBersih(){
             ).value
         ) || 0;
 
-    // Pendapatan Bersih = 10% dari Omset
-    // Kulakan tidak mengurangi Pendapatan Bersih.
-    const bersih = omset * 0.10;
+
+    const bersih =
+        omset * 0.10;
+
 
     document.getElementById(
         "pendapatanBersih"
@@ -1929,12 +2663,14 @@ function hitungBersih(){
 
 }
 
+
 document.getElementById(
     "omset"
 ).addEventListener(
     "input",
     hitungBersih
 );
+
 
 /* =====================================================
    SAVE DATA
@@ -1953,6 +2689,7 @@ async function saveData(){
     const user =
         auth.currentUser;
 
+
     if(!user){
 
         alert(
@@ -1969,20 +2706,24 @@ async function saveData(){
             "namaMustahik"
         ).value.trim();
 
+
     const kecamatan =
         document.getElementById(
             "kecamatan"
         ).value.trim();
+
 
     const bulan =
         document.getElementById(
             "bulan"
         ).value;
 
+
     const tahun =
         document.getElementById(
             "tahun"
         ).value;
+
 
     const omset =
         Number(
@@ -1991,12 +2732,14 @@ async function saveData(){
             ).value
         ) || 0;
 
+
     const kulakan =
         Number(
             document.getElementById(
                 "kulakan"
             ).value
         ) || 0;
+
 
     const tambahan =
         Number(
@@ -2016,6 +2759,7 @@ async function saveData(){
 
     }
 
+
     if(!kecamatan){
 
         alert(
@@ -2026,6 +2770,7 @@ async function saveData(){
 
     }
 
+
     if(!bulan){
 
         alert(
@@ -2035,6 +2780,7 @@ async function saveData(){
         return;
 
     }
+
 
     if(!tahun){
 
@@ -2048,17 +2794,20 @@ async function saveData(){
 
 
     const bulanTahun =
-        bulan + " " + tahun;
+        bulan +
+        " " +
+        tahun;
 
-    // Pendapatan Bersih = 10% dari Omset
-    // Kulakan tidak digunakan dalam perhitungan ini.
+
     const bersih =
         omset * 0.10;
+
 
     const saveBtn =
         document.getElementById(
             "saveBtn"
         );
+
 
     const status =
         document.getElementById(
@@ -2068,10 +2817,12 @@ async function saveData(){
 
     try{
 
-        saveBtn.disabled = true;
+        saveBtn.disabled =
+            true;
 
         saveBtn.innerText =
             "⏳ Menyimpan...";
+
 
         status.className =
             "status loading";
@@ -2080,31 +2831,58 @@ async function saveData(){
             "Sedang menyimpan data...";
 
 
+        /*
+           Simpan nama ke localStorage
+           SEBELUM data dikirim.
+        */
+
+        saveNamaLocal(
+            nama
+        );
+
+
+        /*
+           Refresh daftar autocomplete
+        */
+
+        populateNamaMustahik();
+
+
         const token =
             await user.getIdToken();
 
 
         const payload = {
 
-            idToken:token,
+            idToken:
+                token,
 
-            uid:user.uid,
+            uid:
+                user.uid,
 
-            email:user.email,
+            email:
+                user.email,
 
-            namaMustahik:nama,
+            namaMustahik:
+                nama,
 
-            bulanTahun:bulanTahun,
+            bulanTahun:
+                bulanTahun,
 
-            kecamatan:kecamatan,
+            kecamatan:
+                kecamatan,
 
-            omset:omset,
+            omset:
+                omset,
 
-            kulakan:kulakan,
+            kulakan:
+                kulakan,
 
-            pendapatanBersih:bersih,
+            pendapatanBersih:
+                bersih,
 
-            pendapatanTambahan:tambahan
+            pendapatanTambahan:
+                tambahan
 
         };
 
@@ -2113,7 +2891,9 @@ async function saveData(){
             await fetch(
                 SCRIPT_URL,
                 {
-                    method:"POST",
+                    method:
+                        "POST",
+
                     body:
                         new URLSearchParams(
                             payload
@@ -2143,31 +2923,50 @@ async function saveData(){
             result.message;
 
 
+        /*
+           Reset form
+        */
+
         document.getElementById(
             "bulan"
         ).value = "";
+
 
         document.getElementById(
             "tahun"
         ).value = "";
 
+
         document.getElementById(
             "omset"
         ).value = "";
+
 
         document.getElementById(
             "kulakan"
         ).value = "";
 
+
         document.getElementById(
             "pendapatanTambahan"
         ).value = "";
+
 
         document.getElementById(
             "pendapatanBersih"
         ).value =
             "Rp 0";
 
+
+        /*
+           Nama dan kecamatan
+           TETAP dipertahankan.
+        */
+
+
+        /*
+           Reload data
+        */
 
         await loadUserDashboard();
 
@@ -2176,11 +2975,14 @@ async function saveData(){
 
         console.error(error);
 
+
         status.className =
             "status error";
 
+
         status.innerText =
             "❌ Gagal menyimpan";
+
 
         alert(
             "Gagal menyimpan data:\n\n" +
@@ -2190,7 +2992,8 @@ async function saveData(){
     }
     finally{
 
-        saveBtn.disabled = false;
+        saveBtn.disabled =
+            false;
 
         saveBtn.innerText =
             "💾 Simpan Laporan";
@@ -2210,8 +3013,11 @@ async function loadAdminDashboard(){
         !currentUserData ||
         !currentUserData.uid
     ){
+
         return;
+
     }
+
 
     try{
 
@@ -2226,6 +3032,7 @@ async function loadAdminDashboard(){
 
         const response =
             await fetch(url);
+
 
         const result =
             await response.json();
@@ -2242,6 +3049,7 @@ async function loadAdminDashboard(){
 
         adminData =
             result.data || [];
+
 
         adminUsers =
             result.users || [];
@@ -2267,16 +3075,20 @@ async function loadAdminDashboard(){
             );
 
 
-        // Card Pendapatan Bersih Admin = 10% dari total Omset
         document.getElementById(
             "aTotalBersih"
         ).innerText =
             rupiah(
-                (Number(result.summary.totalOmset) || 0) * 0.10
+                (
+                    Number(
+                        result.summary.totalOmset
+                    ) || 0
+                ) * 0.10
             );
 
 
         populateUserFilter();
+
 
         populateKecamatanFilter(
             result.filters
@@ -2284,13 +3096,16 @@ async function loadAdminDashboard(){
                 : []
         );
 
+
         populateBulanFilter(
             result.filters
                 ? result.filters.bulanTahun
                 : []
         );
 
+
         renderAdminUsers();
+
 
         applyAdminFilter();
 
@@ -2310,7 +3125,7 @@ async function loadAdminDashboard(){
 
 
 /* =====================================================
-   USER FILTER
+   ADMIN USER FILTER
 ===================================================== */
 
 function populateUserFilter(){
@@ -2319,6 +3134,7 @@ function populateUserFilter(){
         document.getElementById(
             "filterUser"
         );
+
 
     const oldValue =
         select.value;
@@ -2333,52 +3149,70 @@ function populateUserFilter(){
 
 
     adminUsers
-        .filter(function(user){
+        .filter(
+            function(user){
 
-            return (
-                String(user.role || "user")
-                    .toLowerCase()
-                !== "admin"
-            );
+                return (
+                    String(
+                        user.role ||
+                        "user"
+                    ).toLowerCase()
+                    !== "admin"
+                );
 
-        })
-        .sort(function(a,b){
+            }
+        )
+        .sort(
+            function(a,b){
 
-            return String(a.nama || "")
-                .localeCompare(
-                    String(b.nama || ""),
+                return String(
+                    a.nama || ""
+                ).localeCompare(
+                    String(
+                        b.nama || ""
+                    ),
                     "id"
                 );
 
-        })
-        .forEach(function(user){
+            }
+        )
+        .forEach(
+            function(user){
 
-            const option =
-                document.createElement(
-                    "option"
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    user.uid;
+
+                option.textContent =
+                    user.nama ||
+                    user.email ||
+                    user.uid;
+
+                select.appendChild(
+                    option
                 );
 
-            option.value =
-                user.uid;
-
-            option.textContent =
-                user.nama ||
-                user.email ||
-                user.uid;
-
-            select.appendChild(option);
-
-        });
+            }
+        );
 
 
     if(
         Array.from(
             select.options
-        ).some(function(option){
+        ).some(
+            function(option){
 
-            return option.value === oldValue;
+                return (
+                    option.value ===
+                    oldValue
+                );
 
-        })
+            }
+        )
     ){
 
         select.value =
@@ -2402,6 +3236,7 @@ function populateKecamatanFilter(
             "filterKecamatan"
         );
 
+
     const oldValue =
         select.value;
 
@@ -2414,41 +3249,56 @@ function populateKecamatanFilter(
         `;
 
 
-    [...new Set(kecamatanList || [])]
+    [...new Set(
+        kecamatanList || []
+    )]
         .filter(Boolean)
-        .sort(function(a,b){
+        .sort(
+            function(a,b){
 
-            return String(a)
-                .localeCompare(
-                    String(b),
-                    "id"
+                return String(a)
+                    .localeCompare(
+                        String(b),
+                        "id"
+                    );
+
+            }
+        )
+        .forEach(
+            function(kec){
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    kec;
+
+                option.textContent =
+                    kec;
+
+                select.appendChild(
+                    option
                 );
 
-        })
-        .forEach(function(kec){
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value = kec;
-
-            option.textContent = kec;
-
-            select.appendChild(option);
-
-        });
+            }
+        );
 
 
     if(
         Array.from(
             select.options
-        ).some(function(option){
+        ).some(
+            function(option){
 
-            return option.value === oldValue;
+                return (
+                    option.value ===
+                    oldValue
+                );
 
-        })
+            }
+        )
     ){
 
         select.value =
@@ -2460,7 +3310,7 @@ function populateKecamatanFilter(
 
 
 /* =====================================================
-   BULAN FILTER
+   BULAN FILTER ADMIN
 ===================================================== */
 
 function populateBulanFilter(
@@ -2471,6 +3321,7 @@ function populateBulanFilter(
         document.getElementById(
             "filterBulan"
         );
+
 
     const oldValue =
         select.value;
@@ -2502,65 +3353,77 @@ function populateBulanFilter(
     };
 
 
-    [...new Set(bulanList || [])]
+    [...new Set(
+        bulanList || []
+    )]
         .filter(Boolean)
-        .sort(function(a,b){
+        .sort(
+            function(a,b){
 
-            const pa =
-                String(a).split(" ");
+                const pa =
+                    String(a).split(" ");
 
-            const pb =
-                String(b).split(" ");
-
-            const ya =
-                Number(pa[1]) || 0;
-
-            const yb =
-                Number(pb[1]) || 0;
+                const pb =
+                    String(b).split(" ");
 
 
-            if(ya !== yb){
+                const ya =
+                    Number(pa[1]) || 0;
 
-                return yb - ya;
+                const yb =
+                    Number(pb[1]) || 0;
 
-            }
+
+                if(ya !== yb){
+
+                    return yb - ya;
+
+                }
 
 
-            return (
-                (bulanOrder[pb[0]] || 0)
-                -
-                (bulanOrder[pa[0]] || 0)
-            );
-
-        })
-        .forEach(function(item){
-
-            const option =
-                document.createElement(
-                    "option"
+                return (
+                    (bulanOrder[pb[0]] || 0)
+                    -
+                    (bulanOrder[pa[0]] || 0)
                 );
 
-            option.value =
-                item;
+            }
+        )
+        .forEach(
+            function(item){
 
-            option.textContent =
-                item;
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
-            select.appendChild(
-                option
-            );
+                option.value =
+                    item;
 
-        });
+                option.textContent =
+                    item;
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
 
 
     if(
         Array.from(
             select.options
-        ).some(function(option){
+        ).some(
+            function(option){
 
-            return option.value === oldValue;
+                return (
+                    option.value ===
+                    oldValue
+                );
 
-        })
+            }
+        )
     ){
 
         select.value =
@@ -2572,14 +3435,7 @@ function populateBulanFilter(
 
 
 /* =====================================================
-   UPDATE BULAN SESUAI USER
-=====================================================
-
-   Jika user dipilih,
-   daftar bulan akan mengikuti
-   bulan yang benar-benar dimiliki
-   user tersebut.
-
+   UPDATE BULAN FILTER USER
 ===================================================== */
 
 function updateBulanFilterByUser(){
@@ -2610,7 +3466,9 @@ function updateBulanFilterByUser(){
             adminData.filter(
                 function(row){
 
-                    return row.uid === uid;
+                    return (
+                        row.uid === uid
+                    );
 
                 }
             );
@@ -2637,13 +3495,16 @@ function updateBulanFilterByUser(){
 
 
     populateBulanFilter(
-        Object.keys(bulanSet)
+        Object.keys(
+            bulanSet
+        )
     );
 
 
     if(
-        Object.keys(bulanSet)
-            .includes(oldValue)
+        Object.keys(
+            bulanSet
+        ).includes(oldValue)
     ){
 
         select.value =
@@ -2652,7 +3513,8 @@ function updateBulanFilterByUser(){
     }
     else{
 
-        select.value = "";
+        select.value =
+            "";
 
     }
 
@@ -2742,7 +3604,9 @@ function applyAdminFilter(){
 
 
                     if(
-                        !text.includes(search)
+                        !text.includes(
+                            search
+                        )
                     ){
 
                         return false;
@@ -2758,20 +3622,15 @@ function applyAdminFilter(){
         );
 
 
-    /* =================================================
-       RENDER TABEL
-    ================================================= */
+    renderAdminTable(
+        filtered
+    );
 
-    renderAdminTable(filtered);
-
-
-    /* =================================================
-       HITUNG SUMMARY FILTER
-    ================================================= */
 
     let omset = 0;
+
     let kulakan = 0;
-    let bersih = 0;
+
     let tambahan = 0;
 
 
@@ -2784,11 +3643,6 @@ function applyAdminFilter(){
             kulakan +=
                 Number(row.kulakan) || 0;
 
-            // Pendapatan Bersih = 10% dari Omset
-            // untuk seluruh hasil filter.
-            bersih =
-                omset * 0.10;
-
             tambahan +=
                 Number(
                     row.pendapatanTambahan
@@ -2796,6 +3650,10 @@ function applyAdminFilter(){
 
         }
     );
+
+
+    const bersih =
+        omset * 0.10;
 
 
     document.getElementById(
@@ -2822,14 +3680,11 @@ function applyAdminFilter(){
         rupiah(tambahan);
 
 
-    /* =================================================
-       FILTER INFO
-    ================================================= */
-
     const userSelect =
         document.getElementById(
             "filterUser"
         );
+
 
     const userText =
         userSelect.options[
@@ -2866,11 +3721,9 @@ function applyAdminFilter(){
         `;
 
 
-    /* =================================================
-       CHART
-    ================================================= */
-
-    renderChart(filtered);
+    renderChart(
+        filtered
+    );
 
 }
 
@@ -2879,12 +3732,15 @@ function applyAdminFilter(){
    RENDER ADMIN TABLE
 ===================================================== */
 
-function renderAdminTable(rows){
+function renderAdminTable(
+    rows
+){
 
     const body =
         document.getElementById(
             "adminTableBody"
         );
+
 
     body.innerHTML = "";
 
@@ -2917,76 +3773,82 @@ function renderAdminTable(rows){
     rows
         .slice()
         .reverse()
-        .forEach(function(row){
+        .forEach(
+            function(row){
 
-            body.innerHTML +=
-            `
-            <tr>
+                body.innerHTML +=
+                `
+                <tr>
 
-                <td>
-                    ${escapeHTML(
-                        formatTanggal(
-                            row.waktu
-                        )
-                    )}
-                </td>
-
-                <td>
-                    <b>
+                    <td>
                         ${escapeHTML(
-                            row.namaMustahik
+                            formatTanggal(
+                                row.waktu
+                            )
                         )}
-                    </b>
-                </td>
+                    </td>
 
-                <td>
-                    ${escapeHTML(
-                        row.bulanTahun
-                    )}
-                </td>
+                    <td>
+                        <b>
+                            ${escapeHTML(
+                                row.namaMustahik
+                            )}
+                        </b>
+                    </td>
 
-                <td>
-                    ${escapeHTML(
-                        row.email
-                    )}
-                </td>
+                    <td>
+                        ${escapeHTML(
+                            row.bulanTahun
+                        )}
+                    </td>
 
-                <td>
-                    ${escapeHTML(
-                        row.kecamatan
-                    )}
-                </td>
+                    <td>
+                        ${escapeHTML(
+                            row.email
+                        )}
+                    </td>
 
-                <td>
-                    ${rupiah(row.omset)}
-                </td>
+                    <td>
+                        ${escapeHTML(
+                            row.kecamatan
+                        )}
+                    </td>
 
-                <td>
-                    ${rupiah(row.kulakan)}
-                </td>
+                    <td>
+                        ${rupiah(
+                            row.omset
+                        )}
+                    </td>
 
-                <td>
-                    ${rupiah(
-                        row.pendapatanBersih
-                    )}
-                </td>
+                    <td>
+                        ${rupiah(
+                            row.kulakan
+                        )}
+                    </td>
 
-                <td>
-                    ${rupiah(
-                        row.pendapatanTambahan
-                    )}
-                </td>
+                    <td>
+                        ${rupiah(
+                            row.pendapatanBersih
+                        )}
+                    </td>
 
-            </tr>
-            `;
+                    <td>
+                        ${rupiah(
+                            row.pendapatanTambahan
+                        )}
+                    </td>
 
-        });
+                </tr>
+                `;
+
+            }
+        );
 
 }
 
 
 /* =====================================================
-   RENDER USER ADMIN
+   RENDER ADMIN USERS
 ===================================================== */
 
 function renderAdminUsers(){
@@ -2995,6 +3857,7 @@ function renderAdminUsers(){
         document.getElementById(
             "adminUserBody"
         );
+
 
     body.innerHTML = "";
 
@@ -3099,7 +3962,9 @@ function renderAdminUsers(){
    RENDER CHART
 ===================================================== */
 
-function renderChart(rows){
+function renderChart(
+    rows
+){
 
     const grouped = {};
 
@@ -3137,10 +4002,14 @@ function renderChart(rows){
                 Number(row.kulakan) || 0;
 
 
-            grouped[key].bersih +=
-                Number(
-                    row.pendapatanBersih
-                ) || 0;
+            /*
+               Bersih dihitung 10%
+               dari omset
+            */
+
+            grouped[key].bersih =
+                grouped[key].omset *
+                0.10;
 
 
             grouped[key].tambahan +=
@@ -3172,68 +4041,79 @@ function renderChart(rows){
 
     const labels =
         Object.keys(grouped)
-        .sort(function(a,b){
+        .sort(
+            function(a,b){
 
-            const pa =
-                String(a).split(" ");
+                const pa =
+                    String(a).split(" ");
 
-            const pb =
-                String(b).split(" ");
-
-            const ya =
-                Number(pa[1]) || 0;
-
-            const yb =
-                Number(pb[1]) || 0;
+                const pb =
+                    String(b).split(" ");
 
 
-            if(ya !== yb){
+                const ya =
+                    Number(pa[1]) || 0;
 
-                return ya - yb;
+                const yb =
+                    Number(pb[1]) || 0;
+
+
+                if(ya !== yb){
+
+                    return ya - yb;
+
+                }
+
+
+                return (
+                    (bulanOrder[pa[0]] || 0)
+                    -
+                    (bulanOrder[pb[0]] || 0)
+                );
 
             }
-
-
-            return (
-                (bulanOrder[pa[0]] || 0)
-                -
-                (bulanOrder[pb[0]] || 0)
-            );
-
-        });
+        );
 
 
     const omset =
         labels.map(
-            key =>
-                grouped[key].omset
+            function(key){
+
+                return grouped[key].omset;
+
+            }
         );
 
 
     const kulakan =
         labels.map(
-            key =>
-                grouped[key].kulakan
+            function(key){
+
+                return grouped[key].kulakan;
+
+            }
         );
 
 
     const bersih =
         labels.map(
-            key =>
-                grouped[key].bersih
+            function(key){
+
+                return grouped[key].bersih;
+
+            }
         );
 
 
     const tambahan =
         labels.map(
-            key =>
-                grouped[key].tambahan
+            function(key){
+
+                return grouped[key].tambahan;
+
+            }
         );
 
-
-    /* =================================================
-       JUDUL GRAFIK SESUAI USER
-    ================================================= */
 
     const userSelect =
         document.getElementById(
@@ -3308,15 +4188,12 @@ function renderChart(rows){
         title;
 
 
-    /* =================================================
-       DESTROY CHART
-    ================================================= */
-
     if(financeChart){
 
         financeChart.destroy();
 
-        financeChart = null;
+        financeChart =
+            null;
 
     }
 
@@ -3325,6 +4202,11 @@ function renderChart(rows){
         document.getElementById(
             "financeChart"
         );
+
+
+    if(!ctx){
+        return;
+    }
 
 
     financeChart =
@@ -3459,7 +4341,7 @@ document.getElementById(
 
 
 /* =====================================================
-   USER RESET KE BULAN BERJALAN
+   USER RESET
 ===================================================== */
 
 document.getElementById(
@@ -3501,7 +4383,8 @@ document.getElementById(
         }
         else{
 
-            select.value = "";
+            select.value =
+                "";
 
         }
 
@@ -3513,7 +4396,7 @@ document.getElementById(
 
 
 /* =====================================================
-   FILTER USER
+   ADMIN FILTER USER
 ===================================================== */
 
 document.getElementById(
@@ -3521,12 +4404,6 @@ document.getElementById(
 ).addEventListener(
     "change",
     function(){
-
-        /*
-          Ketika user berubah,
-          bulan otomatis menyesuaikan
-          data user tersebut.
-        */
 
         updateBulanFilterByUser();
 
@@ -3537,7 +4414,7 @@ document.getElementById(
 
 
 /* =====================================================
-   FILTER KECAMATAN
+   ADMIN FILTER KECAMATAN
 ===================================================== */
 
 document.getElementById(
@@ -3549,7 +4426,7 @@ document.getElementById(
 
 
 /* =====================================================
-   FILTER BULAN
+   ADMIN FILTER BULAN
 ===================================================== */
 
 document.getElementById(
@@ -3573,7 +4450,7 @@ document.getElementById(
 
 
 /* =====================================================
-   RESET FILTER
+   RESET FILTER ADMIN
 ===================================================== */
 
 document.getElementById(
@@ -3586,25 +4463,24 @@ document.getElementById(
             "filterUser"
         ).value = "";
 
+
         document.getElementById(
             "filterKecamatan"
         ).value = "";
 
+
         document.getElementById(
             "filterBulan"
         ).value = "";
+
 
         document.getElementById(
             "filterSearch"
         ).value = "";
 
 
-        /*
-          Kembalikan daftar bulan
-          seluruh user.
-        */
-
         const allMonths = {};
+
 
         adminData.forEach(
             function(row){
@@ -3622,7 +4498,9 @@ document.getElementById(
 
 
         populateBulanFilter(
-            Object.keys(allMonths)
+            Object.keys(
+                allMonths
+            )
         );
 
 
@@ -3644,34 +4522,63 @@ logoutBtn.addEventListener(
 
             await auth.signOut();
 
-            currentUserData = null;
 
-            adminData = [];
+            currentUserData =
+                null;
 
-            adminUsers = [];
 
-            userDashboardData = [];
+            adminData =
+                [];
 
-            userSelectedBulan = "";
+
+            adminUsers =
+                [];
+
+
+            userDashboardData =
+                [];
+
+
+            userSelectedBulan =
+                "";
 
 
             if(financeChart){
 
                 financeChart.destroy();
 
-                financeChart = null;
+                financeChart =
+                    null;
 
             }
 
         }
         catch(error){
 
-            console.error(error);
+            console.error(
+                error
+            );
 
         }
 
     }
 );
+
+
+/* =====================================================
+   INITIAL AUTOCOMPLETE
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        populateNamaMustahik();
+
+    }
+);
+
+  document.getElementById("tanggalPengisian").value = new Date().toISOString().split("T")[0];
 
 </script>
 
