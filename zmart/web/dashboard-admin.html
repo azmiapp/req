@@ -774,7 +774,7 @@ tr:hover{
         <div class="icon">📈</div>
 
         <div class="title">
-           Pendapatan Bersih Z Mart
+           Pendapatan Bersih Z Mart (10%)
         </div>
 
         <div id="fBersih" class="value">
@@ -876,7 +876,7 @@ tr:hover{
         <div id="aTotalBersih" class="value">
             Rp 0
         </div>
-        <div id="aBersihMeta" class="meta">10% dari pendapatan rata-rata</div>
+        <div id="aBersihMeta" class="meta">pendapatan rata-rata</div>
 
     </div>
 
@@ -2447,66 +2447,71 @@ function populateUserFilter(){
     const oldValue =
         select.value;
 
-
     select.innerHTML =
         `
         <option value="">
-            Semua User
+            Semua Nama Mustahik
         </option>
         `;
 
+    /*
+      Filter Nama User sekarang mengambil data langsung
+      dari kolom "Nama Mustahik" pada DATA_KEUANGAN.
 
-    adminUsers
-        .filter(function(user){
+      adminData berasal dari result.data pada dashboard admin,
+      sehingga daftar akan mengikuti data laporan keuangan
+      yang benar-benar tersedia.
+    */
+    const namaSet = new Set();
 
-            return (
-                String(user.role || "user")
-                    .toLowerCase()
-                !== "admin"
+    (adminData || []).forEach(function(row){
+
+        const nama = String(
+            row.namaMustahik || ""
+        ).trim();
+
+        if(nama){
+            namaSet.add(nama);
+        }
+
+    });
+
+    Array.from(namaSet)
+        .sort(function(a,b){
+
+            return a.localeCompare(
+                b,
+                "id",
+                { sensitivity: "base" }
             );
 
         })
-        .sort(function(a,b){
-
-            return String(a.nama || "")
-                .localeCompare(
-                    String(b.nama || ""),
-                    "id"
-                );
-
-        })
-        .forEach(function(user){
+        .forEach(function(nama){
 
             const option =
                 document.createElement(
                     "option"
                 );
 
-            option.value =
-                user.uid;
-
-            option.textContent =
-                user.nama ||
-                user.email ||
-                user.uid;
+            /* value juga menggunakan Nama Mustahik,
+               bukan UID dari sheet USER. */
+            option.value = nama;
+            option.textContent = nama;
 
             select.appendChild(option);
 
         });
 
-
     if(
-        Array.from(
-            select.options
-        ).some(function(option){
+        Array.from(select.options)
+            .some(function(option){
 
-            return option.value === oldValue;
+                return option.value === oldValue;
 
-        })
+            })
     ){
 
-        select.value =
-            oldValue;
+        select.value = oldValue;
 
     }
 
@@ -2708,42 +2713,39 @@ function populateBulanFilter(
 
 function updateBulanFilterByUser(){
 
-    const uid =
+    const namaMustahik =
         document.getElementById(
             "filterUser"
         ).value;
-
 
     const select =
         document.getElementById(
             "filterBulan"
         );
 
-
     const oldValue =
         select.value;
 
-
     let sourceData =
-        adminData;
+        adminData || [];
 
-
-    if(uid){
+    if(namaMustahik){
 
         sourceData =
-            adminData.filter(
+            sourceData.filter(
                 function(row){
 
-                    return row.uid === uid;
+                    return String(
+                        row.namaMustahik || ""
+                    ).trim() ===
+                    String(namaMustahik).trim();
 
                 }
             );
 
     }
 
-
     const bulanSet = {};
-
 
     sourceData.forEach(
         function(row){
@@ -2759,19 +2761,16 @@ function updateBulanFilterByUser(){
         }
     );
 
-
     populateBulanFilter(
         Object.keys(bulanSet)
     );
-
 
     if(
         Object.keys(bulanSet)
             .includes(oldValue)
     ){
 
-        select.value =
-            oldValue;
+        select.value = oldValue;
 
     }
     else{
@@ -2789,7 +2788,7 @@ function updateBulanFilterByUser(){
 
 function applyAdminFilter(){
 
-    const uid =
+    const namaMustahikFilter =
         document.getElementById(
             "filterUser"
         ).value;
@@ -2820,9 +2819,9 @@ function applyAdminFilter(){
             function(row){
 
                 if(
-                    uid &&
-                    String(row.uid) !==
-                    String(uid)
+                    namaMustahikFilter &&
+                    String(row.namaMustahik || "").trim() !==
+                    String(namaMustahikFilter).trim()
                 ){
 
                     return false;
@@ -3653,21 +3652,38 @@ function getActiveAdminFilterText(){
 }
 
 function getFilteredAdminRows(){
-    const uid=document.getElementById("filterUser").value;
+    const namaMustahikFilter=document.getElementById("filterUser").value;
     const kecamatan=document.getElementById("filterKecamatan").value;
     const bulan=document.getElementById("filterBulan").value;
     const search=document.getElementById("filterSearch").value.toLowerCase().trim();
+
     return (adminData||[]).filter(function(row){
-        if(uid && String(row.uid)!==String(uid)) return false;
+
+        if(
+            namaMustahikFilter &&
+            String(row.namaMustahik||"").trim() !==
+            String(namaMustahikFilter).trim()
+        ){
+            return false;
+        }
+
         if(kecamatan && String(row.kecamatan)!==String(kecamatan)) return false;
         if(bulan && String(row.bulanTahun)!==String(bulan)) return false;
+
         if(search){
-            const text=(String(row.namaMustahik||"")+" "+String(row.email||"")+" "+String(row.kecamatan||"")).toLowerCase();
+            const text=(
+                String(row.namaMustahik||"")+" "+
+                String(row.email||"")+" "+
+                String(row.kecamatan||"")
+            ).toLowerCase();
+
             if(!text.includes(search)) return false;
         }
+
         return true;
     });
 }
+
 
 function printFilteredReport(){
     const rows=getFilteredAdminRows();
