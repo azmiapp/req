@@ -90,10 +90,53 @@ function drawWatermark(ctx,w,h,location){
   lines.forEach((line,i)=>{ctx.font=i===0?"700 18px Arial,sans-serif":"16px Arial,sans-serif";ctx.fillText(line,pad,boxY+pad+i*lineH)});
   ctx.restore();
 }
+let locationWatchId=null;
+let locationFastTimer=null;
+
+function applyLocation(pos,refining=false){
+  coords={latitude:pos.coords.latitude,longitude:pos.coords.longitude,accuracy:pos.coords.accuracy};
+  const accuracy=Math.round(coords.accuracy||0);
+  qs("#locationBox").innerHTML=`✓ Lokasi ${refining?"didapat • sedang memperbaiki akurasi":"didapat"}<br><small>Lat ${coords.latitude.toFixed(6)} • Lng ${coords.longitude.toFixed(6)} • ±${accuracy} m</small>`;
+  qs("#submitDelivery").disabled=!(coords&&photoBlob);
+}
+
 function getLocation(){
- qs("#locationBox").textContent="Mengambil lokasi GPS...";
- if(!navigator.geolocation){qs("#locationBox").textContent="GPS tidak didukung browser.";return}
- navigator.geolocation.getCurrentPosition(pos=>{coords={latitude:pos.coords.latitude,longitude:pos.coords.longitude,accuracy:pos.coords.accuracy};qs("#locationBox").innerHTML=`✓ Lokasi didapat<br><small>Lat ${coords.latitude.toFixed(6)} • Lng ${coords.longitude.toFixed(6)} • ±${Math.round(coords.accuracy)} m</small>`;qs("#submitDelivery").disabled=!(coords&&photoBlob)},err=>{qs("#locationBox").textContent="Lokasi gagal: "+err.message;toast("Izinkan akses lokasi untuk melanjutkan.","error")},{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+  qs("#locationBox").textContent="Mencari lokasi GPS...";
+  if(!navigator.geolocation){qs("#locationBox").textContent="GPS tidak didukung browser.";return}
+
+  // Tahap 1: ambil lokasi cepat dari cache/network. Jangan langsung meminta
+  // high accuracy karena pada beberapa HP GPS satelit bisa memerlukan waktu lama.
+  navigator.geolocation.getCurrentPosition(pos=>{
+    applyLocation(pos,true);
+  },()=>{}, {enableHighAccuracy:false,timeout:4000,maximumAge:120000});
+
+  // Tahap 2: sambil menunggu, minta posisi yang lebih akurat. Begitu ada hasil
+  // yang cukup baik, hentikan watch agar baterai tidak terus terpakai.
+  if(locationWatchId!==null){try{navigator.geolocation.clearWatch(locationWatchId)}catch{}locationWatchId=null}
+  if(locationFastTimer)clearTimeout(locationFastTimer);
+  locationWatchId=navigator.geolocation.watchPosition(pos=>{
+    applyLocation(pos,false);
+    const acc=Number(pos.coords.accuracy||9999);
+    if(acc<=50){
+      try{navigator.geolocation.clearWatch(locationWatchId)}catch{}
+      locationWatchId=null;
+      if(locationFastTimer){clearTimeout(locationFastTimer);locationFastTimer=null}
+    }
+  },err=>{
+    if(!coords){
+      qs("#locationBox").textContent="Lokasi gagal: "+err.message;
+      toast("Izinkan akses lokasi untuk melanjutkan.","error");
+    }
+  },{enableHighAccuracy:true,timeout:8000,maximumAge:0});
+
+  // Jangan biarkan proses pencarian akurasi tinggi menggantung terlalu lama.
+  locationFastTimer=setTimeout(()=>{
+    if(locationWatchId!==null){try{navigator.geolocation.clearWatch(locationWatchId)}catch{}locationWatchId=null}
+    locationFastTimer=null;
+    if(coords){
+      qs("#locationBox").innerHTML+=`<br><small class="muted">Lokasi siap digunakan.</small>`;
+    }
+  },8500);
 }
 function blobToDataUrl(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob)})}
 async function submitDelivery(){
