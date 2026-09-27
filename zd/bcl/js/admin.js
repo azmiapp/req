@@ -6,12 +6,26 @@ import { guard,qs,qsa,esc,fmtDate,toast,logout,getUsers,saveUserProfile,getBcls,
 
 let bcls=[],users=[],assignments=[],deliveries=[],profile;
 const $=qs;
-guard("admin",async(user,p)=>{profile=p;$("#adminName").textContent=p.name||user.email;bind();await loadAll();renderAll();});
+
+function setLoading(show,message="Memuat data..."){
+  const el=$("#loadingOverlay");
+  if(!el)return;
+  el.classList.toggle("hidden",!show);
+  const text=$("#loadingText");
+  if(text)text.textContent=message;
+}
+
+setLoading(true,"Memuat data admin...");
+guard("admin",async(user,p)=>{
+  profile=p;$("#adminName").textContent=p.name||user.email;bind();
+  try{await loadAll();renderAll()}catch(e){toast(e.message||"Gagal memuat data.","error")}
+  finally{setLoading(false)}
+});
 
 function bind(){
  $("#logoutBtn").onclick=logout;
  qsa(".nav-btn").forEach(b=>b.onclick=()=>showView(b.dataset.view));
- $("#addBclBtn").onclick=showBclForm;
+ $("#addBclBtn").onclick=()=>showBclForm();
  $("#addAssignmentBtn").onclick=showAssignmentForm;
  $("#addUserBtn").onclick=showUserForm;
  $("#bclSearch").oninput=renderBcl;$("#bclStatus").onchange=renderBcl;
@@ -30,8 +44,18 @@ function renderStats(){
 function renderBcl(){
  const s=($("#bclSearch").value||"").toLowerCase(),st=$("#bclStatus").value;
  const rows=bcls.filter(x=>(!st||x.status===st)&&[x.id,x.name,x.district,x.village].join(" ").toLowerCase().includes(s));
- $("#bclTable").innerHTML=`<table><thead><tr><th>ID</th><th>Penerima</th><th>Wilayah</th><th>Status</th><th>Lokasi</th><th>Aksi</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.id)}</td><td><b>${esc(x.name)}</b><small>${esc(x.address||"")}</small></td><td>${esc(x.district||"-")}<br>${esc(x.village||"-")}</td><td><span class="badge">${esc(x.status||"BELUM_DITUGASKAN")}</span></td><td>${x.mapsUrl?`<a class="btn small" target="_blank" rel="noopener noreferrer" href="${esc(x.mapsUrl)}">🗺️ Maps</a>`:`<span class="muted">Belum ada</span>`}</td><td><button class="btn small" data-edit-bcl="${esc(x.id)}">Edit</button></td></tr>`).join("")}</tbody></table>`;
+ $("#bclTable").innerHTML=`<table><thead><tr><th>ID</th><th>Penerima</th><th>Wilayah</th><th>Status</th><th>Lokasi</th><th>QR</th><th>Aksi</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.id)}</td><td><b>${esc(x.name)}</b><small>${esc(x.address||"")}</small></td><td>${esc(x.district||"-")}<br>${esc(x.village||"-")}</td><td><span class="badge">${esc(x.status||"BELUM_DITUGASKAN")}</span></td><td>${x.mapsUrl?`<a class="btn small" target="_blank" rel="noopener noreferrer" href="${esc(x.mapsUrl)}">🗺️ Maps</a>`:`<span class="muted">Belum ada</span>`}</td><td><button class="btn small" data-qr-bcl="${esc(x.id)}">▣ QR</button></td><td><button class="btn small" data-edit-bcl="${esc(x.id)}">Edit</button></td></tr>`).join("")||`<tr><td colspan="7">Belum ada BCL.</td></tr>`}</tbody></table>`;
  qsa("[data-edit-bcl]").forEach(b=>b.onclick=()=>showBclForm(b.dataset.editBcl));
+ qsa("[data-qr-bcl]").forEach(b=>b.onclick=()=>showQr(b.dataset.qrBcl));
+}
+function showQr(id){
+ const x=bcls.find(v=>v.id===id);if(!x)return;
+ openModal(`<h2>QR BCL</h2><p><b>${esc(x.name)}</b><br><span class="muted">ID: ${esc(x.id)}</span></p><div id="qrCanvas" style="display:flex;justify-content:center;padding:16px"></div><div class="inline"><button id="downloadQr" class="btn primary">Download QR</button><button id="closeQr" class="btn ghost">Tutup</button></div>`);
+ const box=$("#qrCanvas");
+ if(typeof QRCode==="undefined"){box.innerHTML=`<p class="muted">Library QR belum termuat.</p>`;return}
+ new QRCode(box,{text:x.id,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
+ $("#downloadQr").onclick=()=>{const img=box.querySelector("img");const canvas=box.querySelector("canvas");const src=img?.src||canvas?.toDataURL("image/png");if(!src)return;const a=document.createElement("a");a.href=src;a.download=`QR-${x.id}.png`;a.click()};
+ $("#closeQr").onclick=()=>$("#modal").close();
 }
 function renderAssignments(){
  $("#assignmentTable").innerHTML=`<table><thead><tr><th>BCL</th><th>ZMart</th><th>Paket</th><th>Status</th><th>Waktu</th></tr></thead><tbody>${assignments.map(x=>`<tr><td><b>${esc(x.bclName)}</b><small>${esc(x.bclId)}</small></td><td>${esc(x.zmartName)}</td><td>${esc(x.packageName||"-")}</td><td><span class="badge">${esc(x.status)}</span></td><td>${fmtDate(x.createdAt)}</td></tr>`).join("")||`<tr><td colspan="5">Belum ada penugasan.</td></tr>`}</tbody></table>`;
@@ -48,15 +72,15 @@ function renderUsers(){
 function openModal(html){$("#modalBody").innerHTML=html;$("#modal").showModal()}
 function showBclForm(id=""){
  const x=bcls.find(v=>v.id===id)||{};
- openModal(`<h2>${id?"Edit":"Tambah"} BCL</h2><form id="bclForm"><label>ID BCL<input name="id" value="${esc(x.id||"BCL-"+Date.now())}" ${id?"readonly":""} required></label><label>Nama penerima<input name="name" value="${esc(x.name||"")}" required></label><label>Kecamatan<input name="district" value="${esc(x.district||"")}" required></label><label>Desa/Kelurahan<input name="village" value="${esc(x.village||"")}"></label><label>Alamat<textarea name="address">${esc(x.address||"")}</textarea></label><label>No. Kartu/Identitas<input name="cardNo" value="${esc(x.cardNo||"")}"></label><label>📍 Link Lokasi Rumah di Google Maps<input name="mapsUrl" type="url" value="${esc(x.mapsUrl||"")}" placeholder="https://maps.google.com/..."><small class="muted">Buka Google Maps → pilih lokasi rumah → Bagikan → Salin link → tempel di sini.</small></label><button class="btn primary full">Simpan</button></form>`);
- $("#bclForm").onsubmit=async e=>{e.preventDefault();try{const data=Object.fromEntries(new FormData(e.target));data.status=x.status||"BELUM_DITUGASKAN";data.assignedTo=x.assignedTo||"";data.assignedZmartName=x.assignedZmartName||"";await saveBcl(data);$("#modal").close();await loadAll();renderAll();toast("Data BCL tersimpan.")}catch(err){toast(err.message,"error")}};
+ openModal(`<h2>${id?"Edit":"Tambah"} BCL</h2><form id="bclForm"><label>ID BCL<input name="id" value="${esc(x.id||"BCL-"+Date.now())}" ${id?"readonly":""} required></label><label>Nama penerima<input name="name" value="${esc(x.name||"")}" required></label><label>Kecamatan<input name="district" value="${esc(x.district||"")}" required></label><label>Desa/Kelurahan<input name="village" value="${esc(x.village||"")}"></label><label>Alamat<textarea name="address">${esc(x.address||"")}</textarea></label><label>No. Kartu/Identitas<input name="cardNo" value="${esc(x.cardNo||"")}"></label><label>📍 Link Lokasi Rumah di Google Maps<input name="mapsUrl" type="url" value="${esc(x.mapsUrl||"")}" placeholder="https://maps.google.com/..."><small class="muted">Buka Google Maps → pilih lokasi rumah → Bagikan → Salin link → tempel di sini.</small></label><button id="saveBclBtn" class="btn primary full">Simpan & Generate QR</button></form>`);
+ $("#bclForm").onsubmit=async e=>{e.preventDefault();const btn=$("#saveBclBtn");btn.disabled=true;btn.textContent="Menyimpan...";setLoading(true,"Menyimpan data BCL...");try{const data=Object.fromEntries(new FormData(e.target));data.status=x.status||"BELUM_DITUGASKAN";data.assignedTo=x.assignedTo||"";data.assignedZmartName=x.assignedZmartName||"";const saved=await saveBcl(data);await loadAll();renderAll();$("#modal").close();toast("Data BCL tersimpan. QR otomatis tersedia.");showQr(saved?.id||data.id)}catch(err){toast(err.message,"error");btn.disabled=false;btn.textContent="Simpan & Generate QR"}finally{setLoading(false)}};
 }
 function showAssignmentForm(){
  const pending=bcls.filter(x=>x.status!=="SELESAI"),zmarts=users.filter(x=>x.role==="zmart"&&x.active!==false);
- openModal(`<h2>Buat Penugasan</h2><form id="assignmentForm"><label>BCL<select name="bclId" required><option value="">Pilih BCL</option>${pending.map(x=>`<option value="${esc(x.id)}">${esc(x.id)} — ${esc(x.name)}</option>`).join("")}</select></label><label>ZMart<select name="zmartUid" required><option value="">Pilih ZMart</option>${zmarts.map(x=>`<option value="${esc(x.uid)}">${esc(x.name)} — ${esc(x.area||"")}</option>`).join("")}</select></label><label>Nama paket<input name="packageName" value="Paket Sembako BCL"></label><label>Isi paket (pisahkan dengan koma)<textarea name="items">Beras 5 kg, Minyak Goreng 1 L, Gula 1 kg, Tepung Terigu 1 kg, Susu 2 pcs</textarea></label><button class="btn primary full">Buat Penugasan</button></form>`);
- $("#assignmentForm").onsubmit=async e=>{e.preventDefault();try{const f=new FormData(e.target);const items=String(f.get("items")||"").split(",").map(x=>({name:x.trim(),checked:false})).filter(x=>x.name);await createAssignment({bclId:f.get("bclId"),zmartUid:f.get("zmartUid"),packageName:f.get("packageName"),items});$("#modal").close();await loadAll();renderAll();toast("Penugasan dibuat.")}catch(err){toast(err.message,"error")}};
+ openModal(`<h2>Buat Penugasan</h2><form id="assignmentForm"><label>BCL<select name="bclId" required><option value="">Pilih BCL</option>${pending.map(x=>`<option value="${esc(x.id)}">${esc(x.id)} — ${esc(x.name)}</option>`).join("")}</select></label><label>ZMart<select name="zmartUid" required><option value="">Pilih ZMart</option>${zmarts.map(x=>`<option value="${esc(x.uid)}">${esc(x.name)} — ${esc(x.area||"")}</option>`).join("")}</select></label><label>Nama paket<input name="packageName" value="Paket Sembako BCL"></label><label>Isi paket (pisahkan dengan koma)<textarea name="items">Beras 5 kg, Minyak Goreng 1 L, Gula 1 kg, Tepung Terigu 1 kg, Susu 2 pcs</textarea></label><button id="saveAssignmentBtn" class="btn primary full">Buat Penugasan</button></form>`);
+ $("#assignmentForm").onsubmit=async e=>{e.preventDefault();const btn=$("#saveAssignmentBtn");btn.disabled=true;btn.textContent="Menyimpan...";setLoading(true,"Menyimpan penugasan...");try{const f=new FormData(e.target);const items=String(f.get("items")||"").split(",").map(x=>({name:x.trim(),checked:false})).filter(x=>x.name);await createAssignment({bclId:f.get("bclId"),zmartUid:f.get("zmartUid"),packageName:f.get("packageName"),items});$("#modal").close();await loadAll();renderAll();toast("Penugasan dibuat.")}catch(err){toast(err.message,"error");btn.disabled=false;btn.textContent="Buat Penugasan"}finally{setLoading(false)}};
 }
 function showUserForm(){
- openModal(`<h2>Tambah ZMart</h2><p class="muted">Akun Firebase Authentication dibuat otomatis. Data profil dan role disimpan di Google Sheet.</p><form id="userForm"><label>Nama ZMart<input name="name" required></label><label>Email<input name="email" type="email" required></label><label>Password awal<input name="password" type="password" minlength="6" required></label><label>Wilayah<input name="area"></label><button class="btn primary full">Buat akun</button></form>`);
- $("#userForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);let secondary;try{secondary=initializeApp(firebaseConfig,"Secondary-"+Date.now());const sa=getSecondaryAuth(secondary);const cred=await createUserWithEmailAndPassword(sa,f.get("email"),f.get("password"));await saveUserProfile({uid:cred.user.uid,email:f.get("email"),name:f.get("name"),nip:"",jabatan:"ZMart Deliver",role:"zmart",area:f.get("area"),status:"AKTIF"});await secondarySignOut(sa);$("#modal").close();await loadAll();renderUsers();toast("Akun ZMart dibuat dan disimpan di Google Sheet.")}catch(err){toast(err.message,"error")}}
+ openModal(`<h2>Tambah ZMart</h2><p class="muted">Akun Firebase Authentication dibuat otomatis. Data profil dan role disimpan di Google Sheet.</p><form id="userForm"><label>Nama ZMart<input name="name" required></label><label>Email<input name="email" type="email" required></label><label>Password awal<input name="password" type="password" minlength="6" required></label><label>Wilayah<input name="area"></label><button id="saveUserBtn" class="btn primary full">Buat akun</button></form>`);
+ $("#userForm").onsubmit=async e=>{e.preventDefault();const btn=$("#saveUserBtn");btn.disabled=true;btn.textContent="Membuat akun...";setLoading(true,"Membuat akun ZMart...");const f=new FormData(e.target);let secondary;try{secondary=initializeApp(firebaseConfig,"Secondary-"+Date.now());const sa=getSecondaryAuth(secondary);const cred=await createUserWithEmailAndPassword(sa,f.get("email"),f.get("password"));await saveUserProfile({uid:cred.user.uid,email:f.get("email"),name:f.get("name"),nip:"",jabatan:"ZMart Deliver",role:"zmart",area:f.get("area"),status:"AKTIF"});await secondarySignOut(sa);$("#modal").close();await loadAll();renderUsers();toast("Akun ZMart dibuat dan disimpan di Google Sheet.")}catch(err){toast(err.message,"error");btn.disabled=false;btn.textContent="Buat akun"}finally{setLoading(false)}};
 }
