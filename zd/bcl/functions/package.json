@@ -1,0 +1,8 @@
+{
+  "name": "baznas-sragen-bcl-v2-functions",
+  "engines": { "node": "20" },
+  "dependencies": {
+    "firebase-admin": "^13.0.2",
+    "firebase-functions": "^6.1.0"
+  }
+}

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#087f5b"><title>Admin • BCL</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand-inline"><span class="brand-mark small">BZ</span><div><b>BAZNAS Kabupaten Sragen</b><small>Bakti Cinta Lansia • Dashboard Admin</small></div></div>
+    <div class="top-actions"><span id="adminName" class="user-chip"></span><button id="logoutBtn" class="icon-btn" title="Keluar">↪</button></div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <button class="nav-btn active" data-view="dashboard">▦ <span>Dashboard</span></button>
+      <button class="nav-btn" data-view="bcl">♙ <span>Data BCL</span></button>
+      <button class="nav-btn" data-view="assignments">↗ <span>Penugasan</span></button>
+      <button class="nav-btn" data-view="deliveries">✓ <span>Monitoring</span></button>
+      <button class="nav-btn" data-view="users">● <span>Pengguna</span></button>
+    </aside>
+    <main class="content">
+      <section id="view-dashboard" class="view active">
+        <div class="page-title"><div><span class="eyebrow">BAKTI CINTA LANSIA</span><h1>Dashboard Admin</h1><p>Pantau penyaluran sembako BCL bersama ZMart secara real-time.</p><div class="accent-line"></div></div></div>
+        <div class="stats-grid">
+          <div class="stat-card"><span>Total BCL</span><strong id="statBcl">0</strong></div>
+          <div class="stat-card"><span>Ditugaskan</span><strong id="statAssigned">0</strong></div>
+          <div class="stat-card"><span>Selesai</span><strong id="statDone">0</strong></div>
+          <div class="stat-card"><span>Belum Selesai</span><strong id="statPending">0</strong></div>
+        </div>
+        <div class="grid-2">
+          <div class="card"><div class="section-head"><h3>Status Penyaluran</h3></div><div id="statusBars"></div></div>
+          <div class="card"><div class="section-head"><h3>Penyaluran Terbaru</h3></div><div id="recentDeliveries" class="list"></div></div>
+        </div>
+      </section>
+
+      <section id="view-bcl" class="view">
+        <div class="page-title"><div><span class="eyebrow">MASTER DATA</span><h1>Data BCL</h1></div><button id="addBclBtn" class="btn primary">+ Tambah BCL</button></div>
+        <div class="card"><div class="toolbar"><input id="bclSearch" placeholder="Cari nama, ID, kecamatan..."><select id="bclStatus"><option value="">Semua status</option><option value="BELUM_DITUGASKAN">Belum ditugaskan</option><option value="DITUGASKAN">Ditugaskan</option><option value="SELESAI">Selesai</option></select></div><div id="bclTable" class="table-wrap"></div></div>
+      </section>
+
+      <section id="view-assignments" class="view">
+        <div class="page-title"><div><span class="eyebrow">OPERASIONAL</span><h1>Penugasan</h1><p>Assign BCL ke ZMart dan paket sembako.</p></div><button id="addAssignmentBtn" class="btn primary">+ Buat Penugasan</button></div>
+        <div class="card"><div id="assignmentTable" class="table-wrap"></div></div>
+      </section>
+
+      <section id="view-deliveries" class="view">
+        <div class="page-title"><div><span class="eyebrow">MONITORING</span><h1>Monitoring Penyaluran</h1></div></div>
+        <div class="card"><div class="toolbar"><input id="deliverySearch" placeholder="Cari BCL / ZMart / wilayah..."><select id="deliveryStatus"><option value="">Semua status</option><option value="SUBMITTED">Submitted</option><option value="VERIFIED">Verified</option></select></div><div id="deliveryTable" class="table-wrap"></div></div>
+      </section>
+
+      <section id="view-users" class="view">
+        <div class="page-title"><div><span class="eyebrow">AKSES</span><h1>Pengguna</h1><p>Kelola profil Admin dan ZMart.</p></div><button id="addUserBtn" class="btn primary">+ Tambah ZMart</button></div>
+        <div class="card"><div id="userTable" class="table-wrap"></div></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<dialog id="modal"><div class="modal-card"><button class="modal-close" onclick="document.getElementById('modal').close()">×</button><div id="modalBody"></div></div></dialog>
+<div id="toast" class="toast"></div>
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>

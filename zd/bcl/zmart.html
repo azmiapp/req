@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#087f5b"><title>ZMart Deliver • BCL</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand-inline"><span class="brand-mark small">ZM</span><div><b>ZMart Deliver</b><small>BAZNAS Kabupaten Sragen • BCL</small></div></div>
+    <div class="top-actions"><span id="zmartName" class="user-chip"></span><button id="logoutBtn" class="icon-btn">↪</button></div>
+  </header>
+  <main class="mobile-content">
+    <section id="homeView" class="view active">
+      <div class="hero">
+        <span class="eyebrow">BAKTI CINTA LANSIA • TUGAS HARI INI</span>
+        <h1 id="hello">Halo 👋</h1><p>Selamat menjalankan penyaluran BCL.</p>
+      </div>
+      <div class="stats-grid two"><div class="stat-card"><span>Total Tugas</span><strong id="taskTotal">0</strong></div><div class="stat-card"><span>Selesai</span><strong id="taskDone">0</strong></div></div>
+      <button id="openTasksBtn" class="btn primary big full">Mulai Penyaluran →</button>
+      <div class="card"><div class="section-head"><h3>Penugasan Aktif</h3><span id="progressText"></span></div><div class="progress"><i id="progressBar"></i></div><div id="taskPreview" class="list"></div></div>
+    </section>
+
+    <section id="tasksView" class="view">
+      <div class="page-title"><div><span class="eyebrow">DAFTAR TUGAS</span><h1>BCL Ditugaskan</h1></div></div>
+      <div id="taskList" class="list"></div>
+    </section>
+
+    <section id="deliverView" class="view">
+      <div class="page-title"><div><span class="eyebrow">PENYALURAN</span><h1 id="deliverTitle">Detail BCL</h1></div><button id="backTasks" class="btn ghost">← Kembali</button></div>
+      <div id="deliverStep1" class="card step-card">
+        <div class="step-no">1</div><h3>Scan Kartu BCL</h3><p class="muted">Scan QR yang berisi ID BCL.</p>
+        <div id="reader" class="qr-reader"></div>
+        <button id="startScan" class="btn primary full">Buka Scanner</button>
+        <div class="divider">atau</div>
+        <div class="inline"><input id="manualBclId" placeholder="Masukkan ID BCL"><button id="manualFind" class="btn">Cari</button></div>
+        <div id="scanResult"></div>
+      </div>
+      <div id="deliverStep2" class="card step-card hidden">
+        <div class="step-no">2</div><h3>Checklist Sembako</h3><p id="packageName" class="muted"></p><div id="itemChecklist"></div>
+        <button id="toPhoto" class="btn primary full">Lanjut ke Foto & Lokasi</button>
+      </div>
+      <div id="deliverStep3" class="card step-card hidden">
+        <div class="step-no">3</div><h3>Foto Penerima & Geotag</h3>
+        <video id="camera" class="camera" autoplay playsinline muted></video>
+        <canvas id="canvas" class="hidden"></canvas>
+        <img id="photoPreview" class="photo-preview hidden" alt="Preview foto">
+        <div class="camera-actions"><button id="switchCamera" class="btn ghost">↻ Kamera</button><button id="takePhoto" class="btn primary">Ambil Foto</button></div>
+        <div id="locationBox" class="location-box">Menunggu lokasi...</div>
+        <button id="submitDelivery" class="btn primary big full" disabled>Submit Penyaluran</button>
+      </div>
+    </section>
+
+    <section id="historyView" class="view">
+      <div class="page-title"><div><span class="eyebrow">RIWAYAT</span><h1>Penyaluran</h1></div></div>
+      <div id="historyList" class="list"></div>
+    </section>
+  </main>
+  <nav class="bottom-nav"><button class="active" data-zview="homeView">⌂<span>Beranda</span></button><button data-zview="tasksView">☷<span>Tugas</span></button><button data-zview="historyView">✓<span>Riwayat</span></button></nav>
+</div>
+<div id="toast" class="toast"></div>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script type="module" src="js/zmart.js"></script>
+</body>
+</html>
