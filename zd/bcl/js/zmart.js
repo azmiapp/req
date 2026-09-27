@@ -1,4 +1,3 @@
-import { auth } from "./firebase.js";
 import { guard,qs,qsa,esc,fmtDate,toast,logout,getMyAssignments,getMyDeliveries,findBcl as apiFindBcl,uploadDeliveryPhoto } from "./common.js";
 
 let me,tasks=[],history=[],selectedTask=null,selectedBcl=null,stream=null,facing="environment",coords=null,photoBlob=null,scanner=null;
@@ -32,15 +31,21 @@ function renderTasks(){
 }
 function renderHistory(){
  const wrap=qs("#historyList");
- wrap.innerHTML=history.map(x=>`<div class="card history-item"><div><b>${esc(x.bclName)}</b><span>${fmtDate(x.createdAt)}</span><span>${esc(x.district||"Lokasi tidak tersedia")}</span></div><span class="badge">${esc(x.status)}</span>${x.photoUrl?`<a target="_blank" href="${esc(x.photoUrl)}" class="btn small">Foto</a>`:""}</div>`).join("")||`<div class="card"><p class="muted">Belum ada riwayat.</p></div>`;
+ wrap.innerHTML=history.map(x=>`<div class="card history-item"><div><b>${esc(x.bclName)}</b><span>${fmtDate(x.createdAt)}</span><span>${esc(x.district||"Lokasi tidak tersedia")}</span></div><span class="badge">${esc(x.status)}</span>${x.photoUrl?`<a target="_blank" rel="noopener noreferrer" href="${esc(x.photoUrl)}" class="btn small">Foto</a>`:""}</div>`).join("")||`<div class="card"><p class="muted">Belum ada riwayat.</p></div>`;
 }
 async function openTask(id){selectedTask=tasks.find(x=>x.id===id);if(!selectedTask)return;qs("#deliverTitle").textContent=selectedTask.bclName;qs("#scanResult").innerHTML="";qs("#manualBclId").value=selectedTask.bclId;showZView("deliverView");await findBcl(selectedTask.bclId);}
 async function findBcl(id){
  if(!id){toast("Masukkan ID BCL.","error");return}
  try{
   const s=await apiFindBcl(id);selectedBcl=s;
+  if(!selectedBcl){toast("Data BCL tidak ditemukan.","error");return}
   if(selectedTask&&selectedTask.bclId!==selectedBcl.id){toast("QR bukan BCL yang sedang ditugaskan.","error");return}
-  qs("#scanResult").innerHTML=`<div class="verified"><b>✓ Penerima ditemukan</b><span>${esc(selectedBcl.name)}</span><small>${esc(selectedBcl.district||"")} • ${esc(selectedBcl.village||"")}</small></div>`;
+
+  const mapsButton=selectedBcl.mapsUrl
+    ? `<a href="${esc(selectedBcl.mapsUrl)}" target="_blank" rel="noopener noreferrer" class="btn small">🗺️ Buka Lokasi Rumah</a>`
+    : `<small class="muted">📍 Lokasi rumah belum tersedia.</small>`;
+
+  qs("#scanResult").innerHTML=`<div class="verified"><b>✓ Penerima ditemukan</b><span>${esc(selectedBcl.name)}</span><small>${esc(selectedBcl.district||"")} • ${esc(selectedBcl.village||"")}</small><div style="margin-top:10px">${mapsButton}</div></div>`;
   qs("#deliverStep2").classList.remove("hidden");qs("#packageName").textContent=selectedTask?.packageName||"Paket Sembako BCL";
   const items=selectedTask?.items||[{name:"Beras 5 kg"},{name:"Minyak Goreng 1 L"},{name:"Gula 1 kg"}];
   qs("#itemChecklist").innerHTML=items.map((it,i)=>`<label class="check"><input type="checkbox" data-item="${i}"><span>${esc(it.name)}</span></label>`).join("");
