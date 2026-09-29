@@ -288,9 +288,91 @@ button{cursor:pointer}
     </section>
 
     <!-- PAYROLL -->
-    <section id="page-payroll" class="page">
-      <div class="module-hero"><div class="module-left"><div class="module-icon" style="background:#f2efff;color:#7856d9"><span class="material-symbols-rounded">payments</span></div><div><h2>Payroll</h2><p>Lihat penggajian berdasarkan periode dan pegawai.</p></div></div><button class="btn gray" onclick="loadAll()"><span class="material-symbols-rounded" style="font-size:15px">refresh</span> Refresh</button></div>
-      <section class="panel"><div class="panel-head"><div><h2>Daftar Payroll</h2><small id="payrollInfo2">-</small></div></div><div class="payroll-filter"><select id="payrollMonthFilter2" class="select"></select><select id="payrollEmployeeFilter2" class="select"><option value="ALL">Semua Karyawan</option></select><button class="primary" onclick="applyPayrollFilter2()">Tampilkan</button></div><div id="payrollList2" class="mini-list"></div></section>
+    
+<section id="page-payroll" class="page-section">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">PAYROLL</div>
+      <h2>Perhitungan Payroll</h2>
+      <p class="muted">Payroll dihitung dari data pegawai, absensi, pengajuan, dan lembur.</p>
+    </div>
+    <div class="section-actions">
+      <button class="btn secondary" id="refreshPayrollBtn">↻ Muat Ulang</button>
+      <button class="btn primary" id="generatePayrollBtn">⚡ Hitung Payroll</button>
+    </div>
+  </div>
+
+  <div class="filter-card">
+    <div class="field">
+      <label>Periode</label>
+      <input type="month" id="payrollMonthFilter">
+    </div>
+    <div class="field">
+      <label>Karyawan</label>
+      <select id="payrollEmployeeFilter">
+        <option value="">Semua Karyawan</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <select id="payrollStatusFilter">
+        <option value="">Semua</option>
+        <option value="DRAFT">DRAFT</option>
+        <option value="FINAL">FINAL</option>
+        <option value="DIBAYAR">DIBAYAR</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="stats-grid" id="payrollSummary">
+    <div class="stat-card"><span>Total Karyawan</span><strong id="payrollTotalEmployees">0</strong></div>
+    <div class="stat-card"><span>Total Gaji Pokok</span><strong id="payrollTotalBasic">Rp0</strong></div>
+    <div class="stat-card"><span>Total Lembur</span><strong id="payrollTotalOvertime">Rp0</strong></div>
+    <div class="stat-card"><span>Total Potongan</span><strong id="payrollTotalDeduction">Rp0</strong></div>
+    <div class="stat-card"><span>Total Dibayarkan</span><strong id="payrollTotalNet">Rp0</strong></div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-head">
+      <div>
+        <h3>Daftar Payroll</h3>
+        <span class="muted" id="payrollInfo">Belum ada data</span>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Karyawan</th>
+            <th>Hadir</th>
+            <th>Alpha</th>
+            <th>Lembur</th>
+            <th>Gaji Pokok</th>
+            <th>Tunjangan</th>
+            <th>Potongan</th>
+            <th>Total Bersih</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="payrollList">
+          <tr><td colspan="9"><div class="empty">Belum ada data payroll.</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="table-card" id="payrollDetailCard" style="display:none">
+    <div class="table-head">
+      <div>
+        <h3 id="payrollDetailTitle">Detail Payroll</h3>
+        <span class="muted" id="payrollDetailSubtitle"></span>
+      </div>
+      <button class="btn secondary" id="closePayrollDetailBtn">Tutup</button>
+    </div>
+    <div class="detail-grid" id="payrollDetailGrid"></div>
+  </div>
+</section>
+
     </section>
 
   </main>
@@ -478,12 +560,152 @@ async function reviewRequest(requestId,decision){const note=prompt("Catatan revi
 function resetAssignmentForm(){$("assignmentUid").value="";$("assignmentTitle").value="";$("assignmentLocation").value="";$("assignmentDescription").value="";$("assignmentNotes").value="";$("assignmentPriority").value="NORMAL";$("assignmentStart").value=today();$("assignmentEnd").value=today()}
 async function createAssignment(){const uid=$("assignmentUid").value,title=$("assignmentTitle").value.trim(),startDate=$("assignmentStart").value,endDate=$("assignmentEnd").value||startDate;if(!uid)return toast("Pilih pegawai.");if(!title)return toast("Judul wajib diisi.");if(endDate<startDate)return toast("Tanggal selesai tidak boleh sebelum mulai.");const b=$("createAssignmentBtn");b.disabled=true;b.textContent="Menyimpan...";loading(true);try{const r=await request("adminCreateAssignment",{uid,title,startDate,endDate,priority:$("assignmentPriority").value,location:$("assignmentLocation").value.trim(),description:$("assignmentDescription").value.trim(),notes:$("assignmentNotes").value.trim()});if(!r?.ok)throw Error(r?.error||"Gagal membuat penugasan.");toast(r.message||"Penugasan berhasil dibuat.");resetAssignmentForm();await loadAdminAssignments()}catch(e){toast(e.message)}finally{loading(false);b.disabled=false;b.textContent="Buat Penugasan"}}
 
+
+function payrollMoney(v){
+  const n=Number(v)||0;
+  return "Rp"+n.toLocaleString("id-ID");
+}
+function monthNow(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+function payrollVal(r,...keys){
+  for(const k of keys){
+    if(r && r[k]!==undefined && r[k]!==null && r[k]!=="") return r[k];
+  }
+  return "";
+}
+function payrollNumber(r,...keys){ return Number(payrollVal(r,...keys))||0; }
+
+function populatePayrollEmployees(rows){
+  const sel=$("payrollEmployeeFilter");
+  if(!sel)return;
+  const old=sel.value;
+  const list=rows||employeeCache||[];
+  sel.innerHTML='<option value="">Semua Karyawan</option>'+list.map(e=>{
+    const uid=payrollVal(e,"uid","UID","id","employeeUid");
+    const name=payrollVal(e,"nama","name","displayName","pegawai")||uid;
+    return `<option value="${esc(uid)}">${esc(name)}</option>`;
+  }).join("");
+  if(old && [...sel.options].some(o=>o.value===old))sel.value=old;
+}
+
+function renderPayroll(rows){
+  const filtered=(rows||[]).filter(r=>{
+    const uid=String(payrollVal(r,"uid","UID","employeeUid","employeeUID"));
+    const employee=$("payrollEmployeeFilter")?.value||"";
+    const status=$("payrollStatusFilter")?.value||"";
+    return (!employee || uid===employee) && (!status || String(payrollVal(r,"status","Status")).toUpperCase()===status);
+  });
+
+  let basic=0,overtime=0,deduction=0,net=0;
+  filtered.forEach(r=>{
+    basic+=payrollNumber(r,"basicSalary","gajiPokok","Gaji Pokok");
+    overtime+=payrollNumber(r,"overtimePay","upahLembur","Upah Lembur");
+    deduction+=payrollNumber(r,"totalDeduction","potongan","Potongan");
+    net+=payrollNumber(r,"netSalary","totalGaji","totalBersih","Total Gaji");
+  });
+
+  $("payrollTotalEmployees").textContent=filtered.length;
+  $("payrollTotalBasic").textContent=payrollMoney(basic);
+  $("payrollTotalOvertime").textContent=payrollMoney(overtime);
+  $("payrollTotalDeduction").textContent=payrollMoney(deduction);
+  $("payrollTotalNet").textContent=payrollMoney(net);
+  $("payrollInfo").textContent=`${filtered.length} karyawan`;
+
+  $("payrollList").innerHTML=filtered.length?filtered.map((r,i)=>{
+    const uid=payrollVal(r,"uid","UID","employeeUid","employeeUID");
+    const name=payrollVal(r,"name","nama","employeeName","pegawai")||uid||"-";
+    const status=String(payrollVal(r,"status","Status")||"DRAFT").toUpperCase();
+    return `<tr class="payroll-row" data-index="${i}">
+      <td><span class="name">${esc(name)}</span><span class="sub">${esc(payrollVal(r,"nip","NIP")||uid||"")}</span></td>
+      <td>${esc(payrollVal(r,"daysPresent","hariHadir","hadir")||0)}</td>
+      <td>${esc(payrollVal(r,"daysAbsent","alpha","Alpha")||0)}</td>
+      <td>${esc(payrollVal(r,"overtimeHours","jamLembur","Jam Lembur")||0)} jam</td>
+      <td>${payrollMoney(payrollNumber(r,"basicSalary","gajiPokok"))}</td>
+      <td>${payrollMoney(payrollNumber(r,"allowance","tunjangan"))}</td>
+      <td>${payrollMoney(payrollNumber(r,"totalDeduction","potongan"))}</td>
+      <td><b>${payrollMoney(payrollNumber(r,"netSalary","totalGaji","totalBersih"))}</b></td>
+      <td><span class="status ${status==="DIBAYAR"?"ok":"blue"}">${esc(status)}</span></td>
+    </tr>`;
+  }).join(""):'<tr><td colspan="9"><div class="empty">Belum ada data payroll untuk filter ini.</div></td></tr>';
+
+  [...document.querySelectorAll(".payroll-row")].forEach((tr)=>{
+    tr.addEventListener("click",()=>{
+      const row=filtered[Number(tr.dataset.index)];
+      showPayrollDetail(row);
+    });
+  });
+}
+
+function showPayrollDetail(r){
+  if(!r)return;
+  const name=payrollVal(r,"name","nama","employeeName","pegawai")||payrollVal(r,"uid","UID")||"-";
+  $("payrollDetailCard").style.display="";
+  $("payrollDetailTitle").textContent=`Detail Payroll — ${name}`;
+  $("payrollDetailSubtitle").textContent=`Periode ${payrollVal(r,"period","periode","Periode")||$("payrollMonthFilter").value||"-"}`;
+  const items=[
+    ["Gaji Pokok",payrollMoney(payrollNumber(r,"basicSalary","gajiPokok"))],
+    ["Tunjangan",payrollMoney(payrollNumber(r,"allowance","tunjangan"))],
+    ["Hari Hadir",payrollVal(r,"daysPresent","hariHadir","hadir")||0],
+    ["Hari Izin",payrollVal(r,"daysLeave","hariIzin","izin")||0],
+    ["Hari Sakit",payrollVal(r,"daysSick","hariSakit","sakit")||0],
+    ["Hari Cuti",payrollVal(r,"daysVacation","hariCuti","cuti")||0],
+    ["Alpha",payrollVal(r,"daysAbsent","alpha")||0],
+    ["Jam Lembur",payrollVal(r,"overtimeHours","jamLembur")||0],
+    ["Upah Lembur",payrollMoney(payrollNumber(r,"overtimePay","upahLembur"))],
+    ["Potongan Absensi",payrollMoney(payrollNumber(r,"attendanceDeduction","potonganAbsensi"))],
+    ["Potongan Lain",payrollMoney(payrollNumber(r,"otherDeduction","potonganLain"))],
+    ["Total Potongan",payrollMoney(payrollNumber(r,"totalDeduction","potongan"))],
+    ["Total Bersih",payrollMoney(payrollNumber(r,"netSalary","totalGaji","totalBersih"))],
+  ];
+  $("payrollDetailGrid").innerHTML=items.map(([a,b])=>`<div class="detail-item"><span>${esc(a)}</span><b>${esc(String(b))}</b></div>`).join("");
+  $("payrollDetailCard").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+async function loadAdminPayroll(){
+  if(!sessionToken)return;
+  const period=$("payrollMonthFilter")?.value||monthNow();
+  try{
+    const r=await request("payroll",{period});
+    if(!r?.ok)throw Error(r?.error||"Gagal memuat payroll.");
+    const raw=r.items||r.payroll||r.data?.items||r.data?.payroll||r.data||[];
+    payrollRows=arr(raw);
+    renderPayroll(payrollRows);
+  }catch(e){
+    console.error(e);
+    $("payrollInfo").textContent=e.message||"Gagal memuat payroll";
+    toast(e.message||"Gagal memuat payroll");
+  }
+}
+
+async function generateAdminPayroll(){
+  if(!sessionToken)return;
+  const period=$("payrollMonthFilter")?.value||monthNow();
+  try{
+    $("generatePayrollBtn").disabled=true;
+    $("generatePayrollBtn").textContent="Menghitung...";
+    const r=await request("generatePayroll",{period});
+    if(!r?.ok)throw Error(r?.error||"Gagal menghitung payroll.");
+    toast(r.message||"Payroll berhasil dihitung.");
+    await loadAdminPayroll();
+  }catch(e){
+    console.error(e);
+    toast(e.message||"Gagal menghitung payroll.");
+  }finally{
+    $("generatePayrollBtn").disabled=false;
+    $("generatePayrollBtn").textContent="⚡ Hitung Payroll";
+  }
+}
+
+
 async function loadAll(){
  if(!sessionToken||dashboardBusy)return;dashboardBusy=true;const date=$("dateFilter").value||today(),month=$("monthFilter").value||today().slice(0,7);
  try{
   const r=await request("dashboard",{date,month});if(!r?.ok)throw Error(r?.error||"Gagal memuat dashboard.");const d=r.data||r.dashboard||r;
   const att=arr(d.attendance||d.absensi||d.attendanceToday),monthly=arr(d.monthly||d.rekapBulanan||d.monthlyRecap),emp=arr(d.employees||d.pegawai||d.employee),pay=arr(d.payroll);
-  employeeCache=emp;payrollRows=pay;window.__attendance=att;populateAssignmentEmployees(emp);updateStats(d);renderAttendance(att);renderMonthly(monthly);renderEmployees(emp);fillPayrollFilters(pay);$("payrollMonthFilter").value=month;renderPayroll(payrollFilter(month,"ALL"));syncPayroll();
+  employeeCache=emp;payrollRows=pay;window.__attendance=att;populateAssignmentEmployees(emp);
+    populatePayrollEmployees(emp);updateStats(d);renderAttendance(att);renderMonthly(monthly);renderEmployees(emp);fillPayrollFilters(pay);$("payrollMonthFilter").value=month;renderPayroll(payrollFilter(month,"ALL"));syncPayroll();
   if($("assignmentStart")&&!$("assignmentStart").value)resetAssignmentForm();
   Promise.all([loadAdminAssignments(),loadAdminRequests()]).catch(()=>{});
  }catch(e){toast(e.message||"Gagal memuat data")}finally{dashboardBusy=false}
@@ -550,6 +772,16 @@ async function restoreAdminSession(){
   return false;
 }
 restoreAdminSession();
+
+document.addEventListener("DOMContentLoaded",()=>{
+  if($("payrollMonthFilter") && !$("payrollMonthFilter").value) $("payrollMonthFilter").value=monthNow();
+  $("refreshPayrollBtn")?.addEventListener("click",loadAdminPayroll);
+  $("generatePayrollBtn")?.addEventListener("click",generateAdminPayroll);
+  $("payrollMonthFilter")?.addEventListener("change",loadAdminPayroll);
+  $("payrollEmployeeFilter")?.addEventListener("change",()=>renderPayroll(payrollRows));
+  $("payrollStatusFilter")?.addEventListener("change",()=>renderPayroll(payrollRows));
+  $("closePayrollDetailBtn")?.addEventListener("click",()=>{$("payrollDetailCard").style.display="none"});
+});
 </script>
 </body>
 </html>
