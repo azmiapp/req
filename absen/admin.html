@@ -288,7 +288,7 @@ function getJsonp(action,extra={}){
 
 const FAST_GET_ACTIONS=new Set([
   "firebaseLogin","profile","dashboard","adminDashboard","adminAttendance",
-  "adminMonthly","adminPayroll","adminEmployees","adminRequests","assignments"
+  "adminMonthly","adminPayroll","adminEmployees","adminRequests","adminAssignments"
 ]);
 function poll(id,done,tryNo=0){
   const cb="cb_"+crypto.randomUUID().replaceAll("-","");let finish=false;
@@ -479,7 +479,7 @@ function renderAssignments(rows){
 async function loadAdminAssignments(){
   if(!sessionToken)return;
   try{
-    const r=await request("assignments",{limit:"100",includeCompleted:$("includeCompleted").checked?"true":"false"});
+    const r=await request("adminAssignments",{limit:"100",includeCompleted:$("includeCompleted").checked?"true":"false"});
     if(!r?.ok)throw Error(r?.error||"Gagal memuat penugasan.");
     assignmentCache=arr(r.items||r.assignments||r.data?.items||r.data?.assignments||r.data||[]);
     renderAssignments(assignmentCache);
