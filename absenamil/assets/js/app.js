@@ -512,15 +512,8 @@ function restoreLoginButton_(){
 async function completeFirebaseLogin_(user){
 
   if(!user){
-
-    throw new Error(
-      'Akun Firebase tidak ditemukan.'
-    );
-
+    throw new Error('Akun Firebase tidak ditemukan.');
   }
-
-  const requestId =
-    makeId();
 
   loading(
     true,
@@ -528,94 +521,99 @@ async function completeFirebaseLogin_(user){
     'Menghubungkan akun Google dengan data pegawai...'
   );
 
-  const firebaseIdToken =
-    await user.getIdToken(
-      true
-    );
+  const firebaseIdToken = await user.getIdToken(true);
 
-  const sent =
-    await postForm({
+  /*
+   * GitHub Pages tidak dapat membaca response POST Apps Script secara
+   * langsung karena Apps Script tidak memberikan CORS response yang dapat
+   * dibaca browser. Backend kita sudah menyediakan endpoint GET
+   * `firebaseLogin` + JSONP khusus untuk proses ini. Gunakan endpoint itu
+   * secara langsung agar login tidak menggantung pada POST -> polling.
+   */
+  const result = await firebaseLoginJsonp_(firebaseIdToken);
 
-      action:
-        'firebaseLogin',
+  loginProcessing = false;
+  restoreLoginButton_();
 
-      requestId:
-        requestId,
-
-      firebaseIdToken:
-        firebaseIdToken
-
-    });
-
-  if(!sent){
-
+  if(!result || !result.ok){
+    loading(false);
     throw new Error(
-      'Tidak dapat mengirim data login ke server.'
+      result?.error ||
+      result?.message ||
+      'Login gagal. Pastikan akun terdaftar.'
     );
-
   }
 
-  poll(
-    requestId,
-    result => {
+  sessionToken = String(result.sessionToken || '');
 
-      loginProcessing =
-        false;
+  if(!sessionToken){
+    loading(false);
+    throw new Error('Server tidak memberikan sesi login.');
+  }
 
-      restoreLoginButton_();
+  localStorage.setItem('absen_session', sessionToken);
 
-      if(
-        !result ||
-        !result.ok
-      ){
+  currentUser = result.user || null;
+  if(currentUser) cacheSet_('profile', currentUser);
 
-        loading(false);
+  showApp();
+  loading(false);
 
-        showToast(
-          result?.error ||
-          'Login gagal. Pastikan akun terdaftar.'
-        );
+  // Dashboard ditampilkan terlebih dahulu, data tambahan dimuat bertahap.
+  refreshAll({ initial: true });
+}
 
-        return;
+function firebaseLoginJsonp_(firebaseIdToken){
+  return new Promise((resolve, reject) => {
+    const callbackName = '__firebaseLogin_' + makeId();
+    const script = document.createElement('script');
+    let finished = false;
+    let timer = null;
 
-      }
+    const cleanup = () => {
+      if(timer) clearTimeout(timer);
+      try { delete window[callbackName]; } catch(e) {}
+      try { script.remove(); } catch(e) {}
+    };
 
-      sessionToken =
-        result.sessionToken ||
-        '';
+    const finish = (fn, value) => {
+      if(finished) return;
+      finished = true;
+      cleanup();
+      fn(value);
+    };
 
-      if(!sessionToken){
+    window[callbackName] = data => {
+      finish(resolve, data || {
+        ok:false,
+        error:'Respons login dari server kosong.'
+      });
+    };
 
-        loading(false);
+    script.async = true;
+    script.src =
+      CONFIG.WEB_APP_URL +
+      '?action=firebaseLogin' +
+      '&firebaseIdToken=' + encodeURIComponent(firebaseIdToken) +
+      '&callback=' + encodeURIComponent(callbackName) +
+      '&_=' + Date.now();
 
-        showToast(
-          'Server tidak memberikan sesi login.'
-        );
-
-        return;
-
-      }
-
-      localStorage.setItem(
-        'absen_session',
-        sessionToken
+    script.onerror = () => {
+      finish(
+        reject,
+        new Error('Server Apps Script tidak dapat dihubungi untuk verifikasi akun.')
       );
+    };
 
-      currentUser =
-        result.user ||
-        null;
+    timer = setTimeout(() => {
+      finish(
+        reject,
+        new Error('Waktu verifikasi akun habis. Periksa URL Web App Apps Script dan koneksi internet.')
+      );
+    }, 30000);
 
-      if (currentUser) cacheSet_('profile', currentUser);
-
-      showApp();
-
-      // Tampilkan aplikasi segera. Data utama dimuat bertahap di background.
-      loading(false);
-      refreshAll({ initial: true });
-
-    }
-  );
-
+    document.head.appendChild(script);
+  });
 }
 
 function firebaseErrorMessage_(error){
