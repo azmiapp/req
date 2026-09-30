@@ -263,6 +263,33 @@ function post(fields){
   Object.entries(fields).forEach(([k,v])=>body.append(k,v??""));
   return fetch(CONFIG.WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body}).then(()=>true).catch(()=>false);
 }
+
+/* GET/JSONP untuk request read-only: satu round-trip, tanpa polling. */
+function getJsonp(action,extra={}){
+  return new Promise(resolve=>{
+    const cb="cb_"+crypto.randomUUID().replaceAll("-","");
+    let done=false;
+    const finish=data=>{
+      if(done)return; done=true;
+      delete window[cb]; script?.remove();
+      resolve(data||{ok:false,error:"Respons server kosong."});
+    };
+    window[cb]=finish;
+    const params=new URLSearchParams({action,callback:cb,_:Date.now().toString()});
+    Object.entries(extra).forEach(([k,v])=>params.set(k,v??""));
+    const script=document.createElement("script");
+    script.async=true;
+    script.src=CONFIG.WEB_APP_URL+"?"+params.toString();
+    script.onerror=()=>finish({ok:false,error:"Server tidak merespons."});
+    document.body.appendChild(script);
+    setTimeout(()=>finish({ok:false,error:"Waktu tunggu server habis."}),15000);
+  });
+}
+
+const FAST_GET_ACTIONS=new Set([
+  "firebaseLogin","profile","dashboard","adminDashboard","adminAttendance",
+  "adminMonthly","adminPayroll","adminEmployees","adminRequests","assignments"
+]);
 function poll(id,done,tryNo=0){
   const cb="cb_"+crypto.randomUUID().replaceAll("-","");let finish=false;
   const end=x=>{if(finish)return;finish=true;delete window[cb];document.getElementById("s_"+cb)?.remove();done(x)};
@@ -279,6 +306,13 @@ function poll(id,done,tryNo=0){
 }
 async function request(action,extra={}){
   if(!sessionToken && action!=="firebaseLogin")return{ok:false,error:"Sesi login tidak ditemukan."};
+
+  /* Read-only + login: direct GET/JSONP, no REQUESTS sheet/cache and no polling. */
+  if(FAST_GET_ACTIONS.has(action)){
+    return getJsonp(action,{sessionToken,...extra});
+  }
+
+  /* Mutating actions keep the existing reliable POST + polling transport. */
   const id=crypto.randomUUID().replaceAll("-","");
   if(!(await post({action,requestId:id,sessionToken,...extra})))return{ok:false,error:"Gagal menghubungi server."};
   return new Promise(resolve=>setTimeout(()=>poll(id,resolve),100));
@@ -296,7 +330,6 @@ async function initFirebase(){
       auth=getAuth(app);
       await setPersistence(auth,browserLocalPersistence);
       provider=new GoogleAuthProvider();
-      provider.setCustomParameters({prompt:"select_account"});
       return true;
     }catch(e){console.error(e);firebaseReady=null;return false}
   })();
@@ -318,7 +351,7 @@ async function loginAdmin(){
     if(!tokenBaru)throw Error("Session tidak diterima dari server.");
     const user=normalizeUser(res);
     if(String(user?.role||"").toUpperCase()!=="ADMIN")throw Error("Akun tidak memiliki akses ADMIN.");
-    saveSession(tokenBaru,user);currentUser=user;showApp();await loadAll();
+    saveSession(tokenBaru,user);currentUser=user;showApp();loadAll();
   }catch(e){
     console.error("LOGIN ERROR:",e);
     clearSession();toast(e.message||"Login gagal.");
@@ -553,7 +586,8 @@ async function loadAll(){
     populateAssignmentEmployees(emp);populateAdminPayrollEmployees(emp);updateStats(d);renderAttendance(att);renderMonthly(monthly);renderEmployees(emp);
     fillDashboardPayrollFilters(pay);renderDashboardPayroll(dashboardPayrollFilter(month,"ALL"));
     if($("assignmentStart")&&!$("assignmentStart").value)resetAssignmentForm();
-    Promise.all([loadAdminAssignments(),loadAdminRequests()]).catch(()=>{});
+    /* Modul sekunder dimuat setelah dashboard tampil agar login tidak terasa berat. */
+    setTimeout(()=>Promise.all([loadAdminAssignments(),loadAdminRequests()]).catch(()=>{}),250);
   }catch(e){console.error(e);toast(e.message||"Gagal memuat data")}
   finally{dashboardBusy=false}
 }
@@ -605,6 +639,9 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 
 initFilters();
+/* Panaskan Firebase saat browser idle agar klik login tidak menunggu dynamic import. */
+if("requestIdleCallback" in window) requestIdleCallback(()=>initFirebase(),{timeout:1800});
+else setTimeout(()=>initFirebase(),1200);
 restoreAdminSession();
 </script>
 </body>
