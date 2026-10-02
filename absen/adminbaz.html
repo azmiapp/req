@@ -596,7 +596,7 @@ async function ensureXLSX(){
     if(old){old.addEventListener("load",resolve,{once:true});old.addEventListener("error",reject,{once:true});return;}
     const script=document.createElement("script");
     script.dataset.xlsxLoader="1";
-    script.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+    script.src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js";
     script.onload=resolve;script.onerror=()=>reject(Error("Library Excel gagal dimuat."));
     document.head.appendChild(script);
   });
@@ -795,7 +795,33 @@ async function exportAttendanceExcel(){
 
       const ws=XLSX.utils.aoa_to_sheet(sheetRows);
       ws["!cols"]=[{wch:6},{wch:14},{wch:15},{wch:12},{wch:12},{wch:14},{wch:15},{wch:35}];
-      if(ws["A1"])ws["A1"].s="REKAP ABSENSI BULANAN";
+      ws["!freeze"]={xSplit:0,ySplit:13};
+      const fill=(rgb)=>({patternType:"solid",fgColor:{rgb}});
+      const border={top:{style:"thin",color:{rgb:"FFD9E2E7"}},bottom:{style:"thin",color:{rgb:"FFD9E2E7"}},left:{style:"thin",color:{rgb:"FFD9E2E7"}},right:{style:"thin",color:{rgb:"FFD9E2E7"}}};
+      const center={horizontal:"center",vertical:"center"};
+      const baseFont={name:"Aptos",sz:10};
+      if(ws["A1"])ws["A1"].s={font:{name:"Aptos Display",sz:16,bold:true,color:{rgb:"FFFFFFFF"}},fill:fill("FF087F5B"),alignment:{vertical:"center"}};
+      ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:7}}];
+      for(let c=0;c<8;c++){const cell=ws[XLSX.utils.encode_cell({r:12,c})];if(cell)cell.s={font:{name:"Aptos",sz:10,bold:true,color:{rgb:"FFFFFFFF"}},fill:fill("FF056246"),alignment:center,border};}
+      const statusStyle={
+        hadir:{fill:"FFE2F0D9",font:"FF166534"},
+        terlambat:{fill:"FFFFF2CC",font:"FF9A6700"},
+        izin:{fill:"FFDDEBF7",font:"FF1D4ED8"},
+        cuti:{fill:"FFDDEBF7",font:"FF1D4ED8"},
+        tidakabsen:{fill:"FFFCE4D6",font:"FFC2410C"},
+        libur:{fill:"FFF4CCCC",font:"FFC00000"}
+      };
+      rows.forEach((x,idx)=>{
+        const r=13+idx, dayLower=String(x.day||"").toLowerCase(), statusLower=String(x.status||"").toLowerCase().replace(/\s+/g,"");
+        let cfg=statusStyle.hadir;
+        if(dayLower.includes("sabtu")||dayLower.includes("minggu")) cfg=statusStyle.libur;
+        else if(statusLower.includes("terlambat")) cfg=statusStyle.terlambat;
+        else if(statusLower.includes("izin")) cfg=statusStyle.izin;
+        else if(statusLower.includes("cuti")) cfg=statusStyle.cuti;
+        else if(statusLower.includes("tidakabsen")||statusLower.includes("alpha")) cfg=statusStyle.tidakabsen;
+        for(let c=0;c<8;c++){const cell=ws[XLSX.utils.encode_cell({r,c})];if(cell)cell.s={font:{...baseFont,color:{rgb:cfg.font}},fill:fill(cfg.fill),alignment:c===7?{vertical:"center",wrapText:true}:center,border};}
+      });
+      ws["!rows"]=[{hpt:28},{hpt:20},{hpt:20},{hpt:20},{hpt:8},{hpt:20},{hpt:20},{hpt:20},{hpt:20},{hpt:20},{hpt:20},{hpt:8},{hpt:24}];
 
       const base=(name||"Karyawan").replace(/[\\/?*[\]:]/g," ").replace(/\s+/g," ").trim().slice(0,24)||"Karyawan";
       let sheetName=base,n=2;
