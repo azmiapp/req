@@ -40,8 +40,9 @@
 .attendance-summary .summary-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px}
 .attendance-summary .summary-card span{display:block;color:var(--muted);font-size:9px;font-weight:800}.attendance-summary .summary-card b{display:block;font-size:18px;margin-top:7px}
 .monthly-att-table{min-width:980px}.monthly-att-table td{vertical-align:middle}
-.day-weekend{background:#fafbfc}.day-future{opacity:.58}.day-missing{background:#fff8f0}.day-missing:hover{background:#fff3e4!important}
-.att-status{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:99px;font-size:8px;font-weight:900;white-space:nowrap}.att-status.ok{background:var(--greenSoft);color:#087c52}.att-status.late{background:var(--orangeSoft);color:#a56b08}.att-status.missing{background:var(--redSoft);color:#b42318}.att-status.off{background:#f1f4f7;color:#718096}.att-status.future{background:var(--primarySoft);color:var(--primary)}
+.day-weekend{background:#ffe8ea!important;color:#b42318}.day-weekend td{color:#b42318}.day-future{background:#f1f4f7!important;color:#718096;opacity:1}.day-missing{background:#fff7bf!important;color:#5f5200}.day-missing:hover{background:#ffef9a!important}
+.att-status{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:99px;font-size:8px;font-weight:900;white-space:nowrap}.att-status.ok{background:var(--greenSoft);color:#087c52}.att-status.late{background:var(--orangeSoft);color:#a56b08}.att-status.missing{background:#fff4b8;color:#7a6500}.att-status.off{background:#ffe4e7;color:#b42318}.att-status.future{background:#e9edf2;color:#697789}.att-status.leave{background:#eef4ff;color:#155eef}.att-status.sick{background:#f2efff;color:#6849bd}.att-status.vacation{background:#edf9f4;color:#087c52}
+.attendance-summary .summary-card:nth-child(1){border-left:4px solid #0b9b69}.attendance-summary .summary-card:nth-child(2){border-left:4px solid #e59a20}.attendance-summary .summary-card:nth-child(3){border-left:4px solid #d4ad00}.attendance-summary .summary-card:nth-child(4){border-left:4px solid #155eef}.attendance-summary .summary-card:nth-child(5){border-left:4px solid #7856d9}.attendance-summary .summary-card:nth-child(6){border-left:4px solid #0b9b69}
 @media(max-width:800px){.attendance-filter-card{grid-template-columns:1fr 1fr}.attendance-summary{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.attendance-filter-card{grid-template-columns:1fr}.attendance-summary{grid-template-columns:1fr 1fr}}
 
@@ -186,11 +187,12 @@ body{font-size:13px}
   </div>
 
   <div class="attendance-summary">
-    <div class="summary-card"><span>TOTAL HARI</span><b id="attSumDays">0</b></div>
     <div class="summary-card"><span>HADIR</span><b id="attSumPresent">0</b></div>
     <div class="summary-card"><span>TERLAMBAT</span><b id="attSumLate">0</b></div>
-    <div class="summary-card"><span>LUPA / TIDAK ADA ABSEN</span><b id="attSumMissing">0</b></div>
-    <div class="summary-card"><span>AKHIR PEKAN</span><b id="attSumWeekend">0</b></div>
+    <div class="summary-card"><span>ALPHA</span><b id="attSumAlpha">0</b></div>
+    <div class="summary-card"><span>IZIN</span><b id="attSumIzin">0</b></div>
+    <div class="summary-card"><span>SAKIT</span><b id="attSumSakit">0</b></div>
+    <div class="summary-card"><span>CUTI</span><b id="attSumCuti">0</b></div>
   </div>
 
   <section class="panel"><div class="panel-head"><div><h2>Detail Kehadiran Bulanan</h2><small id="attendanceMonthlyInfo">Pilih bulan dan karyawan.</small></div></div><div class="table-wrap"><table class="table monthly-att-table"><thead><tr><th>No</th><th>Hari</th><th>Tanggal</th><th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Status</th><th>Keterangan</th></tr></thead><tbody id="attendanceMonthlyBody"><tr><td colspan="8"><div class="empty">Pilih karyawan untuk melihat rekap bulanan.</div></td></tr></tbody></table></div></section>
@@ -508,39 +510,166 @@ async function loadMonthlyAttendance(force=false){
     $("attendanceMonthlyInfo").textContent=e.message||"Gagal memuat rekap absensi.";
   }finally{monthlyAttendanceBusy=false;btns.forEach(b=>b.disabled=false)}
 }
-function attendanceMonthlyStatus(item){
-  const p=dateParts(item.date),r=item.record,now=today(),isFuture=item.date>now,isWeekend=p.day===0||p.day===6;
-  const masuk=val(r,"masuk","Masuk","jamMasuk","checkIn"),pulang=val(r,"pulang","Pulang","jamPulang","checkOut"),raw=String(val(r,"status","Status")||"").toLowerCase();
-  if(isFuture)return{code:"FUTURE",label:"Belum waktunya",cls:"future",note:"Tanggal belum lewat",p,isWeekend,masuk,pulang};
-  if(r&&masuk){
-    const late=raw.includes("terlambat");
-    return{code:late?"LATE":"PRESENT",label:late?"Terlambat":"Hadir",cls:late?"late":"ok",note:pulang?"Absensi lengkap":"Belum absen pulang",p,isWeekend,masuk,pulang};
-  }
-  if(isWeekend)return{code:"WEEKEND",label:"Akhir pekan",cls:"off",note:r?"Ada data tanpa jam masuk":"Tidak ada absensi",p,isWeekend,masuk,pulang};
-  return{code:"MISSING",label:"Lupa / Tidak Absen",cls:"missing",note:r?"Data ada, jam masuk kosong":"Tidak ditemukan data absensi",p,isWeekend,masuk,pulang};
+function normalizeAttendanceStatus(r){
+  return String(val(r,"status","Status","jenis","Jenis","kategori","Kategori","keterangan","Keterangan")||"")
+    .trim().toUpperCase()
+    .replace(/\s+/g," ");
 }
+function statusContains(raw, words){
+  return words.some(w=>raw===w || raw.includes(w));
+}
+function attendanceMonthlyStatus(item){
+  const p=dateParts(item.date),r=item.record||null,now=today();
+  const isFuture=item.date>now,isWeekend=p.day===0||p.day===6;
+  const masuk=val(r,"masuk","Masuk","jamMasuk","checkIn"),
+        pulang=val(r,"pulang","Pulang","jamPulang","checkOut"),
+        raw=normalizeAttendanceStatus(r);
+
+  // Status pengajuan/kehadiran yang dikirim backend diprioritaskan.
+  if(statusContains(raw,["SAKIT"])) return {code:"SICK",label:"Sakit",cls:"sick",note:"Sakit",p,isWeekend,masuk,pulang};
+  if(statusContains(raw,["CUTI"])) return {code:"VACATION",label:"Cuti",cls:"vacation",note:"Cuti",p,isWeekend,masuk,pulang};
+  if(statusContains(raw,["IZIN","LEAVE"])) return {code:"LEAVE",label:"Izin",cls:"leave",note:"Izin",p,isWeekend,masuk,pulang};
+
+  if(isFuture) return {code:"FUTURE",label:"Belum waktunya",cls:"future",note:"Tanggal belum lewat",p,isWeekend,masuk,pulang};
+
+  if(r && masuk){
+    const late=statusContains(raw,["TERLAMBAT","LATE"]);
+    return {
+      code:late?"LATE":"PRESENT",
+      label:late?"Terlambat":"Hadir",
+      cls:late?"late":"ok",
+      note:pulang?"Absensi lengkap":"Belum absen pulang",
+      p,isWeekend,masuk,pulang
+    };
+  }
+
+  if(isWeekend) return {code:"WEEKEND",label:"Akhir pekan",cls:"off",note:"Sabtu / Minggu",p,isWeekend,masuk,pulang};
+
+  return {
+    code:"ALPHA",
+    label:"Alpha",
+    cls:"missing",
+    note:"Hari kerja tidak ada absensi",
+    p,isWeekend,masuk,pulang
+  };
+}
+
 function renderMonthlyAttendanceDetail(rows){
-  const empKey=$("attendanceEmployeeFilter")?.value||"",emp=employeeCache.find(e=>employeeKey(e)===empKey),name=val(emp,"nama","name","pegawai","displayName")||empKey||"Karyawan",period=$("attendanceMonthFilter")?.value||today().slice(0,7);
-  let present=0,late=0,missing=0,weekend=0;
+  const empKey=$("attendanceEmployeeFilter")?.value||"",
+        emp=employeeCache.find(e=>employeeKey(e)===empKey),
+        name=val(emp,"nama","name","pegawai","displayName")||empKey||"Karyawan",
+        nip=val(emp,"nip","NIP")||"",
+        period=$("attendanceMonthFilter")?.value||today().slice(0,7);
+
+  const summary={PRESENT:0,LATE:0,ALPHA:0,LEAVE:0,SICK:0,VACATION:0};
   const html=(rows||[]).map((item,i)=>{
     const s=attendanceMonthlyStatus(item),r=item.record||{};
-    if(s.code==="PRESENT"||s.code==="LATE")present++;if(s.code==="LATE")late++;if(s.code==="MISSING")missing++;if(s.isWeekend)weekend++;
-    const trClass=s.code==="MISSING"?"day-missing":s.code==="FUTURE"?"day-future":s.isWeekend?"day-weekend":"";
-    return`<tr class="${trClass}"><td>${i+1}</td><td><b>${esc(s.p.dayName)}</b></td><td>${esc(s.p.dateLabel)}</td><td>${esc(s.masuk||"-")}</td><td>${esc(s.pulang||"-")}</td><td>${esc(val(r,"durasi","Durasi","workDuration")||"-")}</td><td><span class="att-status ${s.cls}">${esc(s.label)}</span></td><td>${esc(s.note)}</td></tr>`;
+    if(summary[s.code]!==undefined)summary[s.code]++;
+
+    const trClass =
+      s.code==="ALPHA" ? "day-missing" :
+      s.code==="FUTURE" ? "day-future" :
+      s.isWeekend ? "day-weekend" : "";
+
+    return `<tr class="${trClass}">
+      <td>${i+1}</td>
+      <td><b>${esc(s.p.dayName)}</b></td>
+      <td>${esc(s.p.dateLabel)}</td>
+      <td>${esc(s.masuk||"-")}</td>
+      <td>${esc(s.pulang||"-")}</td>
+      <td>${esc(val(r,"durasi","Durasi","workDuration")||"-")}</td>
+      <td><span class="att-status ${s.cls}">${esc(s.label)}</span></td>
+      <td>${esc(s.note)}</td>
+    </tr>`;
   }).join("");
+
   $("attendanceMonthlyBody").innerHTML=html||'<tr><td colspan="8"><div class="empty">Tidak ada data.</div></td></tr>';
-  $("attSumDays").textContent=rows.length;$("attSumPresent").textContent=present;$("attSumLate").textContent=late;$("attSumMissing").textContent=missing;$("attSumWeekend").textContent=weekend;
-  const label=new Date(period+"-01T12:00:00+07:00").toLocaleDateString("id-ID",{month:"long",year:"numeric",timeZone:"Asia/Jakarta"});
-  $("attendanceMonthlyInfo").textContent=`${name} • ${label} • ${rows.length} hari`;
+  $("attSumPresent").textContent=summary.PRESENT;
+  $("attSumLate").textContent=summary.LATE;
+  $("attSumAlpha").textContent=summary.ALPHA;
+  $("attSumIzin").textContent=summary.LEAVE;
+  $("attSumSakit").textContent=summary.SICK;
+  $("attSumCuti").textContent=summary.VACATION;
+
+  const label=new Date(period+"-01T12:00:00+07:00").toLocaleDateString("id-ID",{
+    month:"long",year:"numeric",timeZone:"Asia/Jakarta"
+  });
+  $("attendanceMonthlyInfo").textContent=`${name} • ${nip ? nip+" • " : ""}${label} • ${rows.length} hari`;
+}
+
+function excelStyleForStatus(s){
+  if(s.code==="PRESENT") return "background:#e8f8f1;color:#087c52;font-weight:bold";
+  if(s.code==="LATE") return "background:#fff6df;color:#a56b08;font-weight:bold";
+  if(s.code==="ALPHA") return "background:#fff4b8;color:#7a6500;font-weight:bold";
+  if(s.code==="LEAVE") return "background:#eef4ff;color:#155eef;font-weight:bold";
+  if(s.code==="SICK") return "background:#f2efff;color:#6849bd;font-weight:bold";
+  if(s.code==="VACATION") return "background:#edf9f4;color:#087c52;font-weight:bold";
+  if(s.code==="WEEKEND") return "background:#ffe4e7;color:#b42318;font-weight:bold";
+  return "background:#e9edf2;color:#697789;font-weight:bold";
 }
 function exportAttendanceExcel(){
-  if(!monthlyAttendanceRows.length){toast("Tampilkan rekap bulanan terlebih dahulu.");return}
-  const empKey=$("attendanceEmployeeFilter")?.value||"",emp=employeeCache.find(e=>employeeKey(e)===empKey),name=val(emp,"nama","name","pegawai","displayName")||"Karyawan",nip=val(emp,"nip","NIP")||"",period=$("attendanceMonthFilter")?.value||today().slice(0,7);
-  const data=monthlyAttendanceRows.map((item,i)=>{const s=attendanceMonthlyStatus(item),r=item.record||{};return[i+1,s.p.dayName,s.p.dateLabel,val(r,"masuk","Masuk","jamMasuk","checkIn")||"-",val(r,"pulang","Pulang","jamPulang","checkOut")||"-",val(r,"durasi","Durasi","workDuration")||"-",s.label,s.note]});
-  const rowsHtml=data.map(row=>'<tr>'+row.map(v=>`<td>${esc(v)}</td>`).join('')+'</tr>').join('');
-  const html=`<!doctype html><html><head><meta charset="utf-8"></head><body><table><tr><th colspan="8">REKAP ABSENSI BULANAN</th></tr><tr><td>Karyawan</td><td colspan="7">${esc(name)}</td></tr><tr><td>NIP</td><td colspan="7">${esc(nip)}</td></tr><tr><td>Periode</td><td colspan="7">${esc(period)}</td></tr><tr></tr><tr><th>No</th><th>Hari</th><th>Tanggal</th><th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Status</th><th>Keterangan</th></tr>${rowsHtml}</table></body></html>`;
-  const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
-  a.href=url;a.download=`Rekap_Absensi_${String(name).replace(/[^a-z0-9]+/gi,"_")}_${period}.xls`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+  if(!monthlyAttendanceRows.length){
+    toast("Tampilkan rekap bulanan terlebih dahulu.");
+    return;
+  }
+
+  const empKey=$("attendanceEmployeeFilter")?.value||"",
+        emp=employeeCache.find(e=>employeeKey(e)===empKey),
+        name=val(emp,"nama","name","pegawai","displayName")||"Karyawan",
+        nip=val(emp,"nip","NIP")||"",
+        period=$("attendanceMonthFilter")?.value||today().slice(0,7);
+
+  const periodLabel=new Date(period+"-01T12:00:00+07:00").toLocaleDateString("id-ID",{
+    month:"long",year:"numeric",timeZone:"Asia/Jakarta"
+  });
+
+  const data=monthlyAttendanceRows.map((item,i)=>{
+    const s=attendanceMonthlyStatus(item),r=item.record||{};
+    return {
+      no:i+1,day:s.p.dayName,date:s.p.dateLabel,
+      masuk:val(r,"masuk","Masuk","jamMasuk","checkIn")||"-",
+      pulang:val(r,"pulang","Pulang","jamPulang","checkOut")||"-",
+      durasi:val(r,"durasi","Durasi","workDuration")||"-",
+      status:s.label,note:s.note,
+      style:excelStyleForStatus(s),
+      rowStyle:s.isWeekend?"background:#ffe8ea;color:#b42318":s.code==="ALPHA"?"background:#fff7bf;color:#5f5200":s.code==="FUTURE"?"background:#f1f4f7;color:#697789":""
+    };
+  });
+
+  const rowsHtml=data.map(x=>`
+    <tr style="${x.rowStyle}">
+      <td>${x.no}</td><td>${esc(x.day)}</td><td>${esc(x.date)}</td>
+      <td>${esc(x.masuk)}</td><td>${esc(x.pulang)}</td><td>${esc(x.durasi)}</td>
+      <td style="${x.style}">${esc(x.status)}</td><td>${esc(x.note)}</td>
+    </tr>`).join("");
+
+  const html=`<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+body{font-family:Arial,sans-serif;font-size:11pt}
+table{border-collapse:collapse;width:100%}
+th,td{border:1px solid #d9e1ea;padding:7px 9px}
+.title{background:#155eef;color:#fff;font-weight:bold;font-size:15pt;text-align:center}
+.meta{background:#f5f8fc;font-weight:bold}
+.head{background:#f8fafc;color:#52647a;font-weight:bold}
+</style></head><body>
+<table>
+<tr><th class="title" colspan="8">REKAP ABSENSI BULANAN</th></tr>
+<tr><td class="meta">Karyawan</td><td colspan="7">${esc(name)}</td></tr>
+<tr><td class="meta">NIP</td><td colspan="7">${esc(nip||"-")}</td></tr>
+<tr><td class="meta">Periode</td><td colspan="7">${esc(periodLabel)}</td></tr>
+<tr><td class="meta">Keterangan</td><td colspan="7">Hijau = Hadir • Oranye = Terlambat • Kuning = Alpha/Lupa Absen • Merah = Sabtu/Minggu • Abu-abu = Belum waktunya</td></tr>
+<tr><td colspan="8"></td></tr>
+<tr class="head"><th>No</th><th>Hari</th><th>Tanggal</th><th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Status</th><th>Keterangan</th></tr>
+${rowsHtml}
+</table></body></html>`;
+
+  const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"});
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;
+  a.download=`Rekap_Absensi_${String(name).replace(/[^a-z0-9]+/gi,"_")}_${period}.xls`;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 
 function employeeHtml(rows){if(!rows.length)return'<tr><td colspan="7"><div class="empty">Tidak ada data pegawai.</div></td></tr>';return rows.map(r=>`<tr><td><span class="name">${esc(val(r,"nama","name","pegawai")||"-")}</span><span class="sub">${esc(val(r,"email","Email")||"")}</span></td><td>${esc(val(r,"nip","NIP")||"-")}</td><td>${esc(val(r,"jabatan","position")||"-")}</td><td>${esc(val(r,"role","Role")||"-")}</td><td>${esc(val(r,"status","Status")||"-")}</td><td>${money(val(r,"gajiPokok","basicSalary","salary"))}</td><td>${money(val(r,"tunjangan","allowance"))}</td></tr>`).join("")}
