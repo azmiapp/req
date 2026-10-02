@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#155eef">
+<title>Admin Absensi • Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,600,0,0" rel="stylesheet">
+<style>
+:root{--primary:#155eef;--primary2:#0b4bc4;--primarySoft:#eef4ff;--ink:#12213a;--muted:#718096;--line:#e7edf5;--bg:#f5f8fc;--white:#fff;--green:#0b9b69;--greenSoft:#e8f8f1;--red:#e5484d;--redSoft:#fff0f1;--orange:#e59a20;--orangeSoft:#fff6df;--purple:#7856d9;--purpleSoft:#f2efff;--shadow:0 12px 35px rgba(23,62,120,.08);--radius:20px;--sidebar:258px;--topbar:70px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.material-symbols-rounded{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;font-size:22px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased}
+.fade-in{animation:fadeIn .25s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}@keyframes spin{to{transform:rotate(360deg)}}
+.login{min-height:100dvh;display:grid;place-items:center;padding:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,#eff5ff 0%,#f9fbff 50%,#eef8f5 100%)}
+.login:before,.login:after{content:"";position:absolute;border-radius:50%;filter:blur(2px);opacity:.55}.login:before{width:420px;height:420px;background:#dce9ff;top:-160px;right:-100px}.login:after{width:320px;height:320px;background:#dff8ed;bottom:-130px;left:-80px}
+.login-card{position:relative;z-index:1;width:min(430px,100%);padding:36px;border:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.9);backdrop-filter:blur(20px);border-radius:30px;box-shadow:0 25px 70px rgba(28,71,130,.14);text-align:center}
+.login-logo{width:76px;height:76px;border-radius:24px;margin:0 auto 18px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#155eef,#0b4bc4);box-shadow:0 15px 30px rgba(21,94,239,.25)}.login-logo .material-symbols-rounded{font-size:38px}.login-card h1{margin:0;font-size:25px;letter-spacing:-.03em}.login-card p{margin:9px 0 25px;color:var(--muted);font-size:12px;line-height:1.65}
+.google-btn{width:100%;height:52px;border:0;border-radius:15px;color:#fff;background:linear-gradient(135deg,#155eef,#0b4bc4);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 9px 22px rgba(21,94,239,.2);transition:.18s}.google-btn:hover{transform:translateY(-1px)}.google-btn:disabled{opacity:.6;cursor:not-allowed}
+.sidebar{position:fixed;z-index:80;left:0;top:0;bottom:0;width:var(--sidebar);background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:17px 13px;overflow-y:auto}
+.logo-area{display:flex;align-items:center;gap:11px;padding:5px 10px 23px}.logo-box{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#155eef,#0b4bc4);box-shadow:0 9px 20px rgba(21,94,239,.2)}.logo-box .material-symbols-rounded{font-size:24px}.logo-area b{display:block;font-size:13px}.logo-area small{display:block;color:#9aa7b7;font-size:8px;margin-top:3px}
+.side-label{margin:9px 10px 7px;color:#9aa6b6;font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.1em}.nav{display:flex;flex-direction:column;gap:4px}.nav-btn{position:relative;width:100%;min-height:47px;padding:0 12px;border:0;border-radius:13px;background:transparent;color:#65758a;text-align:left;display:flex;align-items:center;gap:11px;font-size:11px;font-weight:700;transition:.18s}.nav-btn:hover{background:#f5f8fc;color:var(--primary)}.nav-btn.active{background:linear-gradient(90deg,#edf4ff,#f4f8ff);color:var(--primary);font-weight:800}.nav-btn.active:before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:4px;background:var(--primary)}.nav-btn .icon{width:29px;height:29px;border-radius:9px;display:grid;place-items:center}.nav-btn.active .icon{background:#fff;box-shadow:0 4px 12px rgba(21,94,239,.08)}.nav-count{margin-left:auto;min-width:21px;height:21px;padding:0 6px;border-radius:20px;display:grid;place-items:center;background:#f1f4f8;color:#7a8797;font-size:8px}.nav-btn.active .nav-count{background:#dfeaff;color:var(--primary)}.side-spacer{flex:1;min-height:20px}.side-profile{padding:12px 9px 4px;border-top:1px solid var(--line);display:flex;align-items:center;gap:9px}.avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--primarySoft)}.profile-text{min-width:0}.profile-text b{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.profile-text span{display:block;color:#9aa6b6;font-size:8px;margin-top:2px}
+.topbar{position:fixed;z-index:70;left:var(--sidebar);right:0;top:0;height:var(--topbar);background:rgba(255,255,255,.9);backdrop-filter:blur(17px);border-bottom:1px solid var(--line)}.topbar-inner{height:100%;padding:0 24px;display:flex;align-items:center;justify-content:space-between}.mobile-menu{display:none;width:39px;height:39px;border:0;border-radius:11px;background:#f1f5f9;color:#52647a}.top-left{display:flex;align-items:center;gap:10px}.top-title{font-size:13px;font-weight:800}.top-date{font-size:9px;color:var(--muted);margin-top:3px}.top-right{display:flex;align-items:center;gap:10px}.logout{height:38px;padding:0 12px;border:0;border-radius:11px;background:#f1f4f7;color:#5e7086;font-size:10px;font-weight:800;display:flex;align-items:center;gap:5px}
+.main{margin-left:var(--sidebar);padding:calc(var(--topbar) + 25px) 25px 55px;max-width:1700px}.page{display:none}.page.active{display:block;animation:fadeIn .22s ease}.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:20px}.page-head h1{margin:0;font-size:26px;letter-spacing:-.035em}.page-head p{margin:6px 0 0;color:var(--muted);font-size:11px}.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.input,.select{height:41px;border:1px solid #dce5ef;border-radius:11px;background:#fff;color:var(--ink);padding:0 12px;outline:none;font-size:11px}.input:focus,.select:focus,.textarea:focus{border-color:#8bb2f1;box-shadow:0 0 0 3px rgba(21,94,239,.07)}.primary{height:41px;padding:0 14px;border:0;border-radius:11px;color:#fff;background:var(--primary);font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:6px}.secondary{height:41px;padding:0 13px;border:1px solid var(--line);border-radius:11px;color:#617289;background:#fff;font-size:10px;font-weight:800;display:inline-flex;align-items:center;gap:6px}
+.menu-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px}.menu-card{position:relative;overflow:hidden;min-height:112px;padding:17px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 6px 20px rgba(25,65,120,.04);text-align:left;transition:.2s;cursor:pointer}.menu-card:hover{transform:translateY(-3px);box-shadow:0 16px 35px rgba(25,65,120,.09);border-color:#d7e4f8}.menu-card:after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;right:-40px;bottom:-45px;background:var(--card-bg,#eef4ff)}.menu-card-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--card-bg,#eef4ff);color:var(--card-color,var(--primary));margin-bottom:12px}.menu-card strong{display:block;font-size:11px}.menu-card span{display:block;color:var(--muted);font-size:9px;margin-top:4px}.menu-card-arrow{position:absolute;right:15px;top:16px;color:#a2afbe;font-size:17px;z-index:2}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:17px}.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 5px 17px rgba(25,65,120,.035)}.stat-top{display:flex;align-items:center;justify-content:space-between;color:#7b899a;font-size:8px;font-weight:900;letter-spacing:.03em}.stat-icon{width:32px;height:32px;border-radius:10px;background:var(--primarySoft);color:var(--primary);display:grid;place-items:center}.stat-icon .material-symbols-rounded{font-size:18px}.stat b{display:block;font-size:24px;margin-top:12px;letter-spacing:-.03em}.stat.green .stat-icon{background:var(--greenSoft);color:var(--green)}.stat.red .stat-icon{background:var(--redSoft);color:var(--red)}.stat.orange .stat-icon{background:var(--orangeSoft);color:var(--orange)}.stat.purple .stat-icon{background:var(--purpleSoft);color:var(--purple)}
+.grid{display:grid;grid-template-columns:1.55fr 1fr;gap:16px}.panel{background:#fff;border:1px solid var(--line);border-radius:19px;box-shadow:0 5px 18px rgba(25,65,120,.035);overflow:hidden}.panel-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.panel-head h2{margin:0;font-size:13px}.panel-head small{display:block;margin-top:4px;color:var(--muted);font-size:9px}.section{margin-top:16px}.table-wrap{overflow:auto}.table{width:100%;min-width:720px;border-collapse:collapse}.table th{padding:11px 13px;text-align:left;background:#f8fafc;color:#7c8a9c;font-size:8px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}.table td{padding:12px 13px;border-top:1px solid var(--line);font-size:10px;white-space:nowrap}.table tbody tr:hover{background:#fbfcfe}.name{font-weight:800}.sub{display:block;color:#9aa6b6;font-size:8px;margin-top:3px}.empty{padding:35px;text-align:center;color:var(--muted);font-size:11px}.badge{display:inline-flex;padding:5px 8px;border-radius:99px;font-size:8px;font-weight:900}.hadir{background:var(--greenSoft);color:#087c52}.belum{background:#f1f4f7;color:#718096}.terlambat{background:var(--orangeSoft);color:#a56b08}.tabs{display:flex;gap:5px}.tab{height:29px;padding:0 9px;border:0;border-radius:8px;background:#f1f4f7;color:#7a8797;font-size:8px;font-weight:800}.tab.active{background:var(--primarySoft);color:var(--primary)}.mini-list{padding:7px 17px 13px}.mini{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.mini:last-child{border-bottom:0}.mini-main{min-width:0}.mini-main b{display:block;font-size:10px}.mini-main span{display:block;color:var(--muted);font-size:8px;margin-top:3px}.money{font-size:10px;font-weight:900;white-space:nowrap}.payroll-filter{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;padding:14px}.payroll-summary{display:flex;gap:22px;flex-wrap:wrap;margin:0 14px 8px;padding:12px;border:1px solid var(--line);border-radius:11px;background:#f8fafc}
+.module-hero{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:19px 20px;margin-bottom:15px;border:1px solid var(--line);border-radius:18px;background:radial-gradient(circle at 90% 10%,rgba(21,94,239,.08),transparent 35%),#fff}.module-left{display:flex;align-items:center;gap:12px}.module-icon{width:45px;height:45px;border-radius:13px;background:var(--primarySoft);color:var(--primary);display:grid;place-items:center}.module-hero h2{margin:0;font-size:15px}.module-hero p{margin:4px 0 0;color:var(--muted);font-size:9px}.module-body{padding:17px}.business-grid{display:grid;grid-template-columns:minmax(300px,.8fr) minmax(480px,1.5fr);gap:20px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.full{grid-column:1/-1}.form-label{display:block;margin:0 0 5px;color:#68788d;font-size:9px;font-weight:800}.textarea{width:100%;min-height:82px;resize:vertical;border:1px solid #dce5ef;border-radius:10px;padding:10px 11px;outline:none;color:var(--ink);font-size:10px}.form-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:12px}.btn{height:36px;padding:0 12px;border:0;border-radius:9px;font-size:9px;font-weight:800}.btn.success{background:#0b9b69;color:#fff}.btn.danger{background:#e5484d;color:#fff}.btn.gray{background:#eef2f6;color:#586a80}.btn.blue{background:var(--primary);color:#fff}.btn:disabled{opacity:.55;cursor:not-allowed}.toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.toolbar .select,.toolbar .input{height:36px;width:auto;min-width:130px}.hint{font-size:9px;color:var(--muted);line-height:1.55}.business-table{min-width:950px}.detail{white-space:normal!important;min-width:180px;max-width:350px;line-height:1.45}.status{display:inline-flex;padding:5px 8px;border-radius:99px;font-size:8px;font-weight:900;white-space:nowrap}.status.wait{background:#fff4d7;color:#9a6800}.status.ok{background:var(--greenSoft);color:#087c52}.status.no{background:var(--redSoft);color:#b42318}.status.blue{background:var(--primarySoft);color:var(--primary)}
+/* Payroll module */
+.payroll-page .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}.payroll-page .eyebrow{font-size:8px;font-weight:900;color:var(--primary);letter-spacing:.12em}.payroll-page .section-head h2{margin:4px 0;font-size:25px}.payroll-page .muted{color:var(--muted);font-size:10px}.payroll-page .section-actions{display:flex;gap:8px}.payroll-page .filter-card{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:16px;background:#fff;border:1px solid var(--line);border-radius:18px;margin-bottom:15px}.payroll-page .field label{display:block;font-size:9px;font-weight:800;color:#68788d;margin-bottom:5px}.payroll-page .field input,.payroll-page .field select{width:100%;height:40px;border:1px solid #dce5ef;border-radius:10px;padding:0 10px;background:#fff;color:var(--ink)}.payroll-page .stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:15px}.payroll-page .stat-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px}.payroll-page .stat-card span{font-size:8px;color:var(--muted);font-weight:800}.payroll-page .stat-card strong{display:block;font-size:17px;margin-top:10px}.payroll-page .table-card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:15px}.payroll-page .table-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.payroll-page .table-head h3{margin:0;font-size:13px}.payroll-page table{width:100%;border-collapse:collapse;min-width:900px}.payroll-page th{padding:11px 13px;background:#f8fafc;text-align:left;color:#7c8a9c;font-size:8px;text-transform:uppercase}.payroll-page td{padding:12px 13px;border-top:1px solid var(--line);font-size:10px}.payroll-row{cursor:pointer}.payroll-row:hover{background:#fbfcfe}.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:17px}.detail-item{border:1px solid var(--line);border-radius:11px;padding:11px}.detail-item span{display:block;color:var(--muted);font-size:8px}.detail-item b{display:block;margin-top:5px;font-size:11px}
+
+/* Rekap absensi bulanan */
+.attendance-filter-card{display:grid;grid-template-columns:180px minmax(220px,1fr) auto auto;gap:10px;align-items:end;padding:16px;background:#fff;border:1px solid var(--line);border-radius:18px;margin-bottom:15px}
+.attendance-filter-card .field label{display:block;font-size:10px;font-weight:800;color:#68788d;margin-bottom:5px}
+.attendance-filter-card .field input,.attendance-filter-card .field select{width:100%;height:40px;border:1px solid #dce5ef;border-radius:10px;padding:0 10px;background:#fff;color:var(--ink);font-size:11px}
+.attendance-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:15px}
+.attendance-summary .summary-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px}
+.attendance-summary .summary-card span{display:block;color:var(--muted);font-size:9px;font-weight:800}.attendance-summary .summary-card b{display:block;font-size:18px;margin-top:7px}
+.monthly-att-table{min-width:980px}.monthly-att-table td{vertical-align:middle}
+.day-weekend{background:#fafbfc}.day-future{opacity:.58}.day-missing{background:#fff8f0}.day-missing:hover{background:#fff3e4!important}
+.att-status{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:99px;font-size:8px;font-weight:900;white-space:nowrap}.att-status.ok{background:var(--greenSoft);color:#087c52}.att-status.late{background:var(--orangeSoft);color:#a56b08}.att-status.missing{background:var(--redSoft);color:#b42318}.att-status.off{background:#f1f4f7;color:#718096}.att-status.future{background:var(--primarySoft);color:var(--primary)}
+@media(max-width:800px){.attendance-filter-card{grid-template-columns:1fr 1fr}.attendance-summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.attendance-filter-card{grid-template-columns:1fr}.attendance-summary{grid-template-columns:1fr 1fr}}
+
+/* Mobile */
+.overlay{display:none}@media(max-width:1150px){.menu-cards{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}.business-grid{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.payroll-page .stats-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){:root{--sidebar:0px}.sidebar{transform:translateX(-100%);transition:.22s;box-shadow:15px 0 45px rgba(15,35,60,.13)}.sidebar.open{transform:translateX(0)}.overlay.show{display:block;position:fixed;z-index:75;inset:0;background:rgba(15,35,60,.35);backdrop-filter:blur(2px)}.topbar{left:0}.mobile-menu{display:grid;place-items:center}.main{margin-left:0;padding:calc(var(--topbar) + 18px) 13px 40px}.topbar-inner{padding:0 13px}.top-date{display:none}.page-head{display:block}.page-head .actions{margin-top:13px}.page-head h1{font-size:22px}.payroll-page .section-head{display:block}.payroll-page .section-actions{margin-top:12px}.payroll-page .filter-card{grid-template-columns:1fr}.payroll-page .stats-grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.menu-cards{grid-template-columns:1fr 1fr;gap:9px}.menu-card{min-height:104px;padding:13px}.menu-card-icon{width:34px;height:34px;margin-bottom:10px}.menu-card strong{font-size:10px}.stats{grid-template-columns:1fr 1fr;gap:9px}.stat{padding:13px}.stat b{font-size:21px}.payroll-filter{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.module-hero{align-items:flex-start;padding:15px}.module-hero p{line-height:1.4}.module-hero>.btn{flex:none}.actions .input,.actions .select,.actions .primary,.actions .secondary{flex:1;min-width:0}.payroll-page .stats-grid{grid-template-columns:1fr 1fr}.detail-grid{grid-template-columns:1fr 1fr}}@media(max-width:400px){.menu-cards{grid-template-columns:1fr}.top-title{font-size:11px}}
+</style>
+
+<style id="font-size-override">
+/* ===== FONT UI DIPERBESAR ===== */
+body{font-size:13px}
+.login-card p{font-size:13px}
+.login-card h1{font-size:27px}
+.google-btn{font-size:13px}
+
+.logo-area b{font-size:14px}
+.logo-area small{font-size:9px}
+.side-label{font-size:9px}
+.nav-btn{font-size:12px}
+.nav-count{font-size:9px}
+.profile-text b{font-size:11px}
+.profile-text span{font-size:9px}
+
+.top-title{font-size:14px}
+.top-date{font-size:10px}
+.logout{font-size:11px}
+
+.page-head h1{font-size:28px}
+.page-head p{font-size:12px}
+.input,.select{font-size:12px}
+.primary,.secondary{font-size:12px}
+
+.menu-card strong{font-size:12px}
+.menu-card span{font-size:10px}
+
+.stat-top{font-size:9px}
+.stat b{font-size:26px}
+
+.panel-head h2{font-size:14px}
+.panel-head small{font-size:10px}
+.table th{font-size:9px}
+.table td{font-size:11px}
+.sub{font-size:9px}
+.badge{font-size:9px}
+.tab{font-size:9px}
+
+.money{font-size:11px}
+.mini-main b{font-size:11px}
+.mini-main span{font-size:9px}
+
+.module-hero h2{font-size:17px}
+.module-hero p{font-size:10px}
+.hint{font-size:10px}
+.form-label{font-size:10px}
+.textarea{font-size:11px}
+.btn{font-size:10px}
+.toolbar .select,.toolbar .input{font-size:11px}
+
+.payroll-page .eyebrow{font-size:9px}
+.payroll-page .section-head h2{font-size:28px}
+.payroll-page .muted{font-size:11px}
+.payroll-page .field label{font-size:10px}
+.payroll-page .field input,.payroll-page .field select{font-size:11px}
+.payroll-page .stat-card span{font-size:9px}
+.payroll-page .stat-card strong{font-size:19px}
+.payroll-page .table-head h3{font-size:14px}
+.payroll-page th{font-size:9px}
+.payroll-page td{font-size:11px}
+.detail-item span{font-size:9px}
+.detail-item b{font-size:12px}
+
+@media(max-width:620px){
+  .page-head h1{font-size:24px}
+  .stat b{font-size:23px}
+  .menu-card strong{font-size:11px}
+  .menu-card span{font-size:10px}
+}
+</style>
+
+</head>
+<body>
+
+<section id="login" class="login">
+  <div class="login-card">
+    <div class="login-logo"><span class="material-symbols-rounded">admin_panel_settings</span></div>
+    <h1>Admin Absensi</h1>
+    <p>Kelola absensi, pegawai, penugasan, pengajuan, dan payroll melalui satu dashboard yang praktis.</p>
+    <button id="loginBtn" class="google-btn" onclick="loginAdmin()"><span class="material-symbols-rounded">login</span> Masuk dengan Google</button>
+  </div>
+</section>
+
+<section id="app" class="hidden">
+<aside id="sidebar" class="sidebar">
+  <div class="logo-area"><div class="logo-box"><span class="material-symbols-rounded">admin_panel_settings</span></div><div><b>Absensi Admin</b><small>Management System</small></div></div>
+  <div class="side-label">Menu Utama</div>
+  <nav class="nav">
+    <button class="nav-btn active" data-page="dashboard" onclick="openPage('dashboard')"><span class="icon"><span class="material-symbols-rounded">dashboard</span></span>Dashboard</button>
+    <button class="nav-btn" data-page="attendance" onclick="openPage('attendance')"><span class="icon"><span class="material-symbols-rounded">fact_check</span></span>Absensi</button>
+    <button class="nav-btn" data-page="employees" onclick="openPage('employees')"><span class="icon"><span class="material-symbols-rounded">groups</span></span>Data Pegawai</button>
+    <button class="nav-btn" data-page="assignment" onclick="openPage('assignment')"><span class="icon"><span class="material-symbols-rounded">assignment</span></span>Penugasan <span id="assignmentBadge" class="nav-count">0</span></button>
+    <button class="nav-btn" data-page="request" onclick="openPage('request')"><span class="icon"><span class="material-symbols-rounded">description</span></span>Pengajuan <span id="requestBadge" class="nav-count">0</span></button>
+    <button class="nav-btn" data-page="payroll" onclick="openPage('payroll')"><span class="icon"><span class="material-symbols-rounded">payments</span></span>Payroll</button>
+  </nav>
+  <div class="side-spacer"></div><div class="side-label">Sistem</div>
+  <nav class="nav"><button class="nav-btn" onclick="toast('Menu pengaturan siap dikembangkan.')"><span class="icon"><span class="material-symbols-rounded">settings</span></span>Pengaturan</button></nav>
+  <div class="side-profile"><img id="sideAvatar" class="avatar" alt=""><div class="profile-text"><b id="sideName">Admin</b><span>Administrator</span></div></div>
+</aside>
+<div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+<header class="topbar"><div class="topbar-inner"><div class="top-left"><button class="mobile-menu" onclick="toggleSidebar()"><span class="material-symbols-rounded">menu</span></button><div><div id="topTitle" class="top-title">Dashboard</div><div id="topDate" class="top-date">-</div></div></div><div class="top-right"><img id="avatar" class="avatar" alt=""><button class="logout" onclick="logout()"><span class="material-symbols-rounded" style="font-size:15px">logout</span> Keluar</button></div></div></header>
+
+<main class="main">
+<section id="page-dashboard" class="page active">
+  <div class="page-head"><div><h1>Dashboard</h1><p id="welcome">Ringkasan aktivitas hari ini.</p></div><div class="actions"><input id="dateFilter" class="input" type="date"><select id="monthFilter" class="select"></select><button class="primary" onclick="loadAll()"><span class="material-symbols-rounded" style="font-size:16px">refresh</span> Refresh</button></div></div>
+  <div class="menu-cards">
+    <button class="menu-card" style="--card-bg:#eef4ff;--card-color:#155eef" onclick="openPage('attendance')"><span class="menu-card-arrow material-symbols-rounded">arrow_forward</span><div class="menu-card-icon"><span class="material-symbols-rounded">fact_check</span></div><strong>Absensi</strong><span>Pantau kehadiran pegawai</span></button>
+    <button class="menu-card" style="--card-bg:#edf9f4;--card-color:#0b9b69" onclick="openPage('employees')"><span class="menu-card-arrow material-symbols-rounded">arrow_forward</span><div class="menu-card-icon"><span class="material-symbols-rounded">groups</span></div><strong>Data Pegawai</strong><span>Kelola data karyawan</span></button>
+    <button class="menu-card" style="--card-bg:#f1efff;--card-color:#7856d9" onclick="openPage('assignment')"><span class="menu-card-arrow material-symbols-rounded">arrow_forward</span><div class="menu-card-icon"><span class="material-symbols-rounded">assignment</span></div><strong>Penugasan</strong><span>Buat & pantau tugas pegawai</span></button>
+    <button class="menu-card" style="--card-bg:#fff5df;--card-color:#d8880b" onclick="openPage('request')"><span class="menu-card-arrow material-symbols-rounded">arrow_forward</span><div class="menu-card-icon"><span class="material-symbols-rounded">description</span></div><strong>Pengajuan</strong><span>Review izin & cuti pegawai</span></button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-top">TOTAL PEGAWAI <span class="stat-icon"><span class="material-symbols-rounded">groups</span></span></div><b id="sTotal">0</b></div>
+    <div class="stat green"><div class="stat-top">SUDAH MASUK <span class="stat-icon"><span class="material-symbols-rounded">login</span></span></div><b id="sMasuk">0</b></div>
+    <div class="stat red"><div class="stat-top">BELUM MASUK <span class="stat-icon"><span class="material-symbols-rounded">person_off</span></span></div><b id="sBelum">0</b></div>
+    <div class="stat orange"><div class="stat-top">TERLAMBAT <span class="stat-icon"><span class="material-symbols-rounded">schedule</span></span></div><b id="sLate">0</b></div>
+    <div class="stat purple"><div class="stat-top">SUDAH PULANG <span class="stat-icon"><span class="material-symbols-rounded">logout</span></span></div><b id="sPulang">0</b></div>
+  </div>
+  <div class="grid">
+    <section class="panel"><div class="panel-head"><div><h2>Absensi Hari Ini</h2><small id="attendanceInfo">-</small></div><div class="tabs"><button id="tabAll" class="tab active" onclick="setAttendanceFilter('ALL')">Semua</button><button id="tabBelum" class="tab" onclick="setAttendanceFilter('BELUM')">Belum Masuk</button></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Pegawai</th><th>Jabatan</th><th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Status</th></tr></thead><tbody id="attendanceBody"></tbody></table></div></section>
+    <section class="panel"><div class="panel-head"><div><h2>Payroll</h2><small id="dashboardPayrollInfo">-</small></div></div><div class="payroll-filter"><select id="dashboardPayrollMonthFilter" class="select"></select><select id="dashboardPayrollEmployeeFilter" class="select"><option value="ALL">Semua Karyawan</option></select><button class="primary" onclick="applyDashboardPayrollFilter()">Tampilkan</button></div><div id="dashboardPayrollSummary" class="payroll-summary hidden"></div><div id="dashboardPayrollList" class="mini-list"></div></section>
+  </div>
+  <section class="panel section"><div class="panel-head"><div><h2>Rekap Bulanan</h2><small>Ringkasan kehadiran berdasarkan bulan yang dipilih</small></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Pegawai</th><th>Hari Kerja</th><th>Hadir</th><th>Terlambat</th><th>Izin</th><th>Sakit</th><th>Tidak Hadir</th><th>Jam Kerja</th></tr></thead><tbody id="monthlyBody"></tbody></table></div></section>
+</section>
+
+<section id="page-attendance" class="page">
+  <div class="module-hero"><div class="module-left"><div class="module-icon"><span class="material-symbols-rounded">fact_check</span></div><div><h2>Rekap Absensi Bulanan</h2><p>Lihat absensi karyawan lengkap Senin–Minggu dan temukan hari yang belum tercatat.</p></div></div><button class="btn gray" onclick="loadMonthlyAttendance(true)"><span class="material-symbols-rounded" style="font-size:15px">refresh</span> Refresh</button></div>
+
+  <div class="attendance-filter-card">
+    <div class="field"><label>Bulan</label><input type="month" id="attendanceMonthFilter"></div>
+    <div class="field"><label>Karyawan</label><select id="attendanceEmployeeFilter"><option value="">Pilih Karyawan</option></select></div>
+    <button class="btn blue" style="height:40px" onclick="loadMonthlyAttendance(true)"><span class="material-symbols-rounded" style="font-size:15px;vertical-align:middle">search</span> Tampilkan</button>
+    <button class="btn success" style="height:40px" onclick="exportAttendanceExcel()"><span class="material-symbols-rounded" style="font-size:15px;vertical-align:middle">download</span> Export Excel</button>
+  </div>
+
+  <div class="attendance-summary">
+    <div class="summary-card"><span>TOTAL HARI</span><b id="attSumDays">0</b></div>
+    <div class="summary-card"><span>HADIR</span><b id="attSumPresent">0</b></div>
+    <div class="summary-card"><span>TERLAMBAT</span><b id="attSumLate">0</b></div>
+    <div class="summary-card"><span>LUPA / TIDAK ADA ABSEN</span><b id="attSumMissing">0</b></div>
+    <div class="summary-card"><span>AKHIR PEKAN</span><b id="attSumWeekend">0</b></div>
+  </div>
+
+  <section class="panel"><div class="panel-head"><div><h2>Detail Kehadiran Bulanan</h2><small id="attendanceMonthlyInfo">Pilih bulan dan karyawan.</small></div></div><div class="table-wrap"><table class="table monthly-att-table"><thead><tr><th>No</th><th>Hari</th><th>Tanggal</th><th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Status</th><th>Keterangan</th></tr></thead><tbody id="attendanceMonthlyBody"><tr><td colspan="8"><div class="empty">Pilih karyawan untuk melihat rekap bulanan.</div></td></tr></tbody></table></div></section>
+</section>
+
+<section id="page-employees" class="page">
+  <div class="module-hero"><div class="module-left"><div class="module-icon"><span class="material-symbols-rounded">groups</span></div><div><h2>Data Pegawai</h2><p>Daftar pegawai dan informasi dasar payroll.</p></div></div><button class="btn gray" onclick="loadAll()"><span class="material-symbols-rounded" style="font-size:15px">refresh</span> Refresh</button></div>
+  <section class="panel"><div class="panel-head"><div><h2>Daftar Pegawai</h2><small>Data dari sistem</small></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Pegawai</th><th>NIP</th><th>Jabatan</th><th>Role</th><th>Status</th><th>Gaji Pokok</th><th>Tunjangan</th></tr></thead><tbody id="employeeBody2"></tbody></table></div></section>
+</section>
+
+<section id="page-assignment" class="page">
+  <div class="module-hero"><div class="module-left"><div class="module-icon"><span class="material-symbols-rounded">assignment</span></div><div><h2>Penugasan Pegawai</h2><p>Buat tugas baru dan lihat karyawan yang menerima setiap penugasan.</p></div></div><button class="btn gray" onclick="loadAdminAssignments(true)"><span class="material-symbols-rounded" style="font-size:15px">refresh</span> Refresh</button></div>
+  <section class="panel"><div class="module-body"><div class="business-grid">
+    <div><div class="hint" style="margin-bottom:12px">Isi formulir di bawah untuk memberikan penugasan kepada pegawai tertentu.</div><div class="form-grid">
+      <div class="full"><label class="form-label">Pegawai</label><select id="assignmentUid" class="select" style="width:100%"><option value="">Pilih pegawai</option></select></div>
+      <div class="full"><label class="form-label">Judul Penugasan</label><input id="assignmentTitle" class="input" style="width:100%" maxlength="150" placeholder="Contoh: Kunjungan lapangan"></div>
+      <div><label class="form-label">Tanggal Mulai</label><input id="assignmentStart" class="input" style="width:100%" type="date"></div><div><label class="form-label">Tanggal Selesai</label><input id="assignmentEnd" class="input" style="width:100%" type="date"></div>
+      <div><label class="form-label">Prioritas</label><select id="assignmentPriority" class="select" style="width:100%"><option value="NORMAL">Normal</option><option value="TINGGI">Tinggi</option><option value="RENDAH">Rendah</option></select></div><div><label class="form-label">Lokasi</label><input id="assignmentLocation" class="input" style="width:100%" maxlength="200" placeholder="Lokasi"></div>
+      <div class="full"><label class="form-label">Deskripsi</label><textarea id="assignmentDescription" class="textarea" maxlength="1000" placeholder="Detail pekerjaan / instruksi..."></textarea></div>
+      <div class="full"><label class="form-label">Catatan</label><textarea id="assignmentNotes" class="textarea" maxlength="500" placeholder="Catatan tambahan..."></textarea></div>
+    </div><div class="form-actions"><button class="btn gray" onclick="resetAssignmentForm()">Bersihkan</button><button id="createAssignmentBtn" class="btn success" onclick="createAssignment()">Buat Penugasan</button></div></div>
+    <div><div class="toolbar" style="margin-bottom:10px"><span id="assignmentInfo" class="hint">Memuat...</span><label style="margin-left:auto;font-size:9px;font-weight:800;color:#69788c;display:flex;gap:5px;align-items:center"><input id="includeCompleted" type="checkbox" onchange="loadAdminAssignments(true)"> Tampilkan selesai</label></div><div class="table-wrap"><table class="table business-table"><thead><tr><th>Karyawan Penerima</th><th>Penugasan</th><th>Tanggal</th><th>Lokasi</th><th>Prioritas</th><th>Status</th></tr></thead><tbody id="assignmentBody"></tbody></table></div></div>
+  </div></div></section>
+</section>
+
+<section id="page-request" class="page">
+  <div class="module-hero"><div class="module-left"><div class="module-icon" style="background:#fff5df;color:#d8880b"><span class="material-symbols-rounded">description</span></div><div><h2>Pengajuan Izin / Cuti</h2><p>Review pengajuan pegawai dengan cepat dari halaman khusus ini.</p></div></div><button class="btn gray" onclick="loadAdminRequests(true)"><span class="material-symbols-rounded" style="font-size:15px">refresh</span> Refresh</button></div>
+  <section class="panel"><div class="panel-head"><div><h2>Daftar Pengajuan</h2><small id="requestInfo">Memuat...</small></div></div><div style="padding:13px 16px;border-bottom:1px solid var(--line)"><div class="toolbar"><select id="requestStatusFilter" class="select"><option value="ALL">Semua Status</option><option value="MENUNGGU">Menunggu</option><option value="DISETUJUI">Disetujui</option><option value="DITOLAK">Ditolak</option></select><select id="requestTypeFilter" class="select"><option value="ALL">Semua Jenis</option><option value="IZIN">Izin</option><option value="CUTI">Cuti</option></select></div></div><div class="table-wrap"><table class="table business-table"><thead><tr><th>Pegawai</th><th>Jenis</th><th>Tanggal</th><th>Hari</th><th>Alasan</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="requestBody"></tbody></table></div></section>
+</section>
+
+<section id="page-payroll" class="page payroll-page">
+  <div class="section-head"><div><div class="eyebrow">PAYROLL</div><h2>Perhitungan Payroll</h2><p class="muted">Payroll dihitung dari data pegawai, absensi, pengajuan, dan lembur.</p></div><div class="section-actions"><button class="btn secondary" id="refreshPayrollBtn">↻ Muat Ulang</button><button class="btn primary" id="generatePayrollBtn">⚡ Hitung Payroll</button></div></div>
+  <div class="filter-card">
+    <div class="field"><label>Periode</label><input type="month" id="adminPayrollMonthFilter"></div>
+    <div class="field"><label>Karyawan</label><select id="adminPayrollEmployeeFilter"><option value="">Semua Karyawan</option></select></div>
+    <div class="field"><label>Status</label><select id="adminPayrollStatusFilter"><option value="">Semua</option><option value="DRAFT">DRAFT</option><option value="FINAL">FINAL</option><option value="DIBAYAR">DIBAYAR</option></select></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><span>Total Karyawan</span><strong id="payrollTotalEmployees">0</strong></div><div class="stat-card"><span>Total Gaji Pokok</span><strong id="payrollTotalBasic">Rp0</strong></div><div class="stat-card"><span>Total Lembur</span><strong id="payrollTotalOvertime">Rp0</strong></div><div class="stat-card"><span>Total Potongan</span><strong id="payrollTotalDeduction">Rp0</strong></div><div class="stat-card"><span>Total Dibayarkan</span><strong id="payrollTotalNet">Rp0</strong></div>
+  </div>
+  <div class="table-card"><div class="table-head"><div><h3>Daftar Payroll</h3><span class="muted" id="adminPayrollInfo">Belum ada data</span></div></div><div class="table-wrap"><table><thead><tr><th>Karyawan</th><th>Hadir</th><th>Alpha</th><th>Lembur</th><th>Gaji Pokok</th><th>Tunjangan</th><th>Potongan</th><th>Total Bersih</th><th>Status</th></tr></thead><tbody id="adminPayrollList"><tr><td colspan="9"><div class="empty">Belum ada data payroll.</div></td></tr></tbody></table></div></div>
+  <div class="table-card" id="payrollDetailCard" style="display:none"><div class="table-head"><div><h3 id="payrollDetailTitle">Detail Payroll</h3><span class="muted" id="payrollDetailSubtitle"></span></div><button class="btn secondary" id="closePayrollDetailBtn">Tutup</button></div><div class="detail-grid" id="payrollDetailGrid"></div></div>
+</section>
+</main>
+</section>
+
+<div id="loading" class="hidden" style="position:fixed;z-index:200;inset:0;background:rgba(255,255,255,.78);backdrop-filter:blur(5px);display:grid;place-items:center"><div style="background:#fff;padding:23px 27px;border:1px solid var(--line);border-radius:17px;text-align:center;box-shadow:var(--shadow)"><div style="width:28px;height:28px;border:3px solid #dbe7f8;border-top-color:var(--primary);border-radius:50%;margin:auto auto 10px;animation:spin .8s linear infinite"></div><b style="font-size:11px">Memuat data...</b></div></div>
+<div id="toast" class="hidden" style="position:fixed;z-index:250;left:50%;bottom:22px;transform:translateX(-50%);background:#13243b;color:#fff;border-radius:11px;padding:11px 15px;font-size:10px;box-shadow:0 10px 30px rgba(0,0,0,.15)"></div>
+
+<script type="module">
+/* =========================================================
+   KONFIGURASI — letakkan konstanta SEBELUM sessionToken.
+   Ini memperbaiki ReferenceError SESSION_KEY.
+========================================================= */
+const SESSION_KEY="absen_admin_session";
+const USER_KEY="absen_admin_user";
+
+const CONFIG={
+  WEB_APP_URL:"https://script.google.com/macros/s/AKfycbwgDEVMNm9RccxlYqfIek-8JU7asOyqBTiRohKQUV8FgYLW7uxhNAcr-nvabQxhxuBW/exec",
+  FIREBASE_CONFIG:{
+    apiKey:"AIzaSyDgfq_CNV9kS7Ng_3vecJqmcclFfuD5960",
+    authDomain:"absenbaz.firebaseapp.com",
+    projectId:"absenbaz",
+    storageBucket:"absenbaz.firebasestorage.app",
+    messagingSenderId:"82513914266",
+    appId:"1:82513914266:android:3bdcc0335448e65c9bf223"
+  }
+};
+
+let initializeApp,getApps,getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged,setPersistence,browserLocalPersistence;
+let firebaseReady=null,app=null,auth=null,provider=null;
+let sessionToken=localStorage.getItem(SESSION_KEY)||"";
+let currentUser=null,loginBusy=false,currentPage="dashboard",attendanceFilter="ALL",dashboardBusy=false;
+let employeeCache=[],assignmentCache=[],requestCache=[],payrollRows=[];
+let dashboardPayrollRows=[];
+let monthlyAttendanceRows=[],monthlyAttendanceBusy=false,monthlyAttendanceLoadedKey="";
+
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const val=(r,...keys)=>{for(const k of keys)if(r&&r[k]!==undefined&&r[k]!==null&&r[k]!=="")return r[k];return""};
+const arr=v=>Array.isArray(v)?v:Array.isArray(v?.data)?v.data:Array.isArray(v?.rows)?v.rows:Array.isArray(v?.items)?v.items:[];
+const today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jakarta"}).format(new Date());
+const money=v=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(v)||0);
+const toast=m=>{const e=$("toast");e.textContent=m;e.classList.remove("hidden");clearTimeout(window.__t);window.__t=setTimeout(()=>e.classList.add("hidden"),3000)};
+const loading=x=>$("loading").classList.toggle("hidden",!x);
+
+function saveSession(token,user){
+  sessionToken=token||sessionToken;
+  if(sessionToken)localStorage.setItem(SESSION_KEY,sessionToken);
+  if(user)localStorage.setItem(USER_KEY,JSON.stringify(user));
+}
+function clearSession(){
+  sessionToken="";currentUser=null;
+  localStorage.removeItem(SESSION_KEY);localStorage.removeItem(USER_KEY);
+}
+function getSavedUser(){try{return JSON.parse(localStorage.getItem(USER_KEY)||"null")}catch(_){return null}}
+function normalizeUser(u){if(!u)return null;return u.user||u.data?.user||u.profile||u.data||u}
+
+function post(fields){
+  const body=new URLSearchParams();
+  Object.entries(fields).forEach(([k,v])=>body.append(k,v??""));
+  return fetch(CONFIG.WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body}).then(()=>true).catch(()=>false);
+}
+
+/* GET/JSONP untuk request read-only: satu round-trip, tanpa polling. */
+function getJsonp(action,extra={}){
+  return new Promise(resolve=>{
+    const cb="cb_"+crypto.randomUUID().replaceAll("-","");
+    let done=false;
+    const finish=data=>{
+      if(done)return; done=true;
+      delete window[cb]; script?.remove();
+      resolve(data||{ok:false,error:"Respons server kosong."});
+    };
+    window[cb]=finish;
+    const params=new URLSearchParams({action,callback:cb,_:Date.now().toString()});
+    Object.entries(extra).forEach(([k,v])=>params.set(k,v??""));
+    const script=document.createElement("script");
+    script.async=true;
+    script.src=CONFIG.WEB_APP_URL+"?"+params.toString();
+    script.onerror=()=>finish({ok:false,error:"Server tidak merespons."});
+    document.body.appendChild(script);
+    setTimeout(()=>finish({ok:false,error:"Waktu tunggu server habis."}),15000);
+  });
+}
+
+const FAST_GET_ACTIONS=new Set([
+  "firebaseLogin","profile","dashboard","adminDashboard","adminAttendance",
+  "adminMonthly","adminPayroll","adminEmployees","adminRequests","adminAssignments"
+]);
+function poll(id,done,tryNo=0){
+  const cb="cb_"+crypto.randomUUID().replaceAll("-","");let finish=false;
+  const end=x=>{if(finish)return;finish=true;delete window[cb];document.getElementById("s_"+cb)?.remove();done(x)};
+  window[cb]=data=>{
+    if(data?.state==="DONE")return end(data.result||data);
+    if(tryNo>=32)return end({ok:false,error:data?.error||"Waktu tunggu server habis."});
+    setTimeout(()=>poll(id,done,tryNo+1),Math.min(700,150+tryNo*25));
+  };
+  const s=document.createElement("script");
+  s.id="s_"+cb;s.async=true;
+  s.src=CONFIG.WEB_APP_URL+"?action=status&requestId="+encodeURIComponent(id)+"&callback="+cb+"&_="+Date.now();
+  s.onerror=()=>{s.remove();if(tryNo>=32)end({ok:false,error:"Server tidak merespons."});else setTimeout(()=>poll(id,done,tryNo+1),300)};
+  document.body.appendChild(s);
+}
+async function request(action,extra={}){
+  if(!sessionToken && action!=="firebaseLogin")return{ok:false,error:"Sesi login tidak ditemukan."};
+
+  /* Read-only + login: direct GET/JSONP, no REQUESTS sheet/cache and no polling. */
+  if(FAST_GET_ACTIONS.has(action)){
+    return getJsonp(action,{sessionToken,...extra});
+  }
+
+  /* Mutating actions keep the existing reliable POST + polling transport. */
+  const id=crypto.randomUUID().replaceAll("-","");
+  if(!(await post({action,requestId:id,sessionToken,...extra})))return{ok:false,error:"Gagal menghubungi server."};
+  return new Promise(resolve=>setTimeout(()=>poll(id,resolve),100));
+}
+
+async function initFirebase(){
+  if(auth)return true;if(firebaseReady)return firebaseReady;
+  firebaseReady=(async()=>{
+    try{
+      const a=await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js");
+      const b=await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js");
+      ({initializeApp,getApps}=a);
+      ({getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged,setPersistence,browserLocalPersistence}=b);
+      app=getApps().length?getApps()[0]:initializeApp(CONFIG.FIREBASE_CONFIG);
+      auth=getAuth(app);
+      await setPersistence(auth,browserLocalPersistence);
+      provider=new GoogleAuthProvider();
+      return true;
+    }catch(e){console.error(e);firebaseReady=null;return false}
+  })();
+  return firebaseReady;
+}
+
+async function loginAdmin(){
+  if(loginBusy)return;
+  loginBusy=true;loading(true);
+  const b=$("loginBtn");
+  b.disabled=true;b.innerHTML='<span class="material-symbols-rounded">progress_activity</span> Menghubungkan...';
+  try{
+    if(!(await initFirebase()))throw Error("Firebase gagal dimuat.");
+    const cred=await signInWithPopup(auth,provider);
+    const token=await cred.user.getIdToken(false);
+    const res=await request("firebaseLogin",{firebaseIdToken:token});
+    if(!res?.ok)throw Error(res?.error||"Login gagal.");
+    const tokenBaru=res.sessionToken||res.session?.token||res.session?.sessionToken||res.data?.sessionToken||"";
+    if(!tokenBaru)throw Error("Session tidak diterima dari server.");
+    const user=normalizeUser(res);
+    if(String(user?.role||"").toUpperCase()!=="ADMIN")throw Error("Akun tidak memiliki akses ADMIN.");
+    saveSession(tokenBaru,user);currentUser=user;showApp();loadAll();
+  }catch(e){
+    console.error("LOGIN ERROR:",e);
+    clearSession();toast(e.message||"Login gagal.");
+    try{if(auth)await signOut(auth)}catch(_){}
+  }finally{
+    loading(false);loginBusy=false;b.disabled=false;
+    b.innerHTML='<span class="material-symbols-rounded">login</span> Masuk dengan Google';
+  }
+}
+async function logout(){
+  try{if(sessionToken)await request("logout")}catch(_){}
+  try{if(auth)await signOut(auth)}catch(_){}
+  clearSession();$("app").classList.add("hidden");$("login").classList.remove("hidden");
+}
+
+function showApp(){
+  $("login").classList.add("hidden");$("app").classList.remove("hidden");
+  const name=val(currentUser,"name","nama","displayName","email")||"Admin";
+  const photo=val(currentUser,"photoURL","photo","foto")||"";
+  $("welcome").textContent=`Selamat datang, ${name}. Berikut ringkasan aktivitas sistem.`;
+  $("sideName").textContent=name;$("avatar").src=photo;$("sideAvatar").src=photo;
+  $("topDate").textContent=new Date().toLocaleDateString("id-ID",{dateStyle:"full"});
+  initFilters();
+}
+function initFilters(){
+  $("dateFilter").value=$("dateFilter").value||today();
+  if(!$("monthFilter").options.length){
+    const n=new Date();
+    for(let i=0;i<12;i++){
+      const d=new Date(n.getFullYear(),n.getMonth()-i,1),m=d.toISOString().slice(0,7);
+      $("monthFilter").add(new Option(d.toLocaleDateString("id-ID",{month:"long",year:"numeric"}),m));
+    }
+  }
+  if(!$("assignmentStart").value)$("assignmentStart").value=today();
+  if(!$("assignmentEnd").value)$("assignmentEnd").value=today();
+}
+const titles={dashboard:"Dashboard",attendance:"Absensi",employees:"Data Pegawai",assignment:"Penugasan",request:"Pengajuan",payroll:"Payroll"};
+function openPage(page){
+  currentPage=page;
+  document.querySelectorAll(".page").forEach(e=>e.classList.toggle("active",e.id==="page-"+page));
+  document.querySelectorAll(".nav-btn[data-page]").forEach(e=>e.classList.toggle("active",e.dataset.page===page));
+  $("topTitle").textContent=titles[page]||"Dashboard";
+  closeSidebar();window.scrollTo({top:0,behavior:"smooth"});
+  if(page==="assignment")loadAdminAssignments();
+  if(page==="request")loadAdminRequests();
+  if(page==="attendance"){populateAttendanceEmployees(employeeCache);loadMonthlyAttendance(false)};
+  if(page==="employees")renderEmployees2(employeeCache);
+  if(page==="payroll")loadAdminPayroll();
+}
+function toggleSidebar(){$("sidebar").classList.toggle("open");$("overlay").classList.toggle("show")}
+function closeSidebar(){$("sidebar").classList.remove("open");$("overlay").classList.remove("show")}
+
+function setAttendanceFilter(f){
+  attendanceFilter=f;
+  $("tabAll")?.classList.toggle("active",f==="ALL");$("tabBelum")?.classList.toggle("active",f==="BELUM");
+  renderAttendance(window.__attendance||[]);renderAttendance2(window.__attendance||[]);
+}
+function attendanceHtml(rows){
+  rows=attendanceFilter==="BELUM"?rows.filter(r=>!val(r,"masuk","Masuk","jamMasuk","checkIn")):rows;
+  if(!rows.length)return'<tr><td colspan="6"><div class="empty">Tidak ada data absensi.</div></td></tr>';
+  return rows.map(r=>{
+    const status=String(val(r,"status","Status")||"").toLowerCase();
+    const cls=status.includes("terlambat")?"terlambat":(val(r,"masuk","Masuk","jamMasuk","checkIn")?"hadir":"belum");
+    return`<tr><td><span class="name">${esc(val(r,"nama","name","pegawai","employeeName")||"-")}</span><span class="sub">${esc(val(r,"nip","NIP")||"")}</span></td><td>${esc(val(r,"jabatan","position")||"-")}</td><td>${esc(val(r,"masuk","Masuk","jamMasuk","checkIn")||"-")}</td><td>${esc(val(r,"pulang","Pulang","jamPulang","checkOut")||"-")}</td><td>${esc(val(r,"durasi","Durasi","workDuration")||"-")}</td><td><span class="badge ${cls}">${esc(val(r,"status","Status")||"Belum")}</span></td></tr>`;
+  }).join("");
+}
+function renderAttendance(rows){$("attendanceBody").innerHTML=attendanceHtml(rows);$("attendanceInfo").textContent=`${rows.length} data`;$("attendanceInfo2").textContent=`${rows.length} data`}
+function renderAttendance2(rows){$("attendanceBody2").innerHTML=attendanceHtml(rows)}
+
+function populateAttendanceEmployees(rows){
+  const sel=$("attendanceEmployeeFilter");if(!sel)return;
+  const old=sel.value;
+  sel.innerHTML='<option value="">Pilih Karyawan</option>'+(rows||[]).map(e=>{
+    const key=employeeKey(e),name=val(e,"nama","name","pegawai","displayName")||key||"-",nip=val(e,"nip","NIP")||"";
+    return key?`<option value="${esc(key)}">${esc(name)}${nip?" — "+esc(nip):""}</option>`:"";
+  }).join("");
+  if(old&&[...sel.options].some(o=>o.value===old))sel.value=old;
+  if(!sel.value&&sel.options.length===2)sel.selectedIndex=1;
+}
+function jakartaDateString(d){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jakarta"}).format(d)}
+function monthDates(period){
+  const [y,m]=String(period).split("-").map(Number);if(!y||!m)return[];
+  const last=new Date(y,m,0).getDate(),out=[];
+  for(let d=1;d<=last;d++)out.push(`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`);
+  return out;
+}
+function dateParts(dateStr){
+  const d=new Date(dateStr+"T12:00:00+07:00");
+  return{day:d.getDay(),dayName:d.toLocaleDateString("id-ID",{weekday:"long",timeZone:"Asia/Jakarta"}),dateLabel:d.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Jakarta"})};
+}
+function findAttendanceForEmployee(rows,key){
+  key=String(key||"").toLowerCase();
+  return (rows||[]).find(r=>employeeKey(r)===key)||null;
+}
+function normalizeAttendanceResult(res){return arr(res?.items||res?.attendance||res?.absensi||res?.data?.items||res?.data?.attendance||res?.data?.absensi||res?.data||res)}
+async function fetchAttendanceDate(date){
+  let r=await request("adminAttendance",{date});
+  if(r?.ok===false)throw Error(r?.error||`Gagal memuat absensi ${date}`);
+  return normalizeAttendanceResult(r);
+}
+async function loadMonthlyAttendance(force=false){
+  if(!sessionToken||monthlyAttendanceBusy)return;
+  const period=$("attendanceMonthFilter")?.value||today().slice(0,7),empKey=$("attendanceEmployeeFilter")?.value||"";
+  if(!empKey){$("attendanceMonthlyInfo").textContent="Pilih karyawan terlebih dahulu.";return}
+  const cacheKey=period+"|"+empKey;
+  if(!force&&monthlyAttendanceLoadedKey===cacheKey&&monthlyAttendanceRows.length){renderMonthlyAttendanceDetail(monthlyAttendanceRows);return}
+  monthlyAttendanceBusy=true;
+  const btns=[...document.querySelectorAll('#page-attendance button')];btns.forEach(b=>b.disabled=true);
+  $("attendanceMonthlyInfo").textContent="Memuat rekap bulanan...";
+  try{
+    const dates=monthDates(period),all=[];
+    /* Batasi concurrency agar Apps Script tidak dibanjiri request sekaligus. */
+    for(let i=0;i<dates.length;i+=5){
+      const batch=dates.slice(i,i+5);
+      const results=await Promise.all(batch.map(async date=>({date,rows:await fetchAttendanceDate(date)})));
+      results.forEach(x=>all.push(x));
+      $("attendanceMonthlyInfo").textContent=`Memuat ${Math.min(i+5,dates.length)} dari ${dates.length} hari...`;
+    }
+    monthlyAttendanceRows=all.map(({date,rows})=>({date,record:findAttendanceForEmployee(rows,empKey)}));
+    monthlyAttendanceLoadedKey=cacheKey;renderMonthlyAttendanceDetail(monthlyAttendanceRows);
+  }catch(e){
+    console.error("MONTHLY ATTENDANCE:",e);toast(e.message||"Gagal memuat rekap absensi.");
+    $("attendanceMonthlyInfo").textContent=e.message||"Gagal memuat rekap absensi.";
+  }finally{monthlyAttendanceBusy=false;btns.forEach(b=>b.disabled=false)}
+}
+function attendanceMonthlyStatus(item){
+  const p=dateParts(item.date),r=item.record,now=today(),isFuture=item.date>now,isWeekend=p.day===0||p.day===6;
+  const masuk=val(r,"masuk","Masuk","jamMasuk","checkIn"),pulang=val(r,"pulang","Pulang","jamPulang","checkOut"),raw=String(val(r,"status","Status")||"").toLowerCase();
+  if(isFuture)return{code:"FUTURE",label:"Belum waktunya",cls:"future",note:"Tanggal belum lewat",p,isWeekend,masuk,pulang};
+  if(r&&masuk){
+    const late=raw.includes("terlambat");
+    return{code:late?"LATE":"PRESENT",label:late?"Terlambat":"Hadir",cls:late?"late":"ok",note:pulang?"Absensi lengkap":"Belum absen pulang",p,isWeekend,masuk,pulang};
+  }
+  if(isWeekend)return{code:"WEEKEND",label:"Akhir pekan",cls:"off",note:r?"Ada data tanpa jam masuk":"Tidak ada absensi",p,isWeekend,masuk,pulang};
+  return{code:"MISSING",label:"Lupa / Tidak Absen",cls:"missing",note:r?"Data ada, jam masuk kosong":"Tidak ditemukan data absensi",p,isWeekend,masuk,pulang};
+}
+function renderMonthlyAttendanceDetail(rows){
+  const empKey=$("attendanceEmployeeFilter")?.value||"",emp=employeeCache.find(e=>employeeKey(e)===empKey),name=val(emp,"nama","name","pegawai","displayName")||empKey||"Karyawan",period=$("attendanceMonthFilter")?.value||today().slice(0,7);
+  let present=0,late=0,missing=0,weekend=0;
+  const html=(rows||[]).map((item,i)=>{
+    const s=attendanceMonthlyStatus(item),r=item.record||{};
+    if(s.code==="PRESENT"||s.code==="LATE")present++;if(s.code==="LATE")late++;if(s.code==="MISSING")missing++;if(s.isWeekend)weekend++;
+    const trClass=s.code==="MISSING"?"day-missing":s.code==="FUTURE"?"day-future":s.isWeekend?"day-weekend":"";
+    return`<tr class="${trClass}"><td>${i+1}</td><td><b>${esc(s.p.dayName)}</b></td><td>${esc(s.p.dateLabel)}</td><td>${esc(s.masuk||"-")}</td><td>${esc(s.pulang||"-")}</td><td>${esc(val(r,"durasi","Durasi","workDuration")||"-")}</td><td><span class="att-status ${s.cls}">${esc(s.label)}</span></td><td>${esc(s.note)}</td></tr>`;
+  }).join("");
+  $("attendanceMonthlyBody").innerHTML=html||'<tr><td colspan="8"><div class="empty">Tidak ada data.</div></td></tr>';
+  $("attSumDays").textContent=rows.length;$("attSumPresent").textContent=present;$("attSumLate").textContent=late;$("attSumMissing").textContent=missing;$("attSumWeekend").textContent=weekend;
+  const label=new Date(period+"-01T12:00:00+07:00").toLocaleDateString("id-ID",{month:"long",year:"numeric",timeZone:"Asia/Jakarta"});
+  $("attendanceMonthlyInfo").textContent=`${name} • ${label} • ${rows.length} hari`;
+}
+function exportAttendanceExcel(){
+  if(!monthlyAttendanceRows.length){toast("Tampilkan rekap bulanan terlebih dahulu.");return}
+  const empKey=$("attendanceEmployeeFilter")?.value||"",emp=employeeCache.find(e=>employeeKey(e)===empKey),name=val(emp,"nama","name","pegawai","displayName")||"Karyawan",nip=val(emp,"nip","NIP")||"",period=$("attendanceMonthFilter")?.value||today().slice(0,7);
+  const data=monthlyAttendanceRows.map((item,i)=>{const s=attendanceMonthlyStatus(item),r=item.record||{};return[i+1,s.p.dayName,s.p.dateLabel,val(r,"masuk","Masuk","jamMasuk","checkIn")||"-",val(r,"pulang","Pulang","jamPulang","checkOut")||"-",val(r,"durasi","Durasi","workDuration")||"-",s.label,s.note]});
+  const rowsHtml=data.map(row=>'<tr>'+row.map(v=>`<td>${esc(v)}</td>`).join('')+'</tr>').join('');
+  const html=`<!doctype html><html><head><meta charset="utf-8"></head><body><table><tr><th colspan="8">REKAP ABSENSI BULANAN</th></tr><tr><td>Karyawan</td><td colspan="7">${esc(name)}</td></tr><tr><td>NIP</td><td colspan="7">${esc(nip)}</td></tr><tr><td>Periode</td><td colspan="7">${esc(period)}</td></tr><tr></tr><tr><th>No</th><th>Hari</th><th>Tanggal</th><th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Status</th><th>Keterangan</th></tr>${rowsHtml}</table></body></html>`;
+  const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download=`Rekap_Absensi_${String(name).replace(/[^a-z0-9]+/gi,"_")}_${period}.xls`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+
+function employeeHtml(rows){if(!rows.length)return'<tr><td colspan="7"><div class="empty">Tidak ada data pegawai.</div></td></tr>';return rows.map(r=>`<tr><td><span class="name">${esc(val(r,"nama","name","pegawai")||"-")}</span><span class="sub">${esc(val(r,"email","Email")||"")}</span></td><td>${esc(val(r,"nip","NIP")||"-")}</td><td>${esc(val(r,"jabatan","position")||"-")}</td><td>${esc(val(r,"role","Role")||"-")}</td><td>${esc(val(r,"status","Status")||"-")}</td><td>${money(val(r,"gajiPokok","basicSalary","salary"))}</td><td>${money(val(r,"tunjangan","allowance"))}</td></tr>`).join("")}
+function renderEmployees(rows){$("employeeBody2").innerHTML=employeeHtml(rows)}
+function renderEmployees2(rows){$("employeeBody2").innerHTML=employeeHtml(rows)}
+function updateStats(d){
+  const s=d?.stats||d?.summary||{};
+  const set=(id,...k)=>{const v=val(s,...k);if(v!=="")$(id).textContent=v};
+  set("sTotal","total","totalPegawai","employees");set("sMasuk","masuk","sudahMasuk","present");set("sBelum","belum","belumMasuk","absent");set("sLate","terlambat","late");set("sPulang","pulang","sudahPulang","checkedOut");
+}
+function renderMonthly(rows){
+  $("monthlyBody").innerHTML=rows.length?rows.map(r=>`<tr><td class="name">${esc(val(r,"nama","name","pegawai")||"-")}</td><td>${esc(val(r,"hariKerja","workDays")||0)}</td><td>${esc(val(r,"hadir","present")||0)}</td><td>${esc(val(r,"terlambat","late")||0)}</td><td>${esc(val(r,"izin","leave")||0)}</td><td>${esc(val(r,"sakit","sick")||0)}</td><td>${esc(val(r,"tidakHadir","absent")||0)}</td><td>${esc(val(r,"jamKerja","workHours")||0)}</td></tr>`).join(""):'<tr><td colspan="8"><div class="empty">Tidak ada rekap bulanan.</div></td></tr>';
+}
+
+function employeeKey(r){return String(val(r,"uid","UID","nip","NIP","email","Email","nama","name")||"").toLowerCase()}
+function monthOf(r){return String(val(r,"month","bulan","periode","period","Month","Bulan")||"").slice(0,7)}
+function fillDashboardPayrollFilters(rows){
+  const months=[...new Set(rows.map(monthOf).filter(Boolean))],cur=$("monthFilter").value||today().slice(0,7);
+  if(!months.includes(cur))months.unshift(cur);
+  $("dashboardPayrollMonthFilter").innerHTML=months.map(m=>`<option value="${esc(m)}">${new Date(m+"-01").toLocaleDateString("id-ID",{month:"long",year:"numeric"})}</option>`).join("");
+  $("dashboardPayrollMonthFilter").value=cur;
+  const map=new Map(employeeCache.map(r=>[employeeKey(r),val(r,"nama","name","pegawai")||employeeKey(r)]));
+  rows.forEach(r=>{const k=employeeKey(r);if(k&&!map.has(k))map.set(k,val(r,"nama","name","pegawai")||k)});
+  $("dashboardPayrollEmployeeFilter").innerHTML='<option value="ALL">Semua Karyawan</option>'+[...map].map(([k,n])=>`<option value="${esc(k)}">${esc(n)}</option>`).join("");
+}
+function dashboardPayrollFilter(month,emp){return dashboardPayrollRows.filter(r=>(!month||!monthOf(r)||monthOf(r)===month)&&(emp==="ALL"||employeeKey(r)===emp))}
+function renderDashboardPayroll(rows){
+  const e=$("dashboardPayrollList");if(!e)return;
+  e.innerHTML=rows.length?rows.map(r=>`<div class="mini"><div class="mini-main"><b>${esc(val(r,"nama","name","pegawai","employeeName")||"-")}</b><span>${esc(val(r,"status","Status")||"Payroll")}</span></div><span class="money">${money(val(r,"total","totalGaji","gajiBersih","netSalary","salary"))}</span></div>`).join(""):'<div class="empty">Tidak ada data payroll.</div>';
+  $("dashboardPayrollInfo").textContent=`${rows.length} data`;
+}
+function applyDashboardPayrollFilter(){
+  renderDashboardPayroll(dashboardPayrollFilter($("dashboardPayrollMonthFilter").value,$("dashboardPayrollEmployeeFilter").value));
+}
+
+/* Assignment */
+function populateAssignmentEmployees(rows){
+  const e=$("assignmentUid"),old=e.value;
+  e.innerHTML='<option value="">Pilih pegawai</option>'+rows.filter(r=>val(r,"uid","UID")).map(r=>`<option value="${esc(val(r,"uid","UID"))}">${esc(val(r,"nama","name","pegawai")||"-")}${val(r,"nip","NIP")?" — "+esc(val(r,"nip","NIP")):""}</option>`).join("");
+  if(old)e.value=old;
+}
+function assignmentEmployee(r){
+  const directName=val(r,"employeeName","nama","name","pegawai","assignedToName","assigneeName");
+  const directUid=val(r,"uid","UID","employeeUid","employeeUID","assignedUid","assigneeUid");
+  if(directName)return directName;
+  if(directUid){const emp=employeeCache.find(e=>String(val(e,"uid","UID","id","employeeUid")).toLowerCase()===String(directUid).toLowerCase());if(emp)return val(emp,"nama","name","pegawai","displayName")||directUid}
+  return directUid||"-";
+}
+function renderAssignments(rows){
+  $("assignmentBody").innerHTML=rows.length?rows.map(r=>{
+    const st=String(val(r,"status","Status")||"DIBERIKAN").toUpperCase(),empName=assignmentEmployee(r);
+    const emp=employeeCache.find(e=>String(val(e,"uid","UID","id","employeeUid")).toLowerCase()===String(val(r,"uid","UID","employeeUid","employeeUID","assignedUid","assigneeUid")).toLowerCase());
+    const nip=val(r,"nip","NIP")||val(emp,"nip","NIP"),jab=val(r,"jabatan","position")||val(emp,"jabatan","position");
+    return`<tr><td><span class="name">${esc(empName)}</span><span class="sub">${esc(nip||jab||"Karyawan penerima tugas")}</span></td><td class="detail"><b>${esc(val(r,"title","judul","assignmentTitle")||"-")}</b><div class="sub" style="white-space:normal">${esc(val(r,"description","deskripsi")||"")}</div></td><td>${esc(val(r,"startDate","tanggalMulai","start")||"-")}${val(r,"endDate","tanggalSelesai","end")&&val(r,"endDate","tanggalSelesai","end")!==val(r,"startDate","tanggalMulai","start")?" s/d "+esc(val(r,"endDate","tanggalSelesai","end")):""}</td><td class="detail">${esc(val(r,"location","lokasi")||"-")}</td><td><span class="status blue">${esc(val(r,"priority","prioritas")||"NORMAL")}</span></td><td><span class="status ${st==="SELESAI"?"ok":"blue"}">${esc(val(r,"status","Status")||"Diberikan")}</span></td></tr>`;
+  }).join(""):'<tr><td colspan="6"><div class="empty">Belum ada penugasan. Setelah admin memberikan tugas, karyawan penerima akan tampil di sini.</div></td></tr>';
+  $("assignmentInfo").textContent=`${rows.length} penugasan`;
+  $("assignmentBadge").textContent=rows.filter(r=>String(val(r,"status","Status")).toUpperCase()!=="SELESAI").length;
+}
+async function loadAdminAssignments(){
+  if(!sessionToken)return;
+  try{
+    const r=await request("adminAssignments",{limit:"100",includeCompleted:$("includeCompleted").checked?"true":"false"});
+    if(!r?.ok)throw Error(r?.error||"Gagal memuat penugasan.");
+    assignmentCache=arr(r.items||r.assignments||r.data?.items||r.data?.assignments||r.data||[]);
+    renderAssignments(assignmentCache);
+  }catch(e){console.error(e);toast(e.message)}
+}
+function resetAssignmentForm(){$("assignmentUid").value="";$("assignmentTitle").value="";$("assignmentLocation").value="";$("assignmentDescription").value="";$("assignmentNotes").value="";$("assignmentPriority").value="NORMAL";$("assignmentStart").value=today();$("assignmentEnd").value=today()}
+async function createAssignment(){
+  const uid=$("assignmentUid").value,title=$("assignmentTitle").value.trim(),startDate=$("assignmentStart").value,endDate=$("assignmentEnd").value||startDate;
+  if(!uid)return toast("Pilih pegawai.");if(!title)return toast("Judul wajib diisi.");if(endDate<startDate)return toast("Tanggal selesai tidak boleh sebelum mulai.");
+  const b=$("createAssignmentBtn");b.disabled=true;b.textContent="Menyimpan...";loading(true);
+  try{const r=await request("adminCreateAssignment",{uid,title,startDate,endDate,priority:$("assignmentPriority").value,location:$("assignmentLocation").value.trim(),description:$("assignmentDescription").value.trim(),notes:$("assignmentNotes").value.trim()});if(!r?.ok)throw Error(r?.error||"Gagal membuat penugasan.");toast(r.message||"Penugasan berhasil dibuat.");resetAssignmentForm();await loadAdminAssignments()}catch(e){toast(e.message)}finally{loading(false);b.disabled=false;b.textContent="Buat Penugasan"}
+}
+
+/* Request */
+function renderRequests(rows){
+  $("requestBody").innerHTML=rows.length?rows.map(r=>{
+    const st=String(val(r,"status","Status")||"MENUNGGU").toUpperCase(),id=String(val(r,"requestId","Request ID")||""),pending=st==="MENUNGGU"&&id;
+    return`<tr><td><span class="name">${esc(val(r,"name","nama","pegawai")||"-")}</span><span class="sub">${esc(val(r,"nip","NIP")||"")}</span></td><td>${esc(val(r,"type","Jenis")||"-")}</td><td>${esc(val(r,"startDate","tanggalMulai")||"-")}${val(r,"endDate","tanggalSelesai")&&val(r,"endDate","tanggalSelesai")!==val(r,"startDate","tanggalMulai")?" s/d "+esc(val(r,"endDate","tanggalSelesai")):""}</td><td>${esc(val(r,"days","jumlahHari")||0)}</td><td class="detail">${esc(val(r,"reason","alasan")||"-")}</td><td><span class="status ${st==="DISETUJUI"?"ok":st==="DITOLAK"?"no":"wait"}">${esc(st)}</span></td><td>${pending?`<div style="display:flex;gap:5px"><button class="btn success" onclick='reviewRequest(${JSON.stringify(id)},"DISETUJUI")'>Setujui</button><button class="btn danger" onclick='reviewRequest(${JSON.stringify(id)},"DITOLAK")'>Tolak</button></div>`:`<span class="hint">${esc(val(r,"reviewNote","catatanReview")||"-")}</span>`}</td></tr>`;
+  }).join(""):'<tr><td colspan="7"><div class="empty">Tidak ada pengajuan.</div></td></tr>';
+  $("requestInfo").textContent=`${rows.length} pengajuan`;
+  $("requestBadge").textContent=rows.filter(r=>String(val(r,"status","Status")).toUpperCase()==="MENUNGGU").length;
+}
+async function loadAdminRequests(){
+  if(!sessionToken)return;
+  try{const r=await request("adminRequests",{status:$("requestStatusFilter").value,type:$("requestTypeFilter").value});if(!r?.ok)throw Error(r?.error||"Gagal memuat pengajuan.");requestCache=arr(r.items||r.data);renderRequests(requestCache)}catch(e){toast(e.message)}
+}
+async function reviewRequest(requestId,decision){
+  const note=prompt("Catatan review (opsional):","");
+  if(note===null)return;loading(true);
+  try{const r=await request("adminReviewRequest",{requestId,decision,note:note.trim()});if(!r?.ok)throw Error(r?.error||"Gagal memproses.");toast(r.message||"Pengajuan berhasil diproses.");await loadAdminRequests()}catch(e){toast(e.message)}finally{loading(false)}
+}
+
+/* Payroll halaman utama — ID sengaja berbeda dari Payroll dashboard */
+function payrollMoney(v){return"Rp"+(Number(v)||0).toLocaleString("id-ID")}
+function monthNow(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`}
+function payrollVal(r,...keys){for(const k of keys)if(r&&r[k]!==undefined&&r[k]!==null&&r[k]!=="")return r[k];return""}
+function payrollNumber(r,...keys){return Number(payrollVal(r,...keys))||0}
+function populateAdminPayrollEmployees(rows){
+  const sel=$("adminPayrollEmployeeFilter");if(!sel)return;
+  const old=sel.value;sel.innerHTML='<option value="">Semua Karyawan</option>';
+  (rows||employeeCache||[]).forEach(e=>{const uid=payrollVal(e,"uid","UID","id","employeeUid"),name=payrollVal(e,"nama","name","displayName","pegawai")||uid;if(uid)sel.add(new Option(name,uid))});
+  if(old&&[...sel.options].some(o=>o.value===old))sel.value=old;
+}
+function renderAdminPayroll(rows){
+  const employee=$("adminPayrollEmployeeFilter")?.value||"",statusFilter=$("adminPayrollStatusFilter")?.value||"";
+  const filtered=(rows||[]).filter(r=>{
+    const uid=String(payrollVal(r,"uid","UID","employeeUid","employeeUID"));
+    const status=String(payrollVal(r,"status","Status")||"").toUpperCase();
+    return(!employee||uid===employee)&&(!statusFilter||status===statusFilter);
+  });
+  let basic=0,overtime=0,deduction=0,net=0;
+  filtered.forEach(r=>{basic+=payrollNumber(r,"basicSalary","gajiPokok","Gaji Pokok");overtime+=payrollNumber(r,"overtimePay","upahLembur","Upah Lembur");deduction+=payrollNumber(r,"totalDeduction","potongan","Potongan");net+=payrollNumber(r,"netSalary","totalGaji","totalBersih","Total Gaji")});
+  $("payrollTotalEmployees").textContent=filtered.length;$("payrollTotalBasic").textContent=payrollMoney(basic);$("payrollTotalOvertime").textContent=payrollMoney(overtime);$("payrollTotalDeduction").textContent=payrollMoney(deduction);$("payrollTotalNet").textContent=payrollMoney(net);$("adminPayrollInfo").textContent=`${filtered.length} karyawan`;
+  $("adminPayrollList").innerHTML=filtered.length?filtered.map((r,i)=>{
+    const uid=payrollVal(r,"uid","UID","employeeUid","employeeUID"),name=payrollVal(r,"name","nama","employeeName","pegawai")||uid||"-",status=String(payrollVal(r,"status","Status")||"DRAFT").toUpperCase();
+    return`<tr class="payroll-row" data-index="${i}"><td><span class="name">${esc(name)}</span><span class="sub">${esc(payrollVal(r,"nip","NIP")||uid||"")}</span></td><td>${esc(payrollVal(r,"daysPresent","hariHadir","hadir")||0)}</td><td>${esc(payrollVal(r,"daysAbsent","alpha","Alpha")||0)}</td><td>${esc(payrollVal(r,"overtimeHours","jamLembur","Jam Lembur")||0)} jam</td><td>${payrollMoney(payrollNumber(r,"basicSalary","gajiPokok"))}</td><td>${payrollMoney(payrollNumber(r,"allowance","tunjangan"))}</td><td>${payrollMoney(payrollNumber(r,"totalDeduction","potongan"))}</td><td><b>${payrollMoney(payrollNumber(r,"netSalary","totalGaji","totalBersih"))}</b></td><td><span class="status ${status==="DIBAYAR"?"ok":"blue"}">${esc(status)}</span></td></tr>`;
+  }).join(""):'<tr><td colspan="9"><div class="empty">Belum ada data payroll untuk filter ini.</div></td></tr>';
+  [...document.querySelectorAll("#adminPayrollList .payroll-row")].forEach(tr=>tr.addEventListener("click",()=>showPayrollDetail(filtered[Number(tr.dataset.index)])));
+}
+function showPayrollDetail(r){
+  if(!r)return;
+  const name=payrollVal(r,"name","nama","employeeName","pegawai")||payrollVal(r,"uid","UID")||"-";
+  $("payrollDetailCard").style.display="";
+  $("payrollDetailTitle").textContent=`Detail Payroll — ${name}`;
+  $("payrollDetailSubtitle").textContent=`Periode ${payrollVal(r,"period","periode","Periode")||$("adminPayrollMonthFilter").value||"-"}`;
+  const items=[["Gaji Pokok",payrollMoney(payrollNumber(r,"basicSalary","gajiPokok"))],["Tunjangan",payrollMoney(payrollNumber(r,"allowance","tunjangan"))],["Hari Hadir",payrollVal(r,"daysPresent","hariHadir","hadir")||0],["Hari Izin",payrollVal(r,"daysLeave","hariIzin","izin")||0],["Hari Sakit",payrollVal(r,"daysSick","hariSakit","sakit")||0],["Hari Cuti",payrollVal(r,"daysVacation","hariCuti","cuti")||0],["Alpha",payrollVal(r,"daysAbsent","alpha")||0],["Jam Lembur",payrollVal(r,"overtimeHours","jamLembur")||0],["Upah Lembur",payrollMoney(payrollNumber(r,"overtimePay","upahLembur"))],["Potongan Absensi",payrollMoney(payrollNumber(r,"attendanceDeduction","potonganAbsensi"))],["Potongan Lain",payrollMoney(payrollNumber(r,"otherDeduction","potonganLain"))],["Total Potongan",payrollMoney(payrollNumber(r,"totalDeduction","potongan"))],["Total Bersih",payrollMoney(payrollNumber(r,"netSalary","totalGaji","totalBersih"))]];
+  $("payrollDetailGrid").innerHTML=items.map(([a,b])=>`<div class="detail-item"><span>${esc(a)}</span><b>${esc(String(b))}</b></div>`).join("");
+  $("payrollDetailCard").scrollIntoView({behavior:"smooth",block:"start"});
+}
+async function loadAdminPayroll(){
+  if(!sessionToken)return;
+  const period=$("adminPayrollMonthFilter")?.value||monthNow();
+  try{
+    const r=await request("payroll",{period});
+    if(!r?.ok)throw Error(r?.error||"Gagal memuat payroll.");
+    payrollRows=arr(r.items||r.payroll||r.data?.items||r.data?.payroll||r.data||[]);
+    populateAdminPayrollEmployees(employeeCache);
+    renderAdminPayroll(payrollRows);
+  }catch(e){console.error(e);$("adminPayrollInfo").textContent=e.message||"Gagal memuat payroll";toast(e.message||"Gagal memuat payroll")}
+}
+async function generateAdminPayroll(){
+  if(!sessionToken)return;
+  const period=$("adminPayrollMonthFilter")?.value||monthNow();
+  try{
+    $("generatePayrollBtn").disabled=true;$("generatePayrollBtn").textContent="Menghitung...";
+    const r=await request("generatePayroll",{period});
+    if(!r?.ok)throw Error(r?.error||"Gagal menghitung payroll.");
+    toast(r.message||"Payroll berhasil dihitung.");await loadAdminPayroll();
+  }catch(e){console.error(e);toast(e.message||"Gagal menghitung payroll")}
+  finally{$("generatePayrollBtn").disabled=false;$("generatePayrollBtn").textContent="⚡ Hitung Payroll"}
+}
+
+/* Dashboard */
+async function loadAll(){
+  if(!sessionToken||dashboardBusy)return;
+  dashboardBusy=true;
+  const date=$("dateFilter").value||today(),month=$("monthFilter").value||today().slice(0,7);
+  try{
+    const r=await request("dashboard",{date,month});
+    if(!r?.ok)throw Error(r?.error||"Gagal memuat dashboard.");
+    const d=r.data||r.dashboard||r;
+    const att=arr(d.attendance||d.absensi||d.attendanceToday),monthly=arr(d.monthly||d.rekapBulanan||d.monthlyRecap),emp=arr(d.employees||d.pegawai||d.employee),pay=arr(d.payroll);
+    employeeCache=emp;dashboardPayrollRows=pay;window.__attendance=att;
+    populateAssignmentEmployees(emp);populateAdminPayrollEmployees(emp);populateAttendanceEmployees(emp);updateStats(d);renderAttendance(att);renderMonthly(monthly);renderEmployees(emp);
+    fillDashboardPayrollFilters(pay);renderDashboardPayroll(dashboardPayrollFilter(month,"ALL"));
+    if($("assignmentStart")&&!$("assignmentStart").value)resetAssignmentForm();
+    /* Modul sekunder dimuat setelah dashboard tampil agar login tidak terasa berat. */
+    setTimeout(()=>Promise.all([loadAdminAssignments(),loadAdminRequests()]).catch(()=>{}),250);
+  }catch(e){console.error(e);toast(e.message||"Gagal memuat data")}
+  finally{dashboardBusy=false}
+}
+
+async function restoreAdminSession(){
+  const savedUser=getSavedUser();
+  if(sessionToken&&savedUser&&String(savedUser.role||"").toUpperCase()==="ADMIN"){currentUser=savedUser;showApp()}
+  if(sessionToken){
+    try{
+      const r=await request("profile"),u=normalizeUser(r);
+      if(r?.ok&&String(u?.role||"").toUpperCase()==="ADMIN"){currentUser=u;saveSession(sessionToken,u);showApp();loadAll();return true}
+    }catch(e){console.warn("Validasi session:",e)}
+  }
+  try{
+    if(await initFirebase()){
+      const firebaseUser=await new Promise(resolve=>{
+        let done=false;
+        const finish=u=>{if(done)return;done=true;resolve(u)};
+        const unsub=onAuthStateChanged(auth,u=>{unsub();finish(u)},()=>finish(null));
+        setTimeout(()=>finish(auth?.currentUser||null),3500);
+      });
+      if(firebaseUser){
+        const token=await firebaseUser.getIdToken(true);
+        const r=await request("firebaseLogin",{firebaseIdToken:token});
+        const u=normalizeUser(r),newToken=r?.sessionToken||r?.data?.sessionToken||r?.session?.token||"";
+        if(r?.ok&&newToken&&String(u?.role||"").toUpperCase()==="ADMIN"){saveSession(newToken,u);currentUser=u;showApp();loadAll();return true}
+      }
+    }
+  }catch(e){console.warn("Restore Firebase:",e)}
+  clearSession();$("app").classList.add("hidden");$("login").classList.remove("hidden");return false;
+}
+
+/* Expose handlers used by inline HTML */
+Object.assign(window,{loginAdmin,logout,openPage,toggleSidebar,closeSidebar,loadAll,setAttendanceFilter,applyDashboardPayrollFilter,loadAdminAssignments,loadAdminRequests,reviewRequest,createAssignment,resetAssignmentForm,loadAdminPayroll,generateAdminPayroll,loadMonthlyAttendance,exportAttendanceExcel});
+
+$("dateFilter").addEventListener("change",loadAll);
+$("monthFilter").addEventListener("change",loadAll);
+$("requestStatusFilter").addEventListener("change",loadAdminRequests);
+$("requestTypeFilter").addEventListener("change",loadAdminRequests);
+
+document.addEventListener("DOMContentLoaded",()=>{
+  $("adminPayrollMonthFilter").value=monthNow();
+  $("attendanceMonthFilter").value=monthNow();
+  $("attendanceMonthFilter").addEventListener("change",()=>{monthlyAttendanceLoadedKey="";if($("attendanceEmployeeFilter").value)loadMonthlyAttendance(true)});
+  $("attendanceEmployeeFilter").addEventListener("change",()=>{monthlyAttendanceLoadedKey="";if($("attendanceEmployeeFilter").value)loadMonthlyAttendance(true)});
+  $("refreshPayrollBtn").addEventListener("click",loadAdminPayroll);
+  $("generatePayrollBtn").addEventListener("click",generateAdminPayroll);
+  $("adminPayrollMonthFilter").addEventListener("change",loadAdminPayroll);
+  $("adminPayrollEmployeeFilter").addEventListener("change",()=>renderAdminPayroll(payrollRows));
+  $("adminPayrollStatusFilter").addEventListener("change",()=>renderAdminPayroll(payrollRows));
+  $("closePayrollDetailBtn").addEventListener("click",()=>{$("payrollDetailCard").style.display="none"});
+});
+
+initFilters();
+/* Panaskan Firebase saat browser idle agar klik login tidak menunggu dynamic import. */
+if("requestIdleCallback" in window) requestIdleCallback(()=>initFirebase(),{timeout:1800});
+else setTimeout(()=>initFirebase(),1200);
+restoreAdminSession();
+</script>
+</body>
+</html>
