@@ -232,7 +232,7 @@ body{font-size:13px}
       <div class="full"><label class="form-label">Deskripsi</label><textarea id="assignmentDescription" class="textarea" maxlength="1000" placeholder="Detail pekerjaan / instruksi..."></textarea></div>
       <div class="full"><label class="form-label">Catatan</label><textarea id="assignmentNotes" class="textarea" maxlength="500" placeholder="Catatan tambahan..."></textarea></div>
     </div><div class="form-actions"><button class="btn gray" onclick="resetAssignmentForm()">Bersihkan</button><button id="createAssignmentBtn" class="btn success" onclick="createAssignment()">Buat Penugasan</button></div></div>
-    <div><div class="toolbar" style="margin-bottom:10px"><span id="assignmentInfo" class="hint">Memuat...</span><label style="margin-left:auto;font-size:9px;font-weight:800;color:#69788c;display:flex;gap:5px;align-items:center"><input id="includeCompleted" type="checkbox" onchange="loadAdminAssignments(true)"> Tampilkan selesai</label></div><div class="table-wrap"><table class="table business-table"><thead><tr><th>Karyawan Penerima</th><th>Penugasan</th><th>Tanggal</th><th>Lokasi</th><th>Prioritas</th><th>Status</th></tr></thead><tbody id="assignmentBody"></tbody></table></div></div>
+    <div><div class="toolbar" style="margin-bottom:10px"><span id="assignmentInfo" class="hint">Memuat...</span><label style="margin-left:auto;font-size:9px;font-weight:800;color:#69788c;display:flex;gap:5px;align-items:center"><input id="includeCompleted" type="checkbox" onchange="loadAdminAssignments(true)"> Tampilkan selesai</label></div><div class="table-wrap"><table class="table business-table"><thead><tr><th>Karyawan Penerima</th><th>Penugasan</th><th>Tanggal</th><th>Lokasi</th><th>Prioritas</th><th>Status & Bukti</th><th>Aksi</th></tr></thead><tbody id="assignmentBody"></tbody></table></div></div>
   </div></div></section>
 </section>
 
@@ -929,7 +929,11 @@ function renderAssignments(rows){
     const st=String(val(r,"status","Status")||"DIBERIKAN").toUpperCase(),empName=assignmentEmployee(r);
     const emp=employeeCache.find(e=>String(val(e,"uid","UID","id","employeeUid")).toLowerCase()===String(val(r,"uid","UID","employeeUid","employeeUID","assignedUid","assigneeUid")).toLowerCase());
     const nip=val(r,"nip","NIP")||val(emp,"nip","NIP"),jab=val(r,"jabatan","position")||val(emp,"jabatan","position");
-    return`<tr><td><span class="name">${esc(empName)}</span><span class="sub">${esc(nip||jab||"Karyawan penerima tugas")}</span></td><td class="detail"><b>${esc(val(r,"title","judul","assignmentTitle")||"-")}</b><div class="sub" style="white-space:normal">${esc(val(r,"description","deskripsi")||"")}</div></td><td>${esc(val(r,"startDate","tanggalMulai","start")||"-")}${val(r,"endDate","tanggalSelesai","end")&&val(r,"endDate","tanggalSelesai","end")!==val(r,"startDate","tanggalMulai","start")?" s/d "+esc(val(r,"endDate","tanggalSelesai","end")):""}</td><td class="detail">${esc(val(r,"location","lokasi")||"-")}</td><td><span class="status blue">${esc(val(r,"priority","prioritas")||"NORMAL")}</span></td><td><span class="status ${st==="SELESAI"?"ok":"blue"}">${esc(val(r,"status","Status")||"Diberikan")}</span></td></tr>`;
+    const aid=String(val(r,"assignmentId","Assignment ID")||""),proof=val(r,"proofUrl","buktiUrl"),proofName=val(r,"proofName","buktiNama"),statusRaw=val(r,"status","Status")||"Ditugaskan";
+     const action=st==="MENUNGGU VERIFIKASI"&&aid?`<button class="btn success" style="margin-top:6px" onclick='adminCompleteAssignment(${JSON.stringify(aid)})'><span class="material-symbols-rounded" style="font-size:14px">verified</span> Verifikasi</button>`:"";
+     const del=aid&&st!=="SELESAI"?`<button class="btn danger" style="margin-top:6px" onclick='adminDeleteAssignment(${JSON.stringify(aid)})'><span class="material-symbols-rounded" style="font-size:14px">delete</span></button>`:"";
+     const proofHtml=proof?`<a href="${esc(proof)}" target="_blank" rel="noopener" class="assignment-proof-link"><span class="material-symbols-rounded" style="font-size:14px">attach_file</span>${esc(proofName||"Bukti tugas")}</a>`:"<span class="hint">Belum ada bukti</span>";
+     return`<tr><td><span class="name">${esc(empName)}</span><span class="sub">${esc(nip||jab||"Karyawan penerima tugas")}</span></td><td class="detail"><b>${esc(val(r,"title","judul","assignmentTitle")||"-")}</b><div class="sub" style="white-space:normal">${esc(val(r,"description","deskripsi")||"")}</div></td><td>${esc(val(r,"startDate","tanggalMulai","start")||"-")}${val(r,"endDate","tanggalSelesai","end")&&val(r,"endDate","tanggalSelesai","end")!==val(r,"startDate","tanggalMulai","start")?" s/d "+esc(val(r,"endDate","tanggalSelesai","end")):""}</td><td class="detail">${esc(val(r,"location","lokasi")||"-")}</td><td><span class="status blue">${esc(val(r,"priority","prioritas")||"NORMAL")}</span></td><td><span class="status ${st==="SELESAI"?"ok":st==="MENUNGGU VERIFIKASI"?"wait":"blue"}">${esc(statusRaw)}</span><div>${proofHtml}</div>${action}</td><td>${del||'<span class="hint">—</span>'}</td></tr>`;
   }).join(""):'<tr><td colspan="6"><div class="empty">Belum ada penugasan. Setelah admin memberikan tugas, karyawan penerima akan tampil di sini.</div></td></tr>';
   $("assignmentInfo").textContent=`${rows.length} penugasan`;
   $("assignmentBadge").textContent=rows.filter(r=>String(val(r,"status","Status")).toUpperCase()!=="SELESAI").length;
@@ -951,6 +955,14 @@ async function createAssignment(){
   try{const r=await request("adminCreateAssignment",{uid,title,startDate,endDate,priority:$("assignmentPriority").value,location:$("assignmentLocation").value.trim(),description:$("assignmentDescription").value.trim(),notes:$("assignmentNotes").value.trim()});if(!r?.ok)throw Error(r?.error||"Gagal membuat penugasan.");toast(r.message||"Penugasan berhasil dibuat.");resetAssignmentForm();await loadAdminAssignments()}catch(e){toast(e.message)}finally{loading(false);b.disabled=false;b.textContent="Buat Penugasan"}
 }
 
+async function adminCompleteAssignment(id){
+  if(!confirm("Verifikasi tugas ini sebagai Selesai?"))return;
+  try{const r=await request("adminUpdateAssignment",{assignmentId:id,status:"Selesai"});if(!r?.ok)throw Error(r?.error||"Gagal memverifikasi tugas.");toast("Tugas berhasil diverifikasi.");await loadAdminAssignments(true);}catch(e){toast(e.message||"Gagal memverifikasi tugas.");}
+}
+async function adminDeleteAssignment(id){
+  if(!confirm("Hapus penugasan ini? Data tugas akan dihapus dari sheet."))return;
+  try{const r=await request("adminDeleteAssignment",{assignmentId:id});if(!r?.ok)throw Error(r?.error||"Gagal menghapus penugasan.");toast("Penugasan berhasil dihapus.");await loadAdminAssignments(true);}catch(e){toast(e.message||"Gagal menghapus penugasan.");}
+}
 /* Request */
 function renderRequests(rows){
   $("requestBody").innerHTML=rows.length?rows.map(r=>{
@@ -1079,7 +1091,7 @@ async function restoreAdminSession(){
 }
 
 /* Expose handlers used by inline HTML */
-Object.assign(window,{loginAdmin,logout,openPage,toggleSidebar,closeSidebar,loadAll,setAttendanceFilter,applyDashboardPayrollFilter,loadAdminAssignments,loadAdminRequests,reviewRequest,createAssignment,resetAssignmentForm,loadAdminPayroll,generateAdminPayroll,loadMonthlyAttendance,exportAttendanceExcel});
+Object.assign(window,{loginAdmin,logout,openPage,toggleSidebar,closeSidebar,loadAll,setAttendanceFilter,applyDashboardPayrollFilter,loadAdminAssignments,loadAdminRequests,reviewRequest,createAssignment,resetAssignmentForm,adminCompleteAssignment,adminDeleteAssignment,loadAdminPayroll,generateAdminPayroll,loadMonthlyAttendance,exportAttendanceExcel});
 
 $("dateFilter").addEventListener("change",loadAll);
 $("monthFilter").addEventListener("change",loadAll);
