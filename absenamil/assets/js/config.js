@@ -7,22 +7,22 @@ const CONFIG = {
   FIREBASE_CONFIG: {
 
     apiKey:
-      'AIzaSyAHU_FdW5CGZ_iR19sx9QyPhpem5YbLQe8',
+      'AIzaSyDgfq_CNV9kS7Ng_3vecJqmcclFfuD5960',
 
     authDomain:
-      'absensiamil.firebaseapp.com',
+      'absenbaz.firebaseapp.com',
 
     projectId:
-      'absensiamil',
+      'absenbaz',
 
     storageBucket:
-      'absensiamil.firebasestorage.app',
+      'absenbaz.firebasestorage.app',
 
     messagingSenderId:
-      '962926272481',
+      '82513914266',
 
     appId:
-      '1:962926272481:web:d6d5bae6d890ebecc2bca0'
+      '1:82513914266:android:3bdcc0335448e65c9bf223'
 
   }
 
