@@ -312,16 +312,14 @@ function restoreLoginButton_(){
   const native = isNativeAndroid_();
   const icon = $('loginButtonIcon');
   const text = $('loginButtonText');
-  const fields = $('webviewLoginFields');
   const hint = $('loginModeHint');
-  if(icon) icon.textContent = native ? 'G' : '→';
-  if(text) text.textContent = native ? 'Masuk dengan Google' : 'Masuk';
-  if(fields) fields.classList.toggle('show', !native);
+  if(icon) icon.textContent = 'G';
+  if(text) text.textContent = 'Masuk dengan Google';
   if(hint){
-    hint.classList.toggle('show', !native);
+    hint.classList.add('show');
     hint.textContent = native
-      ? 'Login Google diproses oleh Android, tanpa popup di WebView.'
-      : 'Mode WebView aktif: login menggunakan Email dan Password Firebase.';
+      ? 'Pilih akun Google untuk masuk melalui Android.'
+      : 'Pilih akun Google untuk masuk tanpa email dan password.';
   }
 }
 
@@ -780,36 +778,35 @@ async function loginWithFirebase(){
     return;
   }
 
-  // WebView tanpa native bridge: Email/Password Firebase.
+  // Browser/WebView tanpa native bridge: gunakan Google OAuth Firebase.
+  // Tidak ada lagi form email/password.
   if(!firebaseReady){
     const ready = await initFirebase();
     if(!ready) return;
   }
-  if(!firebaseAuth || !firebaseAuthModule){
+  if(!firebaseAuth || !firebaseAuthModule || !firebaseGoogleProvider){
     showToast('Firebase belum siap. Silakan coba lagi.');
     return;
   }
-
-  const email = String($('loginEmail')?.value || '').trim().toLowerCase();
-  const password = String($('loginPassword')?.value || '');
-  if(!email) return showToast('Email wajib diisi.');
-  if(!password) return showToast('Password wajib diisi.');
 
   loginProcessing = true;
   const button = $('firebaseLoginButton');
   if(button){
     button.disabled = true;
-    button.innerHTML = '<span class="material-symbols-rounded">progress_activity</span><span>Memverifikasi...</span>';
+    button.innerHTML = '<span class="material-symbols-rounded">progress_activity</span><span>Membuka Google...</span>';
   }
-  loading(true, 'Login', 'Memverifikasi akun Anda...');
+  loading(true, 'Login Google', 'Memilih akun Google Anda...');
 
   try{
-    const { signInWithEmailAndPassword } = firebaseAuthModule;
-    const credentialResult = await signInWithEmailAndPassword(firebaseAuth, email, password);
+    const { signInWithPopup } = firebaseAuthModule;
+    const credentialResult = await signInWithPopup(
+      firebaseAuth,
+      firebaseGoogleProvider
+    );
+
     await completeFirebaseLogin_(credentialResult.user);
-    if($('loginPassword')) $('loginPassword').value = '';
   }catch(error){
-    console.error('Firebase WebView Login Error:', error);
+    console.error('Firebase Google Login Error:', error);
     loginProcessing = false;
     restoreLoginButton_();
     loading(false);
