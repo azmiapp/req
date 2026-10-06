@@ -21,8 +21,19 @@
 <section id="view-assignments" class="view"><div class="page-title"><div><span class="eyebrow">PENUGASAN</span><h1>Penugasan</h1></div><button id="addAssignmentBtn" class="btn primary">+ Buat Penugasan</button></div>
 <div class="card"><div class="inline"><select id="assignmentStatus" aria-label="Filter status penugasan"><option value="">Semua tugas</option><option value="PENDING">Belum selesai</option><option value="DONE">Selesai</option></select></div></div>
 <div id="assignmentTable" class="card" style="margin-top:14px"></div></section>
-<section id="view-deliveries" class="view"><div class="page-title"><div><span class="eyebrow">PENYALURAN</span><h1>Penyaluran</h1></div></div>
-<div class="card"><div class="inline"><input id="deliverySearch" placeholder="Cari BCL, ZMart, wilayah..." aria-label="Cari penyaluran"><select id="deliveryStatus" aria-label="Filter status"><option value="">Semua status</option><option value="SUBMITTED">SUBMITTED</option><option value="VERIFIED">VERIFIED</option></select><input id="deliveryMonth" type="month" aria-label="Filter penyaluran per bulan"><button id="makeSpjBtn" class="btn primary">📄 Buat SPJ</button></div><small class="muted">Pilih bulan untuk melihat penyaluran pada bulan tersebut dan membuat SPJ otomatis.</small></div><div id="deliveryTable" class="card" style="margin-top:14px"></div></section>
+<section id="view-deliveries" class="view">
+<div class="page-title"><div><span class="eyebrow">PENYALURAN</span><h1>Penyaluran</h1><p>Gunakan filter untuk menemukan penyaluran dan menyiapkan SPJ.</p></div></div>
+<div class="card delivery-filter-card">
+  <div class="filter-head"><div><b>Filter Penyaluran</b><small class="muted">Cari berdasarkan periode, status, BCL, atau ZMart.</small></div><button id="resetDeliveryFilter" class="btn ghost small">↺ Reset</button></div>
+  <div class="delivery-filter-grid">
+    <label class="filter-field search-field"><span>🔎 Pencarian</span><input id="deliverySearch" placeholder="ID / nama BCL / ZMart / wilayah..." aria-label="Cari penyaluran"></label>
+    <label class="filter-field"><span>📅 Bulan</span><input id="deliveryMonth" type="month" aria-label="Filter penyaluran per bulan"></label>
+    <label class="filter-field"><span>📌 Status</span><select id="deliveryStatus" aria-label="Filter status"><option value="">Semua status</option><option value="SUBMITTED">SUBMITTED</option><option value="VERIFIED">VERIFIED</option></select></label>
+  </div>
+  <div class="filter-actions"><div class="quick-filter"><span class="muted">Periode cepat:</span><button type="button" id="deliveryThisMonth" class="filter-chip">Bulan ini</button><button type="button" id="deliveryAllMonths" class="filter-chip active">Semua bulan</button></div><button id="makeSpjBtn" class="btn primary">📄 Buat SPJ</button></div>
+  <div id="deliveryFilterSummary" class="filter-summary">Menampilkan semua penyaluran</div>
+</div>
+<div id="deliveryTable" class="card delivery-results" style="margin-top:14px"></div></section>
 <section id="view-users" class="view"><div class="page-title"><div><span class="eyebrow">AKUN</span><h1>ZMart</h1></div><button id="addUserBtn" class="btn primary">+ Tambah ZMart</button></div><div id="userTable" class="card"></div></section>
 </main></div>
 <nav class="bottom-nav"><button class="nav-btn active" data-view="dashboard">⌂<span>Dashboard</span></button><button class="nav-btn" data-view="bcl">👵<span>BCL</span></button><button class="nav-btn" data-view="assignments">☷<span>Tugas</span></button><button class="nav-btn" data-view="deliveries">✓<span>Penyaluran</span></button><button class="nav-btn" data-view="users">👤<span>ZMart</span></button></nav>
