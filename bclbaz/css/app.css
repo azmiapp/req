@@ -68,3 +68,14 @@ dialog{border:0;padding:0;background:transparent;width:min(560px,94vw)}dialog::b
  .table-meta,.history-summary{align-items:flex-start}
  .mobile-content .inline{flex-wrap:wrap}
 }
+
+/* ===== Penyaluran & GPS UX v2.2 ===== */
+.delivery-filter-card{padding:18px 20px;background:linear-gradient(180deg,#ffffff 0%,#f9fcfa 100%)}
+.filter-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}.filter-head b{display:block;font-size:15px}.filter-head small{display:block;margin-top:3px}
+.delivery-filter-grid{display:grid;grid-template-columns:minmax(260px,1.6fr) minmax(170px,.75fr) minmax(170px,.75fr);gap:12px}
+.filter-field{margin:0!important;font-size:11px!important;color:var(--muted);font-weight:850!important}.filter-field span{display:block;margin-bottom:5px}.filter-field input,.filter-field select{margin:0!important;width:100%;background:#fff;color:var(--ink);border:1px solid #c9ddd4;border-radius:13px;padding:11px 12px;min-height:43px}
+.filter-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:13px;border-top:1px solid #e7efeb}.quick-filter{display:flex;align-items:center;flex-wrap:wrap;gap:6px}.quick-filter>span{font-size:11px;margin-right:2px}.filter-chip{border:1px solid #cfe1d8;background:#fff;color:#426258;border-radius:99px;padding:7px 11px;font-size:11px;font-weight:850;cursor:pointer}.filter-chip.active{background:#e6f6ee;border-color:#9ed6bc;color:var(--green)}.filter-summary{margin-top:11px;padding:9px 11px;border-radius:11px;background:#eef8f3;color:#506b60;font-size:11px}.filter-summary span{float:right;font-weight:800;color:var(--green)}
+.delivery-results{overflow-x:auto}.delivery-results .table-meta{background:#f8fbf9;border-radius:11px;padding:9px 11px;margin-bottom:10px}.delivery-results .table-meta small{color:var(--muted)}
+.location-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:12px}.location-head .btn{margin:0}.location-box{min-height:45px}.gps-loading{display:flex;align-items:center;gap:8px;font-weight:800}.gps-loading i{width:13px;height:13px;border:2px solid #b8d9cb;border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@media(max-width:800px){.delivery-filter-grid{grid-template-columns:1fr 1fr}.search-field{grid-column:1/-1}.filter-actions{align-items:stretch;flex-direction:column}.quick-filter{width:100%}.filter-actions>#makeSpjBtn{width:100%}.filter-summary span{float:none;display:block;margin-top:4px}}
+@media(max-width:520px){.delivery-filter-grid{grid-template-columns:1fr}.search-field{grid-column:auto}.filter-head{align-items:flex-start}.filter-head .btn{flex:none}.quick-filter>span{width:100%;margin-bottom:1px}.location-head{align-items:flex-start}.location-head .btn{padding:8px 10px}}
