@@ -38,6 +38,8 @@ function bind(){
  $("#addUserBtn").onclick=showUserForm;
  $("#bclSearch").oninput=renderBcl;$("#bclStatus").onchange=renderBcl;
  $("#assignmentStatus").onchange=renderAssignments;
+ $("#dashboardMonth").onchange=renderStats;
+ $("#dashboardAllMonths").onclick=()=>{$("#dashboardMonth").value="";renderStats()};
  $("#deliverySearch").oninput=renderDeliveries;$("#deliveryStatus").onchange=renderDeliveries;
  $("#deliveryMonth").onchange=()=>{updateDeliveryQuickState();renderDeliveries()};
  $("#resetDeliveryFilter").onclick=resetDeliveryFilters;
@@ -50,11 +52,33 @@ async function loadAll(){[bcls,users,assignments,deliveries]=await Promise.all([
 
 function renderAll(){renderStats();renderBcl();renderAssignments();updateDeliveryQuickState();renderDeliveries();renderUsers()}
 function renderStats(){
- const total=bcls.length,assigned=bcls.filter(x=>x.status==="DITUGASKAN").length,done=bcls.filter(x=>x.status==="SELESAI").length;
- $("#statBcl").textContent=total;$("#statAssigned").textContent=assigned;$("#statDone").textContent=done;$("#statPending").textContent=Math.max(0,total-done);
- const counts={SUBMITTED:deliveries.filter(x=>x.status==="SUBMITTED").length,VERIFIED:deliveries.filter(x=>x.status==="VERIFIED").length};
+ const m=$("#dashboardMonth")?.value||"";
+ let total=0,assigned=0,done=0,pending=0;
+ if(!m){
+   total=bcls.length;
+   assigned=bcls.filter(x=>x.status==="DITUGASKAN").length;
+   done=bcls.filter(x=>x.status==="SELESAI").length;
+   pending=assignments.filter(x=>x.status!=="DONE").length;
+ }else{
+   // Statistik bulanan mengikuti aktivitas pada bulan tersebut, bukan status terakhir BCL.
+   // Total BCL = BCL yang dibuat pada bulan pilihan.
+   total=bcls.filter(x=>monthOf(x.createdAt)===m).length;
+   const periodAssignments=assignments.filter(x=>monthOf(x.createdAt)===m);
+   assigned=new Set(periodAssignments.map(x=>x.bclId)).size;
+   done=assignments.filter(x=>x.status==="DONE"&&monthOf(x.completedAt)===m).length;
+   pending=periodAssignments.filter(x=>x.status!=="DONE").length;
+ }
+ $("#statBcl").textContent=total;
+ $("#statAssigned").textContent=assigned;
+ $("#statDone").textContent=done;
+ $("#statPending").textContent=pending;
+ const periodDeliveries=m?deliveries.filter(x=>monthOf(x.createdAt)===m):deliveries;
+ const counts={SUBMITTED:periodDeliveries.filter(x=>x.status==="SUBMITTED").length,VERIFIED:periodDeliveries.filter(x=>x.status==="VERIFIED").length};
  $("#statusBars").innerHTML=Object.entries(counts).map(([k,v])=>`<div class="bar-row"><span>${k}</span><b>${v}</b></div>`).join("")||`<p class="muted">Belum ada penyaluran.</p>`;
- $("#recentDeliveries").innerHTML=deliveries.slice(0,6).map(d=>`<div class="list-row"><div><b>${esc(d.bclName||d.bclId)}</b><small>${esc(d.zmartName||"ZMart")} • ${fmtDate(d.createdAt)}</small></div><span class="badge">${esc(d.status)}</span></div>`).join("")||`<p class="muted">Belum ada data.</p>`;
+ const recent=periodDeliveries.slice(0,6);
+ $("#recentDeliveries").innerHTML=recent.map(d=>`<div class="list-row"><div><b>${esc(d.bclName||d.bclId)}</b><small>${esc(d.zmartName||"ZMart")} • ${fmtDate(d.createdAt)}</small></div><span class="badge">${esc(d.status)}</span></div>`).join("")||`<p class="muted">Belum ada data.</p>`;
+ const period=$("#dashboardPeriod");
+ if(period)period.textContent=m?`Menampilkan data bulan ${monthLabel(m)}`:"Menampilkan semua bulan";
 }
 
 function renderBcl(){
@@ -129,10 +153,10 @@ function showBclForm(id=""){
 }
 
 function showAssignmentForm(){
- const pending=bcls.filter(x=>x.status!=="SELESAI"),zmarts=users.filter(x=>x.role==="zmart"&&x.active!==false);
- openModal(`<h2>Buat Penugasan</h2><p class="muted">Pilih BCL dari database yang sudah tersimpan. Data penerima akan otomatis ikut ke penugasan.</p><form id="assignmentForm"><label>BCL<select name="bclId" required><option value="">Pilih BCL</option>${pending.map(x=>`<option value="${esc(x.id)}">${esc(x.id)} — ${esc(x.name)} — ${esc(x.district||"")}</option>`).join("")}</select></label><div id="assignmentBclPreview" class="assignment-preview"></div><label>ZMart<select name="zmartUid" required><option value="">Pilih ZMart</option>${zmarts.map(x=>`<option value="${esc(x.uid)}">${esc(x.name)} — ${esc(x.area||"")}</option>`).join("")}</select></label><label>Nama paket<input name="packageName" value="Paket Sembako BCL"></label><label>Isi paket (pisahkan dengan koma)<textarea name="items">Beras 5 kg, Minyak Goreng 1 L, Gula 1 kg, Tepung Terigu 1 kg, Susu 2 pcs</textarea></label><button id="saveAssignmentBtn" class="btn primary full">Buat Penugasan</button></form>`);
+ const pending=[...bcls].sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id),"id")),zmarts=users.filter(x=>x.role==="zmart"&&x.active!==false);
+ openModal(`<h2>Buat Penugasan</h2><p class="muted">Pilih BCL dari database yang sudah tersimpan. <b>BCL yang pernah selesai disalurkan tetap dapat digunakan kembali untuk penugasan baru.</b> Data penerima akan otomatis ikut ke penugasan.</p><form id="assignmentForm"><label>BCL<select name="bclId" required><option value="">Pilih BCL</option>${pending.map(x=>`<option value="${esc(x.id)}">${esc(x.id)} — ${esc(x.name)} — ${esc(x.district||"")} — ${esc(x.status||"BELUM_DITUGASKAN")}</option>`).join("")}</select></label><div id="assignmentBclPreview" class="assignment-preview"></div><label>ZMart<select name="zmartUid" required><option value="">Pilih ZMart</option>${zmarts.map(x=>`<option value="${esc(x.uid)}">${esc(x.name)} — ${esc(x.area||"")}</option>`).join("")}</select></label><label>Nama paket<input name="packageName" value="Paket Sembako BCL"></label><label>Isi paket (pisahkan dengan koma)<textarea name="items">Beras 5 kg, Minyak Goreng 1 L, Gula 1 kg, Tepung Terigu 1 kg, Susu 2 pcs</textarea></label><button id="saveAssignmentBtn" class="btn primary full">Buat Penugasan</button></form>`);
  const select=$("#assignmentForm select[name=bclId]"),preview=$("#assignmentBclPreview");
- const updatePreview=()=>{const x=bcls.find(v=>v.id===select.value);preview.innerHTML=x?`<div class="verified"><b>✓ Data BCL tersimpan</b><span>${esc(x.name)}</span><small>ID ${esc(x.id)} • ${esc(x.district||"-")} • ${esc(x.village||"-")}</small><small>${esc(x.address||"Alamat belum diisi")}</small></div>`:""};
+ const updatePreview=()=>{const x=bcls.find(v=>v.id===select.value);preview.innerHTML=x?`<div class="verified"><b>✓ Data BCL tersimpan</b><span>${esc(x.name)}</span><small>ID ${esc(x.id)} • ${esc(x.district||"-")} • ${esc(x.village||"-")}</small><small>${esc(x.address||"Alamat belum diisi")}</small><small><b>Status terakhir:</b> ${esc(x.status||"BELUM_DITUGASKAN")} • BCL dapat ditugaskan kembali.</small></div>`:""};
  select.onchange=updatePreview;updatePreview();
  $("#assignmentForm").onsubmit=async e=>{e.preventDefault();const btn=$("#saveAssignmentBtn");btn.disabled=true;btn.textContent="Menyimpan...";setLoading(true,"Menyimpan penugasan...");try{const f=new FormData(e.target);const items=String(f.get("items")||"").split(",").map(x=>({name:x.trim(),checked:false})).filter(x=>x.name);await createAssignment({bclId:f.get("bclId"),zmartUid:f.get("zmartUid"),packageName:f.get("packageName"),items});$("#modal").close();await loadAll();renderAll();toast("Penugasan dibuat.")}catch(err){toast(err.message,"error");btn.disabled=false;btn.textContent="Buat Penugasan"}finally{setLoading(false)}};
 }
