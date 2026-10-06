@@ -36,6 +36,7 @@ function bind(){
  qs("#takePhoto").onclick=takePhoto;
  qs("#switchCamera").onclick=async()=>{facing=facing==="environment"?"user":"environment";if(stream){stopCamera();startCamera()}};
  qs("#submitDelivery").onclick=submitDelivery;
+ qs("#reloadLocation").onclick=()=>getLocation(true);
  qs("#historyMonth").onchange=renderHistory;
  qs("#zmartSpjBtn").onclick=showSpjForm;
 }
@@ -123,20 +124,46 @@ function drawWatermark(ctx,w,h,location){
  ctx.save();ctx.fillStyle="rgba(0,0,0,.68)";ctx.fillRect(0,boxY,w,boxH);ctx.fillStyle="#fff";ctx.font="600 18px Arial,sans-serif";ctx.textBaseline="top";
  lines.forEach((line,i)=>{ctx.font=i===0?"700 18px Arial,sans-serif":"16px Arial,sans-serif";ctx.fillText(line,pad,boxY+pad+i*lineH)});ctx.restore();
 }
-let locationWatchId=null,locationFastTimer=null;
+let locationWatchId=null,locationFastTimer=null,locationRequestId=0;
 function applyLocation(pos,refining=false){
- coords={latitude:pos.coords.latitude,longitude:pos.coords.longitude,accuracy:pos.coords.accuracy};const accuracy=Math.round(coords.accuracy||0);
+ coords={latitude:pos.coords.latitude,longitude:pos.coords.longitude,accuracy:pos.coords.accuracy};
+ const accuracy=Math.round(coords.accuracy||0);
  qs("#locationBox").innerHTML=`✓ Lokasi ${refining?"didapat • sedang memperbaiki akurasi":"didapat"}<br><small>Lat ${coords.latitude.toFixed(6)} • Lng ${coords.longitude.toFixed(6)} • ±${accuracy} m</small>`;
  qs("#submitDelivery").disabled=!(coords&&photoBlob);
 }
-function getLocation(){
- coords=null;qs("#locationBox").textContent="Mencari lokasi GPS...";
- if(!navigator.geolocation){qs("#locationBox").textContent="GPS tidak didukung browser.";return}
- navigator.geolocation.getCurrentPosition(pos=>applyLocation(pos,true),()=>{},{enableHighAccuracy:false,timeout:4000,maximumAge:120000});
+function stopLocationWatch(){
  if(locationWatchId!==null){try{navigator.geolocation.clearWatch(locationWatchId)}catch{}locationWatchId=null}
- if(locationFastTimer)clearTimeout(locationFastTimer);
- locationWatchId=navigator.geolocation.watchPosition(pos=>{applyLocation(pos,false);if(Number(pos.coords.accuracy||9999)<=50){try{navigator.geolocation.clearWatch(locationWatchId)}catch{}locationWatchId=null;if(locationFastTimer){clearTimeout(locationFastTimer);locationFastTimer=null}}},err=>{if(!coords){qs("#locationBox").textContent="Lokasi gagal: "+err.message;toast("Izinkan akses lokasi untuk melanjutkan.","error")}}, {enableHighAccuracy:true,timeout:8000,maximumAge:0});
- locationFastTimer=setTimeout(()=>{if(locationWatchId!==null){try{navigator.geolocation.clearWatch(locationWatchId)}catch{}locationWatchId=null}locationFastTimer=null;if(coords)qs("#locationBox").innerHTML+=`<br><small class="muted">Lokasi siap digunakan.</small>`},8500);
+ if(locationFastTimer){clearTimeout(locationFastTimer);locationFastTimer=null}
+}
+function getLocation(forceReload=false){
+ if(!navigator.geolocation){qs("#locationBox").textContent="GPS tidak didukung browser.";return}
+ const requestId=++locationRequestId;
+ stopLocationWatch();
+ if(forceReload){
+   coords=null;
+   if(photoBlob){photoBlob=null;qs("#photoPreview").classList.add("hidden");qs("#camera").classList.remove("hidden");qs("#submitDelivery").disabled=true;}
+ }
+ qs("#locationBox").innerHTML=`<span class="gps-loading"><i></i> Mencari lokasi GPS...</span><small class="muted">Sedang mengambil lokasi tercepat yang tersedia.</small>`;
+ const cacheError=()=>{};
+ const preciseError=(err)=>{if(requestId!==locationRequestId)return;if(!coords){qs("#locationBox").innerHTML=`<b>⚠ Lokasi belum ditemukan</b><small class="muted">${esc(err?.message||"Aktifkan GPS dan izin lokasi.")}</small>`;toast("Lokasi belum didapat. Coba Muat Ulang Lokasi.","error")}};
+ // 1) Ambil cache terakhir secepat mungkin. Ini biasanya jauh lebih cepat daripada GPS presisi tinggi.
+ navigator.geolocation.getCurrentPosition(pos=>{if(requestId===locationRequestId)applyLocation(pos,false)},cacheError,{enableHighAccuracy:false,timeout:1800,maximumAge:600000});
+ // 2) Secara paralel minta posisi presisi untuk memperbaiki koordinat tanpa menahan kamera.
+ locationWatchId=navigator.geolocation.watchPosition(pos=>{
+   if(requestId!==locationRequestId)return;
+   applyLocation(pos,true);
+   const acc=Number(pos.coords.accuracy||9999);
+   if(acc<=35)stopLocationWatch();
+ },preciseError,{enableHighAccuracy:true,timeout:7000,maximumAge:0});
+ locationFastTimer=setTimeout(()=>{
+   if(requestId!==locationRequestId)return;
+   if(locationWatchId!==null && coords){
+     try{navigator.geolocation.clearWatch(locationWatchId)}catch{}
+     locationWatchId=null;
+   }
+   locationFastTimer=null;
+   if(coords)qs("#locationBox").innerHTML+=`<br><small class="muted">✓ Lokasi siap digunakan. GPS presisi akan diperbarui jika tersedia.</small>`;
+ },6500);
 }
 function blobToDataUrl(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob)})}
 
