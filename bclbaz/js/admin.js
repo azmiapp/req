@@ -39,13 +39,16 @@ function bind(){
  $("#bclSearch").oninput=renderBcl;$("#bclStatus").onchange=renderBcl;
  $("#assignmentStatus").onchange=renderAssignments;
  $("#deliverySearch").oninput=renderDeliveries;$("#deliveryStatus").onchange=renderDeliveries;
- $("#deliveryMonth").onchange=renderDeliveries;
+ $("#deliveryMonth").onchange=()=>{updateDeliveryQuickState();renderDeliveries()};
+ $("#resetDeliveryFilter").onclick=resetDeliveryFilters;
+ $("#deliveryThisMonth").onclick=()=>{const d=new Date();$("#deliveryMonth").value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;updateDeliveryQuickState();renderDeliveries()};
+ $("#deliveryAllMonths").onclick=()=>{$("#deliveryMonth").value="";updateDeliveryQuickState();renderDeliveries()};
  $("#makeSpjBtn").onclick=()=>showSpjForm("admin");
 }
 function showView(v){qsa(".nav-btn").forEach(x=>x.classList.toggle("active",x.dataset.view===v));qsa(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+v))}
 async function loadAll(){[bcls,users,assignments,deliveries]=await Promise.all([getBcls(),getUsers(),getAssignments(),getDeliveries()]);}
 
-function renderAll(){renderStats();renderBcl();renderAssignments();renderDeliveries();renderUsers()}
+function renderAll(){renderStats();renderBcl();renderAssignments();updateDeliveryQuickState();renderDeliveries();renderUsers()}
 function renderStats(){
  const total=bcls.length,assigned=bcls.filter(x=>x.status==="DITUGASKAN").length,done=bcls.filter(x=>x.status==="SELESAI").length;
  $("#statBcl").textContent=total;$("#statAssigned").textContent=assigned;$("#statDone").textContent=done;$("#statPending").textContent=Math.max(0,total-done);
@@ -88,9 +91,25 @@ function renderAssignments(){
 }
 
 function renderDeliveries(){
- const s=($("#deliverySearch").value||"").toLowerCase(),st=$("#deliveryStatus").value,m=$("#deliveryMonth").value;
- const rows=deliveries.filter(x=>(!st||x.status===st)&&(!m||monthOf(x.createdAt)===m)&&[x.bclId,x.bclName,x.zmartName,x.district].join(" ").toLowerCase().includes(s));
- $("#deliveryTable").innerHTML=`<div class="table-meta"><b>${rows.length} penyaluran</b><span>${m?monthLabel(m):"Semua bulan"}</span></div><table><thead><tr><th>Waktu</th><th>BCL</th><th>ZMart</th><th>Lokasi</th><th>Status</th><th>Bukti</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${fmtDate(x.createdAt)}</td><td><b>${esc(x.bclName)}</b><small>${esc(x.bclId)}</small></td><td>${esc(x.zmartName)}</td><td>${esc(x.district||"-")}<br><small>${x.latitude??"-"}, ${x.longitude??"-"}</small></td><td><span class="badge">${esc(x.status)}</span></td><td>${x.photoUrl?`<a class="btn small" target="_blank" rel="noopener noreferrer" href="${esc(x.photoUrl)}">Foto</a>`:"-"}</td></tr>`).join("")||`<tr><td colspan="6">Belum ada data penyaluran.</td></tr>`}</tbody></table>`;
+ const s=($("#deliverySearch").value||"").trim().toLowerCase(),st=$("#deliveryStatus").value,m=$("#deliveryMonth").value;
+ const rows=deliveries.filter(x=>(!st||x.status===st)&&(!m||monthOf(x.createdAt)===m)&&[x.bclId,x.bclName,x.zmartName,x.district,x.village].join(" ").toLowerCase().includes(s));
+ const total=deliveries.length;
+ $("#deliveryTable").innerHTML=`<div class="table-meta"><div><b>${rows.length}</b> penyaluran ditemukan <small>${m?`• ${monthLabel(m)}`:"• Semua periode"}</small></div><span>${total} total data</span></div><table><thead><tr><th>Waktu</th><th>BCL</th><th>ZMart</th><th>Lokasi</th><th>Status</th><th>Bukti</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${fmtDate(x.createdAt)}</td><td><b>${esc(x.bclName)}</b><small>${esc(x.bclId)}</small></td><td>${esc(x.zmartName)}</td><td>${esc(x.district||"-")}<br><small>${x.latitude??"-"}, ${x.longitude??"-"}</small></td><td><span class="badge">${esc(x.status)}</span></td><td>${x.photoUrl?`<a class="btn small" target="_blank" rel="noopener noreferrer" href="${esc(x.photoUrl)}">Foto</a>`:"-"}</td></tr>`).join("")||`<tr><td colspan="6"><div class="empty-state">Belum ada penyaluran yang sesuai filter.</div></td></tr>`}</tbody></table>`;
+ updateDeliveryFilterSummary(rows.length);
+}
+function resetDeliveryFilters(){
+ $("#deliverySearch").value="";$("#deliveryStatus").value="";$("#deliveryMonth").value="";updateDeliveryQuickState();renderDeliveries();
+}
+function updateDeliveryQuickState(){
+ const m=$("#deliveryMonth").value,d=new Date(),current=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+ $("#deliveryThisMonth")?.classList.toggle("active",m===current);
+ $("#deliveryAllMonths")?.classList.toggle("active",!m);
+ const btn=$("#makeSpjBtn");if(btn){btn.disabled=!m;btn.title=m?"Buat SPJ dari bulan terpilih":"Pilih bulan terlebih dahulu"}
+}
+function updateDeliveryFilterSummary(count){
+ const s=($("#deliverySearch").value||"").trim(),st=$("#deliveryStatus").value,m=$("#deliveryMonth").value;
+ const parts=[];if(m)parts.push(`Bulan: ${monthLabel(m)}`);if(st)parts.push(`Status: ${st}`);if(s)parts.push(`Pencarian: “${esc(s)}”`);
+ $("#deliveryFilterSummary").innerHTML=parts.length?`<b>Filter aktif:</b> ${parts.join(" • ")} <span>→ ${count} data</span>`:`Menampilkan <b>semua ${count} penyaluran</b>`;
 }
 
 function renderUsers(){
