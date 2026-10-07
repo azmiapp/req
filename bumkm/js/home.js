@@ -18,7 +18,7 @@ async function tampilkanProduk() {
     list.innerHTML = `
       <div class="empty">
         <h3>Produk belum tersedia</h3>
-        <p>Periksa koneksi atau pengaturan Google Sheets.</p>
+        <p>Periksa koneksi Internet Kamu.</p>
         <button class="btn btn-primary" onclick="tampilkanProduk()">Coba Lagi</button>
       </div>
     `;
