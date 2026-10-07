@@ -3006,7 +3006,6 @@ function openEditProduct(product){
   document.getElementById("name").value=product.name || "";
   document.getElementById("desc").value=product.desc || "";
   document.getElementById("small").value=product.small ?? "";
-  const medium=document.getElementById("medium"); if(medium) medium.value=product.medium ?? "";
   document.getElementById("status").value=normalizeProductStatus(product.status);
   if(existingImage) existingImage.value=product.image || "";
   if(editMode) editMode.value="1";
@@ -3046,7 +3045,6 @@ async function updateProduct(productData){
   body.append("name",productData.name);
   body.append("desc",productData.desc);
   body.append("small",productData.small);
-  body.append("medium",productData.medium);
   body.append("status",productData.status);
   body.append("existingImageUrl",productData.existingImageUrl || "");
   if(productData.imageBase64){ body.append("imageBase64",productData.imageBase64); body.append("imageName",productData.imageName || (productData.id+".jpg")); body.append("imageMimeType",productData.imageMimeType || "image/jpeg"); }
@@ -4329,21 +4327,6 @@ form.addEventListener(
     }
 
 
-    if(
-      medium === "" ||
-      Number(medium) < 0
-    ){
-
-      showMessage(
-        "err",
-        "Harga Medium tidak valid."
-      );
-
-      return;
-
-    }
-
-
     if(!file && !isEdit){
 
       showMessage(
@@ -4415,7 +4398,7 @@ form.addEventListener(
           compressedSize.textContent=formatBytes(compressedEdit.size);
         }
         setProgress(75,"Menyimpan perubahan...");
-        await updateProduct({id,name,desc,small,medium,status:document.getElementById("status").value,existingImageUrl,imageBase64:editBase64,imageName:editImageName,imageMimeType:editMimeType});
+        await updateProduct({id,name,desc,small,status:document.getElementById("status").value,existingImageUrl,imageBase64:editBase64,imageName:editImageName,imageMimeType:editMimeType});
         setProgress(100,"Produk berhasil diperbarui ✓");
         showMessage("ok","<b>Produk berhasil diperbarui.</b><br>Perubahan sudah dikirim ke server.");
         cancelEditProduct();
