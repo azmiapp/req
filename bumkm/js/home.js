@@ -46,11 +46,6 @@ async function tampilkanProduk() {
           <strong>${rupiah(p.small)}</strong>
         </div>
 
-        <div class="price-row">
-          <span>Large</span>
-          <strong>${rupiah(p.medium)}</strong>
-        </div>
-
         <a class="btn btn-primary"
            href="detail-pesanan.html?produk=${encodeURIComponent(p.id)}">
           Buat Pesanan
