@@ -1,0 +1,4549 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1.0"
+>
+
+<meta
+  name="theme-color"
+  content="#00843D"
+>
+
+<title>
+Dharma Sukowati — UMKM Binaan BAZNAS Sragen
+</title>
+
+<style>
+
+*{
+  box-sizing:border-box
+}
+
+:root{
+  --ink:#111827;
+  --muted:#667085;
+  --line:#e5e7eb;
+  --soft:#f8fafc;
+  --danger:#b42318;
+  --success:#15803d;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(17,24,39,.06),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 20%,
+      rgba(17,24,39,.045),
+      transparent 25%
+    ),
+    #f3f5f8;
+}
+
+.page{
+  width:min(680px,100%);
+  margin:auto;
+  padding:28px 16px 48px;
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+  padding:0 4px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+.brandmark{
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  background:#111827;
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  font-size:17px;
+  box-shadow:
+    0 8px 20px rgba(17,24,39,.18);
+}
+
+.brand strong{
+  display:block;
+  font-size:15px;
+}
+
+.brand span{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.badge{
+  padding:8px 11px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid var(--line);
+  font-size:12px;
+  color:#475467;
+}
+
+.card{
+  background:rgba(255,255,255,.97);
+  border:1px solid rgba(17,24,39,.07);
+  border-radius:26px;
+  padding:28px;
+  box-shadow:
+    0 20px 60px rgba(15,23,42,.10);
+}
+
+h1{
+  margin:0;
+  font-size:28px;
+  letter-spacing:-.8px;
+}
+
+.sub{
+  margin:7px 0 25px;
+  color:var(--muted);
+  line-height:1.55;
+  font-size:14px;
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+.loginbox{
+  padding:18px;
+  border-radius:18px;
+  background:#f8fafc;
+  border:1px solid #e5e7eb;
+  margin-bottom:22px;
+}
+
+.login-title{
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.login-desc{
+  color:#667085;
+  font-size:12px;
+  line-height:1.5;
+  margin-bottom:14px;
+}
+
+ .google-button{
+  min-height:44px;
+}
+
+.firebase-login-btn{
+  display:block;
+  width:100%;
+  min-height:44px;
+  padding:12px 16px;
+  border:1px solid #d0d5dd;
+  border-radius:12px;
+  background:#ffffff;
+  color:#101828;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.firebase-login-btn:hover{
+  background:#f2f4f7;
+}
+
+.logout-btn{
+  background:#111827;
+  color:#ffffff;
+  border-color:#111827;
+}
+
+.logout-btn:hover{
+  background:#374151;
+}
+
+.userbox{
+  display:none;
+  padding:13px 14px;
+  border-radius:14px;
+  background:#ecfdf3;
+  border:1px solid #bbf7d0;
+}
+
+.userbox.allowed{
+  display:block;
+}
+
+.userbox.denied{
+  display:block;
+  background:#fff1f0;
+  border-color:#ffd6d2;
+}
+
+.useremail{
+  font-size:12px;
+  font-weight:800;
+  word-break:break-word;
+}
+
+.userstatus{
+  margin-top:4px;
+  font-size:11px;
+  line-height:1.5;
+  color:#475467;
+}
+
+.denied .userstatus{
+  color:#b42318;
+}
+
+#productSection{
+  display:none;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.section{
+  margin-top:23px;
+}
+
+.section-title{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:9px;
+}
+
+.num{
+  width:23px;
+  height:23px;
+  border-radius:8px;
+  background:#eef0f3;
+  display:grid;
+  place-items:center;
+  font-size:11px;
+}
+
+label{
+  display:block;
+  font-weight:750;
+  font-size:13px;
+  margin:16px 0 7px;
+}
+
+label small{
+  font-weight:500;
+  color:#98a2b3;
+}
+
+input,
+textarea,
+select{
+  width:100%;
+  border:1px solid #d9dee7;
+  background:#fff;
+  color:#111827;
+  border-radius:12px;
+  padding:13px 14px;
+  font:inherit;
+  font-size:14px;
+  outline:none;
+  transition:.18s;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:#111827;
+  box-shadow:
+    0 0 0 4px rgba(17,24,39,.07);
+}
+
+input[readonly]{
+  background:#f8fafc;
+  color:#667085;
+}
+
+textarea{
+  min-height:94px;
+  resize:vertical;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:13px;
+}
+
+.filebox{
+  border:1.5px dashed #cbd2dc;
+  border-radius:17px;
+  padding:15px;
+  background:#fafbfc;
+  overflow:hidden;
+}
+
+.filebox input[type=file]{
+  padding:11px;
+  background:#fff;
+  cursor:pointer;
+}
+
+.filehint{
+  display:flex;
+  gap:9px;
+  align-items:flex-start;
+  margin-top:10px;
+  color:#667085;
+  font-size:12px;
+  line-height:1.45;
+}
+
+.hinticon{
+  width:24px;
+  height:24px;
+  flex:0 0 24px;
+  border-radius:8px;
+  background:#eef1f5;
+  display:grid;
+  place-items:center;
+}
+
+.preview-wrap{
+  display:none;
+  margin-top:13px;
+  position:relative;
+}
+
+.preview{
+  width:100%;
+  height:240px;
+  object-fit:contain;
+  border-radius:14px;
+  background:#eef1f5;
+  border:1px solid #e5e7eb;
+  display:block;
+}
+
+.preview-label{
+  position:absolute;
+  left:10px;
+  top:10px;
+  background:rgba(17,24,39,.82);
+  color:#fff;
+  padding:6px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  z-index:2;
+}
+
+.sizegrid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+
+.sizeitem{
+  padding:10px;
+  border:1px solid #e7eaf0;
+  border-radius:11px;
+  background:#fff;
+}
+
+.sizeitem span{
+  display:block;
+  color:#98a2b3;
+  font-size:10px;
+  margin-bottom:3px;
+}
+
+.sizeitem strong{
+  font-size:12px;
+}
+
+.progressbox{
+  display:none;
+  margin-top:17px;
+  padding:15px;
+  border-radius:16px;
+  background:#f7f8fa;
+  border:1px solid #e8ebef;
+}
+
+.progresshead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:11px;
+  font-size:12px;
+}
+
+.progresshead strong{
+  font-size:13px;
+}
+
+.progressline{
+  height:8px;
+  border-radius:99px;
+  background:#e6e9ee;
+  overflow:hidden;
+}
+
+.progressbar{
+  height:100%;
+  width:0%;
+  background:#111827;
+  border-radius:99px;
+  transition:width .3s ease;
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:20px;
+}
+
+button{
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:14px 16px;
+  background:#111827;
+  color:#fff;
+  font:inherit;
+  font-weight:800;
+  font-size:14px;
+  cursor:pointer;
+  transition:.18s;
+  box-shadow:
+    0 7px 16px rgba(17,24,39,.13);
+}
+
+button:hover{
+  transform:translateY(-1px);
+  box-shadow:
+    0 10px 22px rgba(17,24,39,.17);
+}
+
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none;
+}
+
+.secondary{
+  display:none;
+  background:#eef1f5;
+  color:#111827;
+  box-shadow:none;
+}
+
+.msg{
+  display:none;
+  margin-top:13px;
+  padding:12px 14px;
+  border-radius:12px;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.msg.info{
+  display:block;
+  background:#f1f5f9;
+  color:#334155;
+}
+
+.msg.err{
+  display:block;
+  background:#fff1f0;
+  color:var(--danger);
+  border:1px solid #ffd6d2;
+}
+
+.msg.ok{
+  display:block;
+  background:#ecfdf3;
+  color:#166534;
+  border:1px solid #bbf7d0;
+}
+
+.footer{
+  text-align:center;
+  color:#98a2b3;
+  font-size:11px;
+  margin-top:15px;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.58);
+  backdrop-filter:blur(5px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:9999;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modalcard{
+  width:min(410px,100%);
+  background:#fff;
+  border-radius:24px;
+  padding:28px;
+  text-align:center;
+  box-shadow:
+    0 28px 80px rgba(0,0,0,.28);
+  animation:pop .2s ease-out;
+}
+
+@keyframes pop{
+  from{
+    opacity:0;
+    transform:translateY(8px) scale(.98)
+  }
+  to{
+    opacity:1;
+    transform:none
+  }
+}
+
+.successicon{
+  width:70px;
+  height:70px;
+  margin:0 auto 15px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#ecfdf3;
+  color:#15803d;
+}
+
+.successicon svg{
+  width:34px;
+  height:34px;
+}
+
+.modalcard h2{
+  margin:0;
+  font-size:22px;
+  letter-spacing:-.4px;
+}
+
+.modalcard p{
+  margin:8px 0 0;
+  color:#667085;
+  font-size:13px;
+  line-height:1.55;
+}
+
+.modalstats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:17px;
+  text-align:left;
+}
+
+.modalstat{
+  padding:10px;
+  border-radius:11px;
+  background:#f8fafc;
+}
+
+.modalstat span{
+  display:block;
+  color:#98a2b3;
+  font-size:10px;
+}
+
+.modalstat strong{
+  font-size:12px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:520px){
+
+  .page{
+    padding:18px 12px 35px;
+  }
+
+  .card{
+    padding:20px;
+    border-radius:21px;
+  }
+
+  h1{
+    font-size:24px;
+  }
+
+  .row,
+  .actions{
+    grid-template-columns:1fr;
+  }
+
+  .preview{
+    height:205px;
+  }
+
+  .badge{
+    display:none;
+  }
+
+}
+
+
+/* RESPONSIVE MOBILE OVERRIDES */
+.loginbox,
+.google-button,
+.userbox,
+.useremail {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.loginbox,
+.google-button,
+.userbox {
+  overflow: hidden;
+}
+
+.google-button {
+  width: 100%;
+}
+
+.google-button iframe,
+.google-button > div {
+  max-width: 100% !important;
+}
+
+.useremail {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 520px) {
+  .page {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 8px 28px;
+  }
+
+  .card {
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .loginbox {
+    padding: 13px;
+    border-radius: 15px;
+  }
+
+  .google-button,
+  .google-button iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  .filebox input[type="file"] {
+    width: 100%;
+    min-width: 0;
+    font-size: 12px;
+  }
+
+  .sizegrid,
+  .modalstats {
+    grid-template-columns: 1fr;
+  }
+
+  .modal {
+    padding: 12px;
+  }
+
+  .modalcard {
+    width: 100%;
+    padding: 22px 16px;
+  }
+}
+
+
+/* =========================================================
+   MODERN ALALA JUSSS DASHBOARD THEME
+   ========================================================= */
+
+:root{
+  --brand:#16a34a;
+  --brand-dark:#166534;
+  --brand-soft:#ecfdf3;
+  --ink:#101828;
+  --muted:#667085;
+  --line:#e4e7ec;
+  --panel:#ffffff;
+}
+
+body{
+  background:
+    radial-gradient(circle at 8% 0%, rgba(34,197,94,.12), transparent 27%),
+    radial-gradient(circle at 100% 10%, rgba(59,130,246,.08), transparent 28%),
+    #f5f7fb;
+}
+
+.page{
+  width:min(1180px,100%);
+  padding:30px 22px 48px;
+}
+
+.topbar{
+  margin-bottom:24px;
+  padding:0 4px;
+}
+
+.brand{
+  gap:13px;
+}
+
+.brandmark{
+  width:48px;
+  height:48px;
+  border-radius:16px;
+  background:linear-gradient(145deg,#172033,#0f172a);
+  box-shadow:0 10px 24px rgba(15,23,42,.16);
+}
+
+.brand strong{
+  font-size:16px;
+  letter-spacing:-.25px;
+}
+
+.brand span{
+  font-size:12px;
+  margin-top:4px;
+}
+
+.badge{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  font-weight:700;
+  color:#344054;
+  box-shadow:0 4px 12px rgba(15,23,42,.04);
+}
+
+.badge-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 0 4px #dcfce7;
+}
+
+.card{
+  padding:38px;
+  border:1px solid #e8ebf0;
+  border-radius:30px;
+  box-shadow:0 24px 70px rgba(15,23,42,.08);
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:var(--brand-dark);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  margin-bottom:10px;
+}
+
+.eyebrow:before{
+  content:"";
+  width:22px;
+  height:3px;
+  border-radius:99px;
+  background:var(--brand);
+}
+
+h1{
+  font-size:clamp(27px,4vw,38px);
+  letter-spacing:-1.25px;
+  line-height:1.12;
+  max-width:650px;
+}
+
+.sub{
+  max-width:650px;
+  font-size:14px;
+  margin-top:12px;
+  margin-bottom:28px;
+}
+
+.loginbox{
+  padding:22px;
+  border-radius:21px;
+  background:linear-gradient(135deg,#f8fafc,#f1f5f9);
+  border:1px solid #e2e8f0;
+  margin-bottom:28px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+.login-title{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:14px;
+  margin-bottom:8px;
+}
+
+.login-heading-icon{
+  display:grid;
+  place-items:center;
+  width:27px;
+  height:27px;
+  border-radius:9px;
+  background:#dcfce7;
+  color:#166534;
+  font-size:14px;
+  font-weight:900;
+}
+
+.login-desc{
+  max-width:650px;
+  font-size:13px;
+  margin-bottom:16px;
+}
+
+.firebase-login-btn{
+  border-radius:13px;
+  min-height:48px;
+  border:1px solid #d0d5dd;
+  box-shadow:0 5px 12px rgba(15,23,42,.05);
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.firebase-login-btn:hover{
+  background:#f8fafc;
+  box-shadow:0 8px 18px rgba(15,23,42,.08);
+}
+
+.logout-btn{
+  background:#111827;
+  color:#fff;
+}
+
+.userbox{
+  margin-top:10px;
+  padding:15px 16px;
+  border-radius:15px;
+  box-shadow:0 4px 12px rgba(15,23,42,.03);
+}
+
+#productForm{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+
+#productForm > .section{
+  margin-top:0;
+  padding:23px;
+  border:1px solid #e7ebf0;
+  border-radius:21px;
+  background:#fff;
+  box-shadow:0 8px 22px rgba(15,23,42,.035);
+}
+
+#productForm > .section:first-child{
+  grid-column:1 / -1;
+}
+
+.section-title{
+  gap:11px;
+  padding-bottom:15px;
+  margin-bottom:14px;
+  border-bottom:1px solid #edf0f4;
+  font-size:14px;
+}
+
+.section-title > span:last-child{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+
+.section-title strong{
+  font-size:14px;
+}
+
+.section-title small{
+  color:#98a2b3;
+  font-size:11px;
+  font-weight:500;
+}
+
+.num{
+  width:32px;
+  height:32px;
+  border-radius:11px;
+  background:var(--brand-soft);
+  color:var(--brand-dark);
+  font-size:11px;
+  font-weight:900;
+}
+
+label{
+  font-size:12px;
+  letter-spacing:.05px;
+  margin-top:17px;
+}
+
+input,textarea,select{
+  border-color:#dce2ea;
+  border-radius:13px;
+  padding:13px 14px;
+}
+
+input:focus,textarea:focus,select:focus{
+  border-color:#22c55e;
+  box-shadow:0 0 0 4px rgba(34,197,94,.10);
+}
+
+.filebox{
+  padding:16px;
+  border-radius:17px;
+  border-color:#bbd9c5;
+  background:#f8fffa;
+}
+
+.filehint{
+  background:#fff;
+  border:1px solid #e8f1eb;
+  border-radius:12px;
+  padding:11px;
+}
+
+.hinticon{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.progressbar{
+  background:linear-gradient(90deg,#16a34a,#4ade80);
+}
+
+.actions{
+  grid-column:1 / -1;
+  margin-top:2px;
+}
+
+button{
+  border-radius:13px;
+  background:linear-gradient(135deg,#172033,#111827);
+}
+
+button:hover{
+  box-shadow:0 10px 24px rgba(15,23,42,.18);
+}
+
+.secondary{
+  background:#eef2f6;
+}
+
+.msg{
+  grid-column:1 / -1;
+}
+
+.footer{
+  margin-top:20px;
+  font-size:11px;
+}
+
+@media(max-width:760px){
+  .page{
+    padding:18px 12px 32px;
+  }
+
+  .card{
+    padding:22px;
+    border-radius:24px;
+  }
+
+  #productForm{
+    grid-template-columns:1fr;
+  }
+
+  #productForm > .section:first-child{
+    grid-column:auto;
+  }
+
+  .actions,.msg{
+    grid-column:auto;
+  }
+}
+
+@media(max-width:520px){
+  .topbar{
+    margin-bottom:18px;
+  }
+
+  .brandmark{
+    width:43px;
+    height:43px;
+    border-radius:14px;
+  }
+
+  .brand strong{
+    font-size:14px;
+  }
+
+  .card{
+    padding:16px;
+    border-radius:20px;
+  }
+
+  h1{
+    font-size:27px;
+  }
+
+  .loginbox{
+    padding:15px;
+    border-radius:17px;
+  }
+
+  #productForm > .section{
+    padding:16px;
+    border-radius:17px;
+  }
+
+  .row{
+    gap:0;
+  }
+
+  .section-title{
+    padding-bottom:12px;
+  }
+}
+
+
+/* =========================================================
+   DASHBOARD NAVIGATION AND OVERVIEW
+   ========================================================= */
+
+.dashboard-nav{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  overflow-x:auto;
+  padding:6px;
+  margin:0 0 18px;
+  border:1px solid #e5e7eb;
+  border-radius:18px;
+  background:rgba(255,255,255,.88);
+  box-shadow:0 8px 24px rgba(15,23,42,.05);
+  scrollbar-width:thin;
+}
+
+.nav-item{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-height:40px;
+  padding:10px 13px;
+  border:1px solid transparent;
+  border-radius:12px;
+  background:transparent;
+  color:#667085;
+  font-size:12px;
+  font-weight:600;
+  box-shadow:none;
+  white-space:nowrap;
+}
+
+.nav-item span{
+  font-size:15px;
+}
+
+.nav-item b{
+  font-weight:700;
+}
+
+.nav-item:hover{
+  background:#f3f4f6;
+  color:#111827;
+  box-shadow:none;
+}
+
+.nav-item.active{
+  background:#111827;
+  color:#fff;
+  box-shadow:0 5px 12px rgba(15,23,42,.14);
+}
+
+.dashboard-overview{
+  padding:0 0 26px;
+  margin-bottom:26px;
+  border-bottom:1px solid #edf0f4;
+}
+
+.overview-heading{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:20px;
+}
+
+.overview-heading h2{
+  margin:0;
+  font-size:22px;
+  line-height:1.2;
+  letter-spacing:-.65px;
+}
+
+.overview-heading p{
+  margin:8px 0 0;
+  color:#667085;
+  font-size:13px;
+}
+
+.overview-status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 11px;
+  border:1px solid #bbf7d0;
+  border-radius:999px;
+  background:#f0fdf4;
+  color:#166534;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.status-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#22c55e;
+}
+
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+
+.stat-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+  padding:16px;
+  border:1px solid #e7ebf0;
+  border-radius:17px;
+  background:#fff;
+  box-shadow:0 8px 20px rgba(15,23,42,.035);
+}
+
+.stat-icon{
+  display:grid;
+  place-items:center;
+  width:38px;
+  height:38px;
+  flex:0 0 38px;
+  border-radius:12px;
+  background:#f0fdf4;
+  font-size:18px;
+}
+
+.stat-card small{
+  display:block;
+  margin-bottom:5px;
+  color:#667085;
+  font-size:10px;
+  font-weight:700;
+}
+
+.stat-card strong{
+  display:block;
+  font-size:22px;
+  letter-spacing:-.5px;
+}
+
+.utility-panel{
+  display:none;
+  align-items:flex-start;
+  gap:13px;
+  padding:18px;
+  margin-bottom:22px;
+  border:1px solid #e4e7ec;
+  border-radius:18px;
+  background:#f8fafc;
+}
+
+.utility-panel.visible{
+  display:flex;
+}
+
+.utility-icon{
+  display:grid;
+  place-items:center;
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  background:#e0f2fe;
+  font-size:18px;
+  flex:0 0 38px;
+}
+
+.utility-panel h3{
+  margin:0 0 5px;
+  font-size:14px;
+}
+
+.utility-panel p{
+  margin:0;
+  color:#667085;
+  font-size:12px;
+  line-height:1.6;
+}
+
+@media(max-width:900px){
+  .stats-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:560px){
+  .dashboard-nav{
+    border-radius:15px;
+  }
+
+  .nav-item{
+    padding:9px 11px;
+    font-size:11px;
+  }
+
+  .overview-heading{
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .overview-heading h2{
+    font-size:20px;
+  }
+
+  .stats-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+  }
+
+  .stat-card{
+    padding:12px;
+    gap:9px;
+  }
+
+  .stat-icon{
+    width:32px;
+    height:32px;
+    flex-basis:32px;
+    font-size:15px;
+  }
+
+  .stat-card strong{
+    font-size:19px;
+  }
+}
+
+
+/* =========================================================
+   LIVE PRODUCT CATALOG
+   ========================================================= */
+
+.catalog-section{
+  margin:0 0 30px;
+  padding:22px;
+  border:1px solid #e7ebf0;
+  border-radius:22px;
+  background:#fbfcfe;
+}
+
+.catalog-heading{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:18px;
+}
+
+.catalog-heading h2{
+  margin:0;
+  font-size:20px;
+  letter-spacing:-.5px;
+}
+
+.catalog-heading p{
+  margin:6px 0 0;
+  color:#667085;
+  font-size:12px;
+}
+
+.refresh-btn{
+  min-height:38px;
+  padding:9px 13px;
+  border:1px solid #d0d5dd;
+  background:#fff;
+  color:#344054;
+  font-size:12px;
+  box-shadow:none;
+}
+
+.refresh-btn:hover{
+  background:#f8fafc;
+  box-shadow:none;
+}
+
+.catalog-message{
+  padding:18px;
+  border:1px dashed #d0d5dd;
+  border-radius:14px;
+  color:#667085;
+  font-size:12px;
+  text-align:center;
+}
+
+.catalog-message.error{
+  border-color:#fecaca;
+  background:#fff7f7;
+  color:#b42318;
+}
+
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+
+.product-card{
+  overflow:hidden;
+  border:1px solid #e7ebf0;
+  border-radius:17px;
+  background:#fff;
+  box-shadow:0 7px 18px rgba(15,23,42,.04);
+}
+
+.product-card-image{
+  width:100%;
+  height:155px;
+  object-fit:cover;
+  background:#f2f4f7;
+  display:block;
+}
+
+.product-card-body{
+  padding:14px;
+}
+
+.product-card-title{
+  margin:0 0 6px;
+  font-size:14px;
+  font-weight:800;
+  color:#101828;
+}
+
+.product-card-desc{
+  min-height:34px;
+  margin:0 0 12px;
+  color:#667085;
+  font-size:11px;
+  line-height:1.55;
+}
+
+.product-card-price{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:11px;
+}
+
+.price-chip{
+  padding:5px 8px;
+  border-radius:8px;
+  background:#f2f4f7;
+  color:#344054;
+  font-size:10px;
+  font-weight:700;
+}
+
+.product-card-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.product-status{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:800;
+}
+
+.product-status.available{
+  background:#ecfdf3;
+  color:#027a48;
+}
+
+.product-status.unavailable{
+  background:#fff1f3;
+  color:#c01048;
+}
+
+.product-status-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:currentColor;
+}
+
+.product-id{
+  color:#98a2b3;
+  font-size:10px;
+}
+
+@media(max-width:900px){
+  .products-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:520px){
+  .catalog-section{
+    padding:15px;
+    border-radius:18px;
+  }
+
+  .catalog-heading{
+    flex-direction:column;
+  }
+
+  .products-grid{
+    grid-template-columns:1fr;
+  }
+
+  .product-card-image{
+    height:180px;
+  }
+}
+
+
+/* =========================================================
+   FINAL DASHBOARD UX
+   ========================================================= */
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.top-auth-button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.auth-icon-btn{
+  display:grid;
+  place-items:center;
+  width:42px;
+  height:42px;
+  padding:0;
+  border:1px solid #dce3eb;
+  border-radius:14px;
+  background:#fff;
+  color:#101828;
+  font-size:18px;
+  box-shadow:0 5px 14px rgba(15,23,42,.06);
+}
+
+.auth-icon-btn:hover{
+  background:#f0fdf4;
+  color:#166534;
+  box-shadow:0 8px 18px rgba(15,23,42,.10);
+}
+
+.auth-icon-btn.logout{
+  background:#111827;
+  border-color:#111827;
+  color:#fff;
+}
+
+.auth-icon-btn.logout:hover{
+  background:#374151;
+  color:#fff;
+}
+
+#mainDashboardCard{
+  transition:opacity .2s ease;
+}
+
+#mainDashboardCard:not(.logged-in){
+  display:block;
+  padding:0;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+}
+
+#mainDashboardCard:not(.logged-in) > *:not(#loginRequiredView){
+  display:none !important;
+}
+
+#mainDashboardCard:not(.logged-in) #loginRequiredView{
+  display:block;
+}
+
+.login-required-view{
+  display:none;
+  text-align:center;
+  padding:48px 18px;
+}
+
+.login-required-icon{
+  font-size:36px;
+  margin-bottom:10px;
+}
+
+.login-required-view h2{
+  margin:0 0 8px;
+  font-size:22px;
+}
+
+.login-required-view p{
+  margin:0;
+  color:#667085;
+  font-size:13px;
+}
+
+.add-product-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  margin:0 0 20px;
+  padding:20px;
+  border:1px solid #e7ebf0;
+  border-radius:20px;
+  background:linear-gradient(135deg,#f8fffa,#f8fafc);
+}
+
+.add-product-toolbar h2{
+  margin:0;
+  font-size:20px;
+  letter-spacing:-.5px;
+}
+
+.add-product-toolbar p{
+  margin:6px 0 0;
+  color:#667085;
+  font-size:12px;
+}
+
+.add-product-btn{
+  flex:0 0 auto;
+  min-height:44px;
+  padding:11px 15px;
+  border-radius:13px;
+  background:#166534;
+  color:#fff;
+  font-size:12px;
+  font-weight:800;
+}
+
+.add-product-btn:hover{
+  background:#14532d;
+}
+
+.status-control{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:12px;
+}
+
+.status-control select{
+  min-width:0;
+  flex:1;
+  margin:0;
+  padding:8px 9px;
+  font-size:11px;
+}
+
+.status-save-btn{
+  min-height:35px;
+  padding:8px 10px;
+  border-radius:10px;
+  background:#111827;
+  color:#fff;
+  font-size:11px;
+  white-space:nowrap;
+}
+
+.status-save-btn:disabled{
+  opacity:.55;
+  cursor:wait;
+}
+
+.status-update-message{
+  margin-top:7px;
+  font-size:10px;
+  color:#667085;
+}
+
+@media(max-width:560px){
+  .top-actions{
+    gap:6px;
+  }
+
+  .badge{
+    display:none;
+  }
+
+  .auth-icon-btn{
+    width:39px;
+    height:39px;
+    border-radius:12px;
+  }
+
+  .add-product-toolbar{
+    align-items:flex-start;
+    flex-direction:row;
+    padding:0;
+  }
+
+  .add-product-btn{
+    width:auto !important;
+    max-width:100%;
+    padding:10px 13px;
+    font-size:11px;
+  }
+}
+
+
+/* Final compact add-product button adjustment */
+.add-product-toolbar .add-product-btn{
+  width:max-content !important;
+  max-width:100%;
+}
+
+
+/* Sembunyikan panel akses lama; login/keluar tetap melalui ikon atas */
+.loginbox{
+  display:none !important;
+}
+  .delete-product-btn {
+  margin-top: 8px;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #dc2626;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.delete-product-btn:hover {
+  background: #b91c1c;
+}
+
+.delete-product-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* DHARMA SUKOWATI x BAZNAS SRAGEN BRAND REFRESH */
+:root{--baznas-green:#00843D;--baznas-green-dark:#006B32;--baznas-green-deep:#004F26;--baznas-gold:#F4B41A;--baznas-green-soft:#EAF7EF;--ds-ink:#18312A;--ds-line:#DCE7E1}
+body{color:var(--ds-ink);background:radial-gradient(circle at 0% 0%,rgba(0,132,61,.10),transparent 25%),radial-gradient(circle at 100% 0%,rgba(244,180,26,.09),transparent 23%),linear-gradient(180deg,#F7FAF8,#F2F6F4)}
+.page{max-width:1240px;padding:22px 24px 46px}.topbar{position:sticky;top:10px;z-index:100;min-height:72px;padding:10px 14px 10px 12px;border:1px solid rgba(0,132,61,.12);border-radius:20px;background:rgba(255,255,255,.92);backdrop-filter:blur(18px);box-shadow:0 12px 35px rgba(0,79,38,.08)}
+.brand{gap:12px}.brandmark{width:48px;height:48px;flex:0 0 48px;border-radius:15px;background:linear-gradient(145deg,var(--baznas-green),var(--baznas-green-dark));box-shadow:0 9px 22px rgba(0,132,61,.22);font-size:16px}.brand strong{color:var(--baznas-green-deep);font-size:16px}.brand span{color:#718079;font-size:11px}.badge{border-color:#D8E6DE;color:var(--baznas-green-dark);background:#F8FCF9}.badge-dot{background:var(--baznas-green);box-shadow:0 0 0 4px #DDF2E5}
+.card{padding:30px;border-color:#E1EBE5;border-radius:26px;box-shadow:0 22px 65px rgba(0,79,38,.08)}.dashboard-nav{position:sticky;top:96px;z-index:90;border-color:#DCE8E1;background:rgba(255,255,255,.94);box-shadow:0 8px 25px rgba(0,79,38,.06)}.nav-item:hover{color:var(--baznas-green-dark);background:var(--baznas-green-soft)}.nav-item.active{background:var(--baznas-green);color:#fff;box-shadow:0 6px 15px rgba(0,132,61,.22)}
+.eyebrow{color:var(--baznas-green-dark)}.eyebrow:before{background:var(--baznas-gold)}.overview-status{border-color:#CBE7D5;background:#F0FAF3;color:var(--baznas-green-dark)}.status-dot{background:var(--baznas-green)}.stat-card{border-color:#E2EBE5;box-shadow:0 7px 20px rgba(0,79,38,.035)}.stat-icon{background:var(--baznas-green-soft)}
+.catalog-section{border-color:#E0EAE4;background:#FAFCFB}.refresh-btn{border-color:#D2E1D8;color:var(--baznas-green-dark)}.refresh-btn:hover{background:var(--baznas-green-soft)}.product-card{border-color:#E0E9E3;box-shadow:0 8px 20px rgba(0,79,38,.045)}.product-card-title{color:#18312A}.product-status.available{background:#EAF7EF;color:var(--baznas-green-dark)}
+.add-product-toolbar{border-color:#D9E7DE;background:linear-gradient(135deg,#F2FAF5,#FBFCFB)}.add-product-btn{background:var(--baznas-green);box-shadow:0 7px 16px rgba(0,132,61,.18)}.add-product-btn:hover{background:var(--baznas-green-dark)}input,textarea,select{border-color:#D6E2DB}input:focus,textarea:focus,select:focus{border-color:var(--baznas-green);box-shadow:0 0 0 4px rgba(0,132,61,.10)}.filebox{border-color:#B9DCC6;background:#F7FCF8}.hinticon{background:#E2F4E8;color:var(--baznas-green-dark)}.progressbar{background:linear-gradient(90deg,var(--baznas-green),#35A85F)}button{background:linear-gradient(135deg,var(--baznas-green),var(--baznas-green-dark))}.auth-icon-btn{border-color:#D5E2DA;color:var(--baznas-green-dark)}.auth-icon-btn:hover{background:var(--baznas-green-soft);color:var(--baznas-green-deep)}.auth-icon-btn.logout{background:var(--baznas-green);border-color:var(--baznas-green)}.utility-panel{border-color:#DCE8E1;background:#F7FAF8}.utility-icon{background:var(--baznas-green-soft);color:var(--baznas-green-dark)}
+@media(max-width:700px){.page{padding:10px 10px 92px}.topbar{position:relative;top:auto;min-height:64px;padding:8px 9px;border-radius:17px}.brandmark{width:42px;height:42px;flex-basis:42px;border-radius:13px;font-size:14px}.brand strong{font-size:13px}.brand span{max-width:190px;font-size:9.5px}.dashboard-nav{position:fixed;left:8px;right:8px;bottom:8px;top:auto;z-index:999;justify-content:space-around;gap:2px;margin:0;padding:6px;border-radius:18px;box-shadow:0 12px 35px rgba(0,40,20,.18)}.nav-item{flex:1 1 0;min-width:0;min-height:52px;padding:6px 4px;flex-direction:column;gap:3px;font-size:9px}.nav-item span{font-size:17px}.nav-item b{max-width:72px;overflow:hidden;text-overflow:ellipsis}.card{padding:16px;border-radius:20px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.stat-card{padding:11px}.stat-card strong{font-size:18px}.catalog-section{padding:13px}.products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.product-card-image{height:145px}.product-card-body{padding:11px}.product-card-title{font-size:12px}.product-card-desc{font-size:10px;min-height:31px}.status-control{flex-direction:column;align-items:stretch}.status-save-btn{width:100%}}
+@media(max-width:430px){.brand span{max-width:145px}.badge{display:none}.products-grid{grid-template-columns:1fr 1fr}.product-card-image{height:125px}.nav-item{min-height:50px}.nav-item b{font-size:8px}}
+</style>
+
+
+<!-- =======================================================
+     GOOGLE IDENTITY SERVICES
+     ======================================================= -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+  <!-- =====================================================
+       TOPBAR
+       ===================================================== -->
+
+  <div class="topbar">
+
+    <div class="brand">
+
+      <div class="brandmark">
+        DS
+      </div>
+
+      <div>
+
+        <strong>
+          Dharma Sukowati
+        </strong>
+
+        <span>
+          Pusat Pengelolaan UMKM
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="top-actions">
+      <span class="badge">
+        <span class="badge-dot"></span>
+        Panel UMKM
+      </span>
+      <div id="topAuthButton" class="top-auth-button" aria-label="Akses akun"></div>
+    </div>
+
+  </div>
+
+  <!-- =====================================================
+       DASHBOARD NAVIGATION
+       ===================================================== -->
+
+  <nav class="dashboard-nav" aria-label="Navigasi dashboard">
+    <button class="nav-item active" data-target="dashboardOverview">
+      <span>🏠</span>
+      <b>Dashboard</b>
+    </button>
+
+    <button class="nav-item" data-target="productSection">
+      <span>🛍️</span>
+      <b>Produk Saya</b>
+    </button>
+
+    <button class="nav-item" data-target="productSection">
+      <span>➕</span>
+      <b>Tambah Produk</b>
+    </button>
+
+    <button class="nav-item" data-target="productSection">
+      <span>📦</span>
+      <b>Status Produk</b>
+    </button>
+
+    <button class="nav-item admin-only" id="userManagementNav" data-target="userManagementPanel" hidden>
+      <span>👤</span>
+      <b>Manajemen Pengguna</b>
+    </button>
+
+    <button class="nav-item" data-target="settingsPanel">
+      <span>⚙️</span>
+      <b>Pengaturan</b>
+    </button>
+  </nav>
+
+
+  <!-- =====================================================
+       MAIN CARD
+       ===================================================== -->
+
+  <main class="card" id="mainDashboardCard">
+    <section id="loginRequiredView" class="login-required-view">
+      <div class="login-required-icon">🔐</div>
+      <h2>Masuk untuk membuka dashboard</h2>
+      <p>Gunakan ikon akun di bagian atas untuk masuk dengan akun yang telah terdaftar.</p>
+    </section>
+
+    <!-- ===================================================
+         DASHBOARD OVERVIEW
+         =================================================== -->
+
+    <section id="dashboardOverview" class="dashboard-overview">
+      <div class="overview-heading">
+        <div>
+          <div class="eyebrow">RINGKASAN DASHBOARD</div>
+          <h2>Selamat datang Admin Dharma Sukowati 👋</h2>
+          <p>Kelola produk dan katalog lebih praktis</p>
+        </div>
+        <div class="overview-status">
+          <span class="status-dot"></span>
+          Sistem aktif
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-icon">📦</span>
+          <div>
+            <small>Total Produk</small>
+            <strong id="totalProductsStat">—</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-icon">✅</span>
+          <div>
+            <small>Produk Tersedia</small>
+            <strong id="availableProductsStat">—</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-icon">⛔</span>
+          <div>
+            <small>Produk Habis</small>
+            <strong id="soldOutProductsStat">—</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-icon">👤</span>
+          <div>
+            <small>Role Aktif</small>
+            <strong id="activeRoleStat">—</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================
+         PRODUCT CATALOG / LIVE DATA
+         =================================================== -->
+
+    <section id="catalogSection" class="catalog-section">
+      <div class="catalog-heading">
+        <div>
+          <div class="eyebrow">KATALOG UMKM</div>
+          <h2>Daftar Produk</h2>
+          <p>Kelola produk UMKM binaan secara praktis</p>
+        </div>
+
+        <button type="button" id="refreshProductsBtn" class="refresh-btn">
+          ↻ Muat ulang
+        </button>
+      </div>
+
+      <div id="productsLoading" class="catalog-message">
+        Memuat data produk...
+      </div>
+
+      <div id="productsEmpty" class="catalog-message" hidden>
+        Belum ada produk yang tersedia.
+      </div>
+
+      <div id="productsError" class="catalog-message error" hidden>
+        Gagal memuat data produk.
+      </div>
+
+      <div id="productsGrid" class="products-grid"></div>
+    </section>
+
+
+    <!-- ===================================================
+         LOGIN
+         =================================================== -->
+
+    <div class="loginbox">
+
+      <div class="login-title">
+        <span class="login-heading-icon">↗</span>
+        Akses Panel
+      </div>
+
+      <div class="login-desc">
+        Masuk menggunakan akun Google yang telah terdaftar
+        untuk membuka fitur sesuai role pengguna.
+      </div>
+
+
+      <div
+        id="googleLoginButton"
+        class="google-button">
+      </div>
+
+
+      <div
+        id="userBox"
+        class="userbox">
+
+        <div
+          id="userEmail"
+          class="useremail">
+        </div>
+
+        <div
+          id="userStatus"
+          class="userstatus">
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================================
+         ADMIN AND SETTINGS PANELS
+         =================================================== -->
+
+    <section id="userManagementPanel" class="utility-panel admin-only" hidden>
+      <div class="utility-icon">👤</div>
+      <div>
+        <h3>Manajemen Pengguna</h3>
+        <p>Urung kepikiran</p>
+      </div>
+    </section>
+
+    <section id="settingsPanel" class="utility-panel">
+      <div class="utility-icon">⚙️</div>
+      <div>
+        <h3>Pengaturan</h3>
+        <p>Iki yo urung kepikiran</p>
+      </div>
+    </section>
+
+
+    <!-- ===================================================
+         PRODUCT SECTION
+         =================================================== -->
+
+    <div id="productSection">
+
+      <div class="add-product-toolbar">
+        <button type="button" id="toggleAddProductBtn" class="add-product-btn">
+          ＋ Tambah Produk
+        </button>
+      </div>
+
+      <div id="addProductFormWrap" hidden>
+
+      <form
+        id="productForm"
+        method="POST"
+        action="https://script.google.com/macros/s/AKfycbytCn63MmYrjNBaJpG9pz7dg45hlmA08oKN-t5ljH7j-2ETeMlK57XMG5QxvlNXdFnSNA/exec"
+      >
+
+
+        <div class="section">
+
+          <div class="section-title">
+            <span class="num">01</span>
+            <span>
+              <strong>Informasi Produk</strong>
+              <small>Identitas dan harga produk</small>
+            </span>
+          </div>
+
+
+          <label for="id">
+            ID Produk
+            <small>
+              (otomatis)
+            </small>
+          </label>
+
+          <input
+            id="id"
+            name="id"
+            readonly
+            placeholder="Otomatis dari nama produk"
+          >
+
+
+          <label for="name">
+            Nama Produk
+          </label>
+
+          <input
+            id="name"
+            name="name"
+            required
+            placeholder="Contoh: Jus Alpukat"
+            autocomplete="off"
+          >
+
+
+          <label for="desc">
+            Deskripsi Produk
+          </label>
+
+          <textarea
+            id="desc"
+            name="desc"
+            required
+            placeholder="Deskripsi singkat produk">
+          </textarea>
+
+
+          <div class="row">
+
+            <div>
+
+              <label for="small">
+                Harga Small
+              </label>
+
+              <input
+                id="small"
+                name="small"
+                type="number"
+                min="0"
+                required
+                placeholder="10000"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label for="medium">
+                Harga Large
+              </label>
+
+              <input
+                id="medium"
+                name="medium"
+                type="number"
+                min="0"
+                required
+                placeholder="15000"
+              >
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FOTO
+             ================================================= -->
+
+        <div class="section">
+
+          <div class="section-title">
+            <span class="num">02</span>
+            <span>
+              <strong>Foto Produk</strong>
+              <small>Unggah dan optimalkan gambar</small>
+            </span>
+          </div>
+
+
+          <div class="filebox">
+
+            <input
+              id="image"
+              type="file"
+              accept="image/*"
+              required
+            >
+
+
+            <div class="filehint">
+
+              <div class="hinticon">
+                ↗
+              </div>
+
+              <div>
+
+                <b>
+                  Optimasi otomatis
+                </b>
+
+                <br>
+
+                Foto diperkecil maksimal
+                900×900 px dengan target
+                sekitar 350 KB.
+
+              </div>
+
+            </div>
+
+
+            <div
+              id="previewWrap"
+              class="preview-wrap">
+
+              <span class="preview-label">
+                Preview
+              </span>
+
+
+              <img
+                id="preview"
+                class="preview"
+                alt="Preview Produk"
+              >
+
+
+              <div
+                id="sizeInfo"
+                class="sizegrid">
+
+                <div class="sizeitem">
+
+                  <span>
+                    ASLI
+                  </span>
+
+                  <strong id="originalSize">
+                    -
+                  </strong>
+
+                </div>
+
+
+                <div class="sizeitem">
+
+                  <span>
+                    HASIL KOMPRES
+                  </span>
+
+                  <strong id="compressedSize">
+                    -
+                  </strong>
+
+                </div>
+
+
+                <div class="sizeitem">
+
+                  <span>
+                    HEMAT
+                  </span>
+
+                  <strong id="savingSize">
+                    -
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             STATUS
+             ================================================= -->
+
+        <div class="section">
+
+          <div class="section-title">
+            <span class="num">03</span>
+            <span>
+              <strong>Ketersediaan</strong>
+              <small>Tentukan status produk</small>
+            </span>
+          </div>
+
+
+          <label for="status">
+            Status Produk
+          </label>
+
+
+          <select
+            id="status"
+            name="status">
+
+            <option value="tersedia">
+              Tersedia
+            </option>
+
+            <option value="habis">
+              Tidak tersedia
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- =================================================
+             HIDDEN
+             ================================================= -->
+
+        <input
+          type="hidden"
+          id="imageBase64"
+          name="imageBase64"
+        >
+
+
+        <input
+          type="hidden"
+          id="imageName"
+          name="imageName"
+        >
+
+
+        <input
+          type="hidden"
+          id="imageMimeType"
+          name="imageMimeType"
+        >
+
+
+        <input
+          type="hidden"
+          id="idToken"
+          name="idToken"
+        >
+
+
+        <!-- =================================================
+             PROGRESS
+             ================================================= -->
+
+        <div
+          id="progressBox"
+          class="progressbox">
+
+          <div class="progresshead">
+
+            <span id="progressText">
+              Menyiapkan...
+            </span>
+
+            <strong id="progressPercent">
+              0%
+            </strong>
+
+          </div>
+
+
+          <div class="progressline">
+
+            <div
+              id="progressBar"
+              class="progressbar">
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACTIONS
+             ================================================= -->
+
+        <div class="actions">
+
+          <button
+            id="submitBtn"
+            type="submit">
+
+            Simpan Produk
+
+          </button>
+
+
+          <button
+            id="resetBtn"
+            type="button"
+            class="secondary">
+
+            Tambah Produk Lagi
+
+          </button>
+
+        </div>
+
+
+        <div
+          id="message"
+          class="msg">
+        </div>
+
+
+      </form>
+
+
+    </div>
+
+
+  </main>
+
+
+  <div class="footer">
+    Dharma Sukowati • Dibuat Oleh Gus Wi
+  </div>
+
+
+</div>
+
+
+<!-- =======================================================
+     SUCCESS MODAL
+     ======================================================= -->
+
+<div
+  id="successModal"
+  class="modal"
+  aria-hidden="true">
+
+  <div class="modalcard">
+
+    <div class="successicon">
+
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5">
+
+        <path
+          d="m5 12 4 4L19 6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+
+      </svg>
+
+    </div>
+
+
+    <h2>
+      Produk Berhasil Disimpan
+    </h2>
+
+
+    <p>
+      Data produk dan foto sudah dikirim
+      ke server.
+    </p>
+
+
+    <div class="modalstats">
+
+      <div class="modalstat">
+
+        <span>
+          PRODUK
+        </span>
+
+        <strong id="successProduct">
+          -
+        </strong>
+
+      </div>
+
+
+      <div class="modalstat">
+
+        <span>
+          FOTO
+        </span>
+
+        <strong id="successPhoto">
+          -
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <button
+      id="modalAddBtn"
+      type="button">
+
+      Tambah Produk Lagi
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+ * KONFIGURASI
+ * ========================================================= */
+
+
+/* Firebase Configuration */
+const firebaseConfig = {
+  apiKey: "AIzaSyAmbfwmxLS5HuwbAWGnl5oSP4h1-geNWbM",
+  authDomain: "alalajusss.firebaseapp.com",
+  projectId: "alalajusss",
+  storageBucket: "alalajusss.firebasestorage.app",
+  messagingSenderId: "1027131491565",
+  appId: "1:1027131491565:web:d303bcafaa7ce73294b8e4",
+  measurementId: "G-LE4XX3SJLJ"
+};
+
+
+/*
+ * EMAIL YANG DIIZINKAN
+ *
+ * HANYA UNTUK TAMPILAN FRONTEND.
+ *
+ * KEAMANAN SEBENARNYA TETAP DI CODE.GS.
+ */
+
+/*
+ * URL APPS SCRIPT
+ */
+
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbytCn63MmYrjNBaJpG9pz7dg45hlmA08oKN-t5ljH7j-2ETeMlK57XMG5QxvlNXdFnSNA/exec";
+
+
+/* =========================================================
+ * ELEMENT
+ * ========================================================= */
+
+const form =
+  document.getElementById(
+    "productForm"
+  );
+
+
+const nameInput =
+  document.getElementById(
+    "name"
+  );
+
+
+const idInput =
+  document.getElementById(
+    "id"
+  );
+
+
+const imageInput =
+  document.getElementById(
+    "image"
+  );
+
+
+const preview =
+  document.getElementById(
+    "preview"
+  );
+
+
+const previewWrap =
+  document.getElementById(
+    "previewWrap"
+  );
+
+
+const imageBase64 =
+  document.getElementById(
+    "imageBase64"
+  );
+
+
+const imageName =
+  document.getElementById(
+    "imageName"
+  );
+
+
+const imageMimeType =
+  document.getElementById(
+    "imageMimeType"
+  );
+
+
+const idTokenInput =
+  document.getElementById(
+    "idToken"
+  );
+
+
+const btn =
+  document.getElementById(
+    "submitBtn"
+  );
+
+
+const resetBtn =
+  document.getElementById(
+    "resetBtn"
+  );
+
+
+const msg =
+  document.getElementById(
+    "message"
+  );
+
+
+const progressBox =
+  document.getElementById(
+    "progressBox"
+  );
+
+
+const progressBar =
+  document.getElementById(
+    "progressBar"
+  );
+
+
+const progressText =
+  document.getElementById(
+    "progressText"
+  );
+
+
+const progressPercent =
+  document.getElementById(
+    "progressPercent"
+  );
+
+
+const originalSize =
+  document.getElementById(
+    "originalSize"
+  );
+
+
+const compressedSize =
+  document.getElementById(
+    "compressedSize"
+  );
+
+
+const savingSize =
+  document.getElementById(
+    "savingSize"
+  );
+
+
+const successModal =
+  document.getElementById(
+    "successModal"
+  );
+
+
+const modalAddBtn =
+  document.getElementById(
+    "modalAddBtn"
+  );
+
+
+const successProduct =
+  document.getElementById(
+    "successProduct"
+  );
+
+
+const successPhoto =
+  document.getElementById(
+    "successPhoto"
+  );
+
+
+const userBox =
+  document.getElementById(
+    "userBox"
+  );
+
+
+const userEmail =
+  document.getElementById(
+    "userEmail"
+  );
+
+
+const userStatus =
+  document.getElementById(
+    "userStatus"
+  );
+
+
+const productSection =
+  document.getElementById(
+    "productSection"
+  );
+
+
+/* =========================================================
+ * GLOBAL USER / FIREBASE GOOGLE LOGIN
+ * ========================================================= */
+
+let currentGoogleUser = null;
+let currentUserRole = "";
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+function renderLoginButton(){
+  const loginButton = document.getElementById("topAuthButton");
+  if (!loginButton) return;
+
+  loginButton.innerHTML = `
+    <button type="button" class="auth-icon-btn" id="firebaseLoginBtn"
+      title="Masuk dengan Google" aria-label="Masuk dengan Google">👤</button>
+  `;
+
+  const button = document.getElementById("firebaseLoginBtn");
+  if(button) button.addEventListener("click", signInWithGoogle);
+}
+
+function renderLogoutButton(){
+  const loginButton = document.getElementById("topAuthButton");
+  if (!loginButton) return;
+
+  loginButton.innerHTML = `
+    <button type="button" class="auth-icon-btn logout" id="firebaseLogoutBtn"
+      title="Keluar" aria-label="Keluar">↪</button>
+  `;
+
+  const button = document.getElementById("firebaseLogoutBtn");
+  if(button) button.addEventListener("click", signOutFromGoogle);
+}
+
+function setLoggedInView(isLoggedIn){
+  const card = document.getElementById("mainDashboardCard");
+  const loginView = document.getElementById("loginRequiredView");
+
+  if(card) card.classList.toggle("logged-in", !!isLoggedIn);
+  if(loginView) loginView.style.display = isLoggedIn ? "none" : "block";
+}
+
+function setDashboardVisibility(access){
+  const canUpload = !!access.canUpload;
+  const canManageStatus = !!access.canManageStatus;
+
+  productSection.style.display = canUpload ? "block" : "none";
+
+  const addToolbar = document.querySelector(".add-product-toolbar");
+  if(addToolbar) addToolbar.style.display = canUpload ? "flex" : "none";
+
+  const toggleAdd = document.getElementById("toggleAddProductBtn");
+  if(toggleAdd) toggleAdd.style.display = canUpload ? "inline-flex" : "none";
+
+  document.querySelectorAll(".status-control").forEach(function(control){
+    control.style.display = canManageStatus ? "flex" : "none";
+  });
+}
+
+async function signOutFromGoogle(){
+  try{
+    await auth.signOut();
+    currentGoogleUser = null;
+    currentUserRole = "";
+    idTokenInput.value = "";
+    userEmail.textContent = "";
+    userStatus.textContent = "";
+    userBox.className = "userbox";
+    productSection.style.display = "none";
+    setLoggedInView(false);
+
+    const roleStat = document.getElementById("activeRoleStat");
+    if(roleStat) roleStat.textContent = "—";
+
+    const userManagementNav = document.getElementById("userManagementNav");
+    const userManagementPanel = document.getElementById("userManagementPanel");
+    if(userManagementNav) userManagementNav.hidden = true;
+    if(userManagementPanel) userManagementPanel.hidden = true;
+
+    renderLoginButton();
+  }catch(error){
+    console.error(error);
+    showLoginError("Gagal keluar dari akun Google.");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  renderLoginButton();
+
+  const navItems = document.querySelectorAll(".nav-item[data-target]");
+
+  navItems.forEach(function(item){
+    item.addEventListener("click", function(){
+      const targetId = item.getAttribute("data-target");
+      const target = document.getElementById(targetId);
+
+      navItems.forEach(function(nav){
+        nav.classList.remove("active");
+      });
+
+      item.classList.add("active");
+
+      if(target){
+        if(targetId === "userManagementPanel"){
+          target.classList.add("visible");
+        }
+
+        target.scrollIntoView({
+          behavior:"smooth",
+          block:"start"
+        });
+      }
+    });
+  });
+});
+
+async function handleAuthenticatedUser(user){
+  try{
+    const token = await user.getIdToken(true);
+
+    idTokenInput.value = token;
+    currentGoogleUser = {
+      email: user.email || "",
+      name: user.displayName || "",
+      token: token
+    };
+
+    userEmail.textContent = user.email || "";
+    userStatus.textContent = "Memeriksa role dan izin...";
+    userBox.className = "userbox allowed";
+
+    const access = await checkAccess(token);
+
+    if(!access.allowed){
+      currentUserRole = "";
+      userBox.className = "userbox denied";
+      userStatus.textContent = "✕ " + (access.message || "Akses ditolak.");
+      setLoggedInView(false);
+      renderLoginButton();
+      return;
+    }
+
+    currentUserRole = access.role || "";
+    userStatus.textContent = "✓ Login aktif | Role: " + currentUserRole +
+      (access.canUpload ? " | Dapat menambah produk." : " | Hanya akses lihat.");
+
+    const roleStat = document.getElementById("activeRoleStat");
+    if(roleStat) roleStat.textContent = currentUserRole || "—";
+
+    const userManagementNav = document.getElementById("userManagementNav");
+    const userManagementPanel = document.getElementById("userManagementPanel");
+
+    const isAdmin = currentUserRole.toLowerCase() === "admin";
+    if(userManagementNav) userManagementNav.hidden = !isAdmin;
+    if(userManagementPanel) userManagementPanel.hidden = !isAdmin;
+
+    setLoggedInView(true);
+    setDashboardVisibility(access);
+    renderLogoutButton();
+
+    // Refresh the token whenever the page is reopened/reloaded.
+    loadProducts();
+  }catch(error){
+    console.error(error);
+    showLoginError(error.message || "Login Firebase gagal.");
+  }
+}
+
+async function signInWithGoogle(){
+  try{
+    await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    await auth.signInWithPopup(googleProvider);
+    // Processing is handled by onAuthStateChanged.
+  }catch(error){
+    console.error(error);
+    showLoginError(error.message || "Login Firebase gagal.");
+  }
+}
+
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(error){
+  console.warn("Firebase persistence gagal diatur:", error);
+});
+
+auth.onAuthStateChanged(async function(user){
+  if(user){
+    await handleAuthenticatedUser(user);
+  }else{
+    currentGoogleUser = null;
+    currentUserRole = "";
+    setLoggedInView(false);
+    renderLoginButton();
+  }
+});
+
+/* =========================================================
+ * LIVE PRODUCTS AND DASHBOARD STATISTICS
+ * ========================================================= */
+
+function setProductMessage(id, visible, text){
+  const element = document.getElementById(id);
+  if(!element) return;
+
+  element.hidden = !visible;
+  if(text) element.textContent = text;
+}
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function normalizeProductStatus(status){
+  const value = String(status || "tersedia").toLowerCase().trim();
+  return ["habis", "tidak tersedia", "tidak_tersedia"].includes(value)
+    ? "habis"
+    : "tersedia";
+}
+
+function formatRupiah(value){
+  const number = Number(value || 0);
+  return "Rp " + number.toLocaleString("id-ID");
+}
+
+function renderProducts(products){
+  const grid = document.getElementById("productsGrid");
+  if(!grid) return;
+
+  grid.innerHTML = "";
+
+  const total = products.length;
+  const available = products.filter(item => normalizeProductStatus(item.status) === "tersedia").length;
+  const soldOut = total - available;
+
+  const totalStat = document.getElementById("totalProductsStat");
+  const availableStat = document.getElementById("availableProductsStat");
+  const soldOutStat = document.getElementById("soldOutProductsStat");
+
+  if(totalStat) totalStat.textContent = total;
+  if(availableStat) availableStat.textContent = available;
+  if(soldOutStat) soldOutStat.textContent = soldOut;
+
+  if(!total){
+    setProductMessage("productsEmpty", true);
+    return;
+  }
+
+  setProductMessage("productsEmpty", false);
+
+  products.forEach(function(product){
+    const status = normalizeProductStatus(product.status);
+    const isAvailable = status === "tersedia";
+    const card = document.createElement("article");
+    card.className = "product-card";
+
+    const image = product.image
+      ? `<img class="product-card-image" src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name || "Produk")}" loading="lazy">`
+      : `<div class="product-card-image"></div>`;
+
+    const adminControl = currentUserRole.toLowerCase() === "admin"
+      ? `
+        <div class="status-control">
+          <select class="status-select" data-product-id="${escapeHtml(product.id)}">
+            <option value="tersedia" ${status === "tersedia" ? "selected" : ""}>Tersedia</option>
+            <option value="habis" ${status === "habis" ? "selected" : ""}>Tidak tersedia</option>
+          </select>
+          <button type="button" class="status-save-btn" data-product-id="${escapeHtml(product.id)}">Simpan</button>
+          <button type="button" class="delete-product-btn" data-product-id="${escapeHtml(product.id)}">
+  🗑️ Hapus
+</button>
+        </div>
+        <div class="status-update-message" id="status-message-${escapeHtml(product.id)}"></div>
+      `
+      : "";
+
+    card.innerHTML = `
+      ${image}
+      <div class="product-card-body">
+        <h3 class="product-card-title">${escapeHtml(product.name || "Tanpa nama")}</h3>
+        <p class="product-card-desc">${escapeHtml(product.desc || "Tidak ada deskripsi.")}</p>
+
+        <div class="product-card-price">
+          <span class="price-chip">S: ${formatRupiah(product.small)}</span>
+          <span class="price-chip">L: ${formatRupiah(product.medium)}</span>
+        </div>
+
+        <div class="product-card-footer">
+          <span class="product-status ${isAvailable ? "available" : "unavailable"}">
+            <span class="product-status-dot"></span>
+            ${isAvailable ? "Tersedia" : "Habis"}
+          </span>
+          <span class="product-id">${escapeHtml(product.id || "")}</span>
+        </div>
+
+        ${adminControl}
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  if(currentUserRole.toLowerCase() === "admin"){
+    grid.querySelectorAll(".status-save-btn").forEach(function(button){
+      button.addEventListener("click", function(){
+        const id = button.getAttribute("data-product-id");
+        const select = grid.querySelector('.status-select[data-product-id="' + CSS.escape(id) + '"]');
+        if(select) updateProductStatus(id, select.value, button);
+      });
+    });
+  }
+}
+
+async function updateProductStatus(productId, status, button){
+  if(currentUserRole.toLowerCase() !== "admin"){
+    alert("Hanya admin yang dapat mengubah status produk.");
+    return;
+  }
+
+  const user = auth.currentUser;
+  if(!user){
+    alert("Sesi login tidak ditemukan. Silakan login kembali.");
+    return;
+  }
+
+  const message = document.getElementById("status-message-" + productId);
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "Menyimpan...";
+
+  try{
+    const token = await user.getIdToken(true);
+    const body = new URLSearchParams();
+    body.append("action", "updateStatus");
+    body.append("idToken", token);
+    body.append("id", productId);
+    body.append("status", status);
+
+    /*
+     * Google Apps Script sering mengembalikan redirect/response
+     * yang diblokir browser oleh CORS, walaupun data sebenarnya
+     * sudah berhasil diproses di Google Sheets.
+     *
+     * Karena endpoint ini hanya perlu mengirim data, gunakan
+     * mode no-cors dan jangan membaca response-nya.
+     */
+    await fetch(SCRIPT_URL, {
+      method:"POST",
+      mode:"no-cors",
+      redirect:"follow",
+      body:body
+    });
+
+    if(message) message.textContent = "Permintaan dikirim. Memuat status terbaru...";
+
+    // Beri waktu Apps Script menyelesaikan penulisan ke Sheet.
+    await new Promise(resolve => setTimeout(resolve, 800));
+    await loadProducts();
+
+    if(message) message.textContent = "Status berhasil diperbarui.";
+  }catch(error){
+    console.error("Gagal mengubah status:", error);
+    if(message) {
+      message.textContent = "Permintaan mungkin sudah diproses. Silakan tekan Muat ulang.";
+    }
+    // Refresh tetap dijalankan agar tampilan mengikuti data terbaru.
+    try{
+      await loadProducts();
+    }catch(refreshError){
+      console.warn("Refresh setelah update gagal:", refreshError);
+    }
+  }finally{
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
+async function loadProducts(){
+  setProductMessage("productsLoading", true, "Memuat data produk...");
+  setProductMessage("productsError", false);
+  setProductMessage("productsEmpty", false);
+
+  try{
+    const response = await fetch(SCRIPT_URL + "?t=" + Date.now(), {
+      method:"GET",
+      cache:"no-store"
+    });
+
+    if(!response.ok){
+      throw new Error("Server produk tidak merespons.");
+    }
+
+    const data = await response.json();
+
+    if(!Array.isArray(data)){
+      throw new Error(data.message || "Format data produk tidak valid.");
+    }
+
+    renderProducts(data);
+  }catch(error){
+    console.error("Gagal memuat produk:", error);
+    setProductMessage("productsError", true, "Gagal memuat produk. Periksa URL Apps Script dan izin aksesnya.");
+  }finally{
+    setProductMessage("productsLoading", false);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  const refreshButton = document.getElementById("refreshProductsBtn");
+
+  if(refreshButton){
+    refreshButton.addEventListener("click", loadProducts);
+  }
+
+  const toggleAddProductBtn = document.getElementById("toggleAddProductBtn");
+  const addProductFormWrap = document.getElementById("addProductFormWrap");
+
+  if(toggleAddProductBtn && addProductFormWrap){
+    toggleAddProductBtn.addEventListener("click", function(){
+      const willOpen = addProductFormWrap.hidden;
+      addProductFormWrap.hidden = !willOpen;
+      toggleAddProductBtn.textContent = willOpen ? "− Tutup Formulir" : "＋ Tambah Produk";
+
+      if(willOpen){
+        addProductFormWrap.scrollIntoView({behavior:"smooth", block:"start"});
+      }
+    });
+  }
+});
+
+/* =========================================================
+ * CHECK ACCESS
+ * ========================================================= */
+
+async function checkAccess(
+  token
+){
+
+  const url =
+    SCRIPT_URL +
+    "?action=checkAccess&idToken=" +
+    encodeURIComponent(
+      token
+    );
+
+
+  const response =
+    await fetch(
+      url,
+      {
+        method:
+          "GET",
+
+        cache:
+          "no-store"
+      }
+    );
+
+
+  if(
+    !response.ok
+  ){
+
+    throw new Error(
+      "Server tidak dapat memeriksa akses."
+    );
+
+  }
+
+
+  const data =
+    await response.json();
+
+
+  if(
+    !data.success &&
+    !data.allowed
+  ){
+
+    return {
+
+      allowed:
+        false,
+
+      message:
+        data.message || ""
+
+    };
+
+  }
+
+
+  return data;
+
+}
+  /* =========================================================
+ * Hapus Produk
+ * ========================================================= */
+
+  document.addEventListener("click", function(event) {
+
+  const button = event.target.closest(".delete-product-btn");
+
+  if (!button) return;
+
+  const productId = button.dataset.productId;
+
+  if (!productId) {
+    alert("ID produk tidak ditemukan.");
+    return;
+  }
+
+  const confirmation = confirm(
+    "Yakin ingin menghapus produk ini?\n\n" +
+    "Produk dan foto di Google Drive akan dihapus."
+  );
+
+  if (!confirmation) return;
+
+  deleteProduct(productId, button);
+
+});
+
+/* =========================================================
+ * LOGIN ERROR
+ * ========================================================= */
+
+function showLoginError(
+  text
+){
+
+  userBox.className =
+    "userbox denied";
+
+
+  userEmail.textContent =
+    "Login Google";
+
+
+  userStatus.textContent =
+    "✕ " +
+    text;
+
+
+  productSection.style.display =
+    "none";
+
+  setLoggedInView(false);
+
+}
+  
+
+  async function deleteProduct(productId, button) {
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("Silakan login terlebih dahulu.");
+    return;
+  }
+
+  const originalText = button.textContent;
+
+  button.disabled = true;
+  button.textContent = "Menghapus...";
+
+  try {
+
+    const token = await user.getIdToken(true);
+
+    const formData = new URLSearchParams();
+
+    formData.append("action", "deleteProduct");
+    formData.append("idToken", token);
+    formData.append("id", productId);
+
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: formData
+    });
+
+    // Tunggu sebentar agar Apps Script menyelesaikan proses
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Muat ulang daftar produk
+    await loadProducts();
+
+    // Pesan sukses
+    showDeleteSuccessMessage(
+      "✓ Produk berhasil dihapus."
+    );
+
+  } catch (error) {
+
+    console.error("Gagal menghapus produk:", error);
+
+    showDeleteSuccessMessage(
+      "✕ Gagal menghapus produk."
+    );
+
+    button.disabled = false;
+    button.textContent = originalText;
+
+  }
+
+}
+  function showDeleteSuccessMessage(message) {
+
+  let messageBox = document.getElementById(
+    "delete-success-message"
+  );
+
+  if (!messageBox) {
+
+    messageBox = document.createElement("div");
+
+    messageBox.id = "delete-success-message";
+
+    messageBox.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      background: #166534;
+      color: white;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 8px 25px #0003;
+    `;
+
+    document.body.appendChild(messageBox);
+  }
+
+  messageBox.textContent = message;
+  messageBox.style.display = "block";
+
+  setTimeout(() => {
+    messageBox.style.display = "none";
+  }, 3500);
+
+}
+
+/* =========================================================
+ * JWT PAYLOAD
+ *
+ * Hanya untuk membaca tampilan.
+ * BUKAN VALIDASI KEAMANAN.
+ * ========================================================= */
+
+function parseJwtPayload(
+  token
+){
+
+  try{
+
+    const parts =
+      token.split(".");
+
+
+    if(
+      parts.length !== 3
+    ){
+
+      return null;
+
+    }
+
+
+    const base64 =
+      parts[1]
+        .replace(
+          /-/g,
+          "+"
+        )
+        .replace(
+          /_/g,
+          "/"
+        );
+
+
+    const json =
+      decodeURIComponent(
+
+        atob(
+          base64
+        )
+        .split("")
+        .map(
+          function(c){
+
+            return "%" +
+              (
+                "00" +
+                c.charCodeAt(
+                  0
+                ).toString(16)
+              ).slice(-2);
+
+          }
+        )
+        .join("")
+
+      );
+
+
+    return JSON.parse(
+      json
+    );
+
+  }catch(error){
+
+    return null;
+
+  }
+
+}
+
+
+/* =========================================================
+ * SLUG
+ * ========================================================= */
+
+function slugify(
+  text
+){
+
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(
+      /[^a-z0-9\s-]/g,
+      ""
+    )
+    .replace(
+      /\s+/g,
+      "-"
+    )
+    .replace(
+      /-+/g,
+      "-"
+    );
+
+}
+
+
+/* =========================================================
+ * FORMAT BYTES
+ * ========================================================= */
+
+function formatBytes(
+  bytes
+){
+
+  if(
+    bytes < 1024
+  ){
+
+    return bytes +
+      " B";
+
+  }
+
+
+  if(
+    bytes <
+    1024 * 1024
+  ){
+
+    return (
+      bytes /
+      1024
+    ).toFixed(1) +
+      " KB";
+
+  }
+
+
+  return (
+    bytes /
+    (1024 * 1024)
+  ).toFixed(2) +
+    " MB";
+
+}
+
+
+/* =========================================================
+ * PROGRESS
+ * ========================================================= */
+
+function setProgress(
+  value,
+  text
+){
+
+  value =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        value
+      )
+    );
+
+
+  progressBar.style.width =
+    value + "%";
+
+
+  progressPercent.textContent =
+    value + "%";
+
+
+  progressText.textContent =
+    text;
+
+}
+
+
+/* =========================================================
+ * MESSAGE
+ * ========================================================= */
+
+function showMessage(
+  type,
+  text
+){
+
+  msg.className =
+    "msg " +
+    type;
+
+
+  msg.innerHTML =
+    text;
+
+}
+
+
+/* =========================================================
+ * COMPRESS IMAGE
+ * ========================================================= */
+
+function compressImage(
+  file,
+  maxWidth=900,
+  maxHeight=900,
+  maxBytes=350*1024
+){
+
+  return new Promise(
+    (
+      resolve,
+      reject
+    )=>{
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        event => {
+
+          const img =
+            new Image();
+
+
+          img.onload =
+            async()=>{
+
+              try{
+
+                let width =
+                  img.width;
+
+
+                let height =
+                  img.height;
+
+
+                const scale =
+                  Math.min(
+                    1,
+                    maxWidth /
+                      width,
+                    maxHeight /
+                      height
+                  );
+
+
+                width =
+                  Math.max(
+                    1,
+                    Math.round(
+                      width *
+                      scale
+                    )
+                  );
+
+
+                height =
+                  Math.max(
+                    1,
+                    Math.round(
+                      height *
+                      scale
+                    )
+                  );
+
+
+                const canvas =
+                  document.createElement(
+                    "canvas"
+                  );
+
+
+                canvas.width =
+                  width;
+
+
+                canvas.height =
+                  height;
+
+
+                const ctx =
+                  canvas.getContext(
+                    "2d",
+                    {
+                      alpha:false
+                    }
+                  );
+
+
+                ctx.fillStyle =
+                  "#fff";
+
+
+                ctx.fillRect(
+                  0,
+                  0,
+                  width,
+                  height
+                );
+
+
+                ctx.imageSmoothingEnabled =
+                  true;
+
+
+                ctx.imageSmoothingQuality =
+                  "high";
+
+
+                ctx.drawImage(
+                  img,
+                  0,
+                  0,
+                  width,
+                  height
+                );
+
+
+                let quality =
+                  .82;
+
+
+                let blob =
+                  await new Promise(
+                    res =>
+                      canvas.toBlob(
+                        res,
+                        "image/jpeg",
+                        quality
+                      )
+                  );
+
+
+                while(
+                  blob &&
+                  blob.size >
+                    maxBytes &&
+                  quality >
+                    .40
+                ){
+
+                  quality -=
+                    .07;
+
+
+                  blob =
+                    await new Promise(
+                      res =>
+                        canvas.toBlob(
+                          res,
+                          "image/jpeg",
+                          quality
+                        )
+                    );
+
+                }
+
+
+                if(!blob){
+
+                  throw new Error(
+                    "Gagal mengompres foto."
+                  );
+
+                }
+
+
+                resolve(
+                  blob
+                );
+
+
+              }catch(err){
+
+                reject(
+                  err
+                );
+
+              }
+
+            };
+
+
+          img.onerror =
+            () =>
+              reject(
+                new Error(
+                  "Foto tidak dapat dibaca."
+                )
+              );
+
+
+          img.src =
+            event.target.result;
+
+        };
+
+
+      reader.onerror =
+        () =>
+          reject(
+            new Error(
+              "Gagal membaca foto."
+            )
+          );
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+ * BLOB TO BASE64
+ * ========================================================= */
+
+function blobToBase64(
+  blob
+){
+
+  return new Promise(
+    (
+      resolve,
+      reject
+    )=>{
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        ()=>{
+
+          const result =
+            reader.result;
+
+
+          if(!result){
+
+            return reject(
+              new Error(
+                "Foto kosong."
+              )
+            );
+
+          }
+
+
+          const parts =
+            result.split(
+              ","
+            );
+
+
+          if(
+            parts.length < 2
+          ){
+
+            return reject(
+              new Error(
+                "Format Base64 tidak valid."
+              )
+            );
+
+          }
+
+
+          resolve(
+            parts[1]
+          );
+
+        };
+
+
+      reader.onerror =
+        () =>
+          reject(
+            new Error(
+              "Gagal membaca foto."
+            )
+          );
+
+
+      reader.readAsDataURL(
+        blob
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+ * NAME → ID
+ * ========================================================= */
+
+nameInput.addEventListener(
+  "input",
+  ()=>{
+
+    idInput.value =
+      slugify(
+        nameInput.value
+      );
+
+  }
+);
+
+
+/* =========================================================
+ * IMAGE PREVIEW
+ * ========================================================= */
+
+imageInput.addEventListener(
+  "change",
+  ()=>{
+
+    const file =
+      imageInput.files[0];
+
+
+    if(!file){
+
+      previewWrap.style.display =
+        "none";
+
+      return;
+
+    }
+
+
+    if(
+      file.type &&
+      !file.type.startsWith(
+        "image/"
+      )
+    ){
+
+      showMessage(
+        "err",
+        "File harus berupa gambar."
+      );
+
+
+      imageInput.value =
+        "";
+
+
+      return;
+
+    }
+
+
+    preview.src =
+      URL.createObjectURL(
+        file
+      );
+
+
+    previewWrap.style.display =
+      "block";
+
+
+    originalSize.textContent =
+      formatBytes(
+        file.size
+      );
+
+
+    compressedSize.textContent =
+      "Menunggu...";
+
+
+    savingSize.textContent =
+      "-";
+
+
+    msg.className =
+      "msg";
+
+
+    msg.style.display =
+      "none";
+
+  }
+);
+
+
+/* =========================================================
+ * RESET
+ * ========================================================= */
+
+function resetProductForm(){
+
+  form.reset();
+
+
+  idInput.value =
+    "";
+
+
+  imageBase64.value =
+    "";
+
+
+  imageName.value =
+    "";
+
+
+  imageMimeType.value =
+    "";
+
+
+  idTokenInput.value =
+    currentGoogleUser
+      ? currentGoogleUser.token
+      : "";
+
+
+  preview.src =
+    "";
+
+
+  previewWrap.style.display =
+    "none";
+
+
+  originalSize.textContent =
+    "-";
+
+
+  compressedSize.textContent =
+    "-";
+
+
+  savingSize.textContent =
+    "-";
+
+
+  progressBox.style.display =
+    "none";
+
+
+  setProgress(
+    0,
+    "Menyiapkan..."
+  );
+
+
+  msg.className =
+    "msg";
+
+
+  msg.style.display =
+    "none";
+
+
+  btn.disabled =
+    false;
+
+
+  btn.textContent =
+    "Simpan Produk";
+
+
+  resetBtn.style.display =
+    "none";
+
+}
+
+
+/* =========================================================
+ * SUCCESS MODAL
+ * ========================================================= */
+
+function openSuccessModal(
+  productName,
+  photoSize
+){
+
+  successProduct.textContent =
+    productName || "-";
+
+
+  successPhoto.textContent =
+    photoSize || "-";
+
+
+  successModal.classList.add(
+    "show"
+  );
+
+
+  successModal.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+}
+
+
+function closeSuccessModal(){
+
+  successModal.classList.remove(
+    "show"
+  );
+
+
+  successModal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+}
+
+
+/* =========================================================
+ * MODAL EVENTS
+ * ========================================================= */
+
+modalAddBtn.addEventListener(
+  "click",
+  ()=>{
+
+    closeSuccessModal();
+
+    resetProductForm();
+
+    nameInput.focus();
+
+  }
+);
+
+
+resetBtn.addEventListener(
+  "click",
+  ()=>{
+
+    closeSuccessModal();
+
+    resetProductForm();
+
+    nameInput.focus();
+
+  }
+);
+
+
+successModal.addEventListener(
+  "click",
+  e => {
+
+    if(
+      e.target ===
+      successModal
+    ){
+
+      closeSuccessModal();
+
+    }
+
+  }
+);
+
+
+document.addEventListener(
+  "keydown",
+  e => {
+
+    if(
+      e.key ===
+      "Escape"
+    ){
+
+      closeSuccessModal();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+ * SUBMIT
+ * ========================================================= */
+
+form.addEventListener(
+  "submit",
+  async e => {
+
+    e.preventDefault();
+
+
+    /*
+     * Pastikan login.
+     */
+
+    if(
+      !currentGoogleUser ||
+      !currentGoogleUser.token
+    ){
+
+      showMessage(
+        "err",
+        "<b>Akses ditolak.</b><br>" +
+        "Silakan login dengan Google terlebih dahulu."
+      );
+
+
+      return;
+
+    }
+
+
+    /*
+     * Pastikan token terbaru dimasukkan.
+     */
+
+    idTokenInput.value =
+      currentGoogleUser.token;
+
+
+    /*
+     * Validasi email UI.
+     *
+     * SERVER TETAP MEMVALIDASI LAGI.
+     */
+
+    if (!["admin", "editor"].includes(currentUserRole)) {
+      showMessage(
+        "err",
+        "<b>Akses ditolak.</b><br>Role admin atau editor diperlukan untuk upload."
+      );
+      return;
+    }
+
+
+    const name =
+      nameInput.value.trim();
+
+
+    const id =
+      idInput.value.trim();
+
+
+    const desc =
+      document
+        .getElementById(
+          "desc"
+        )
+        .value
+        .trim();
+
+
+    const small =
+      document
+        .getElementById(
+          "small"
+        )
+        .value;
+
+
+    const medium =
+      document
+        .getElementById(
+          "medium"
+        )
+        .value;
+
+
+    const file =
+      imageInput.files[0];
+
+
+    if(!name){
+
+      showMessage(
+        "err",
+        "Nama produk wajib diisi."
+      );
+
+      return;
+
+    }
+
+
+    if(!id){
+
+      showMessage(
+        "err",
+        "ID produk belum terbentuk."
+      );
+
+      return;
+
+    }
+
+
+    if(!desc){
+
+      showMessage(
+        "err",
+        "Deskripsi wajib diisi."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      small === "" ||
+      Number(small) < 0
+    ){
+
+      showMessage(
+        "err",
+        "Harga Small tidak valid."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      medium === "" ||
+      Number(medium) < 0
+    ){
+
+      showMessage(
+        "err",
+        "Harga Medium tidak valid."
+      );
+
+      return;
+
+    }
+
+
+    if(!file){
+
+      showMessage(
+        "err",
+        "Silakan pilih foto produk."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      file.size >
+      15 *
+      1024 *
+      1024
+    ){
+
+      showMessage(
+        "err",
+        "Ukuran foto asli maksimal 15 MB."
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * START
+     */
+
+    btn.disabled =
+      true;
+
+
+    resetBtn.style.display =
+      "none";
+
+
+    progressBox.style.display =
+      "block";
+
+
+    msg.style.display =
+      "none";
+
+
+    setProgress(
+      8,
+      "Membaca foto..."
+    );
+
+
+    try{
+
+      /*
+       * Compress
+       */
+
+      const compressed =
+        await compressImage(
+          file,
+          900,
+          900,
+          350 *
+          1024
+        );
+
+
+      setProgress(
+        38,
+        "Foto berhasil dikompres..."
+      );
+
+
+      if(
+        compressed.size >
+        500 *
+        1024
+      ){
+
+        throw new Error(
+          "Foto setelah dikompres masih terlalu besar. Silakan pilih foto lain."
+        );
+
+      }
+
+
+      const saved =
+        Math.max(
+          0,
+          file.size -
+          compressed.size
+        );
+
+
+      const savedPercent =
+        file.size
+          ? Math.round(
+              saved /
+              file.size *
+              100
+            )
+          : 0;
+
+
+      compressedSize.textContent =
+        formatBytes(
+          compressed.size
+        );
+
+
+      savingSize.textContent =
+        savedPercent +
+        "%";
+
+
+      setProgress(
+        58,
+        "Menyiapkan data upload..."
+      );
+
+
+      /*
+       * Base64
+       */
+
+      const base64 =
+        await blobToBase64(
+          compressed
+        );
+
+
+      imageBase64.value =
+        base64;
+
+
+      imageName.value =
+        id +
+        ".jpg";
+
+
+      imageMimeType.value =
+        "image/jpeg";
+
+
+      /*
+       * Token
+       */
+
+      idTokenInput.value =
+        currentGoogleUser.token;
+
+
+      setProgress(
+        72,
+        "Mengirim ke server..."
+      );
+
+
+      /*
+       * IFRAME
+       */
+
+      let uploadFrame =
+        document.getElementById(
+          "uploadFrame"
+        );
+
+
+      if(!uploadFrame){
+
+        uploadFrame =
+          document.createElement(
+            "iframe"
+          );
+
+
+        uploadFrame.id =
+          "uploadFrame";
+
+
+        uploadFrame.name =
+          "uploadFrame";
+
+
+        uploadFrame.style.display =
+          "none";
+
+
+        document.body.appendChild(
+          uploadFrame
+        );
+
+      }
+
+
+      form.target =
+        "uploadFrame";
+
+
+      /*
+       * SUBMIT
+       */
+
+      form.submit();
+
+
+      /*
+       * Apps Script menerima
+       * request secara asynchronous.
+       */
+
+      setProgress(
+        100,
+        "Data dikirim ke server..."
+      );
+
+
+      btn.textContent =
+        "Tersimpan ✓";
+
+
+      /*
+       * Tampilkan modal setelah
+       * request terkirim.
+       */
+
+      setTimeout(
+        ()=>{
+
+          openSuccessModal(
+            name,
+            formatBytes(
+              compressed.size
+            )
+          );
+
+
+          resetBtn.style.display =
+            "block";
+
+        },
+        800
+      );
+
+
+    }catch(error){
+
+      console.error(
+        error
+      );
+
+
+      showMessage(
+        "err",
+        "<b>Gagal.</b><br><small>" +
+        error.message +
+        "</small>"
+      );
+
+
+      progressBox.style.display =
+        "none";
+
+
+      btn.disabled =
+        false;
+
+
+      btn.textContent =
+        "Simpan Produk";
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
