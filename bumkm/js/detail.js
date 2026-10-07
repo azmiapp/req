@@ -71,7 +71,7 @@ async function tampilkanDetail() {
 
         <div class="form-group">
           <label for="note">Catatan</label>
-          <textarea id="note" rows="3" placeholder="Contoh: jangan terlalu manis"></textarea>
+          <textarea id="note" rows="3" placeholder="Contoh: Packing dengan rapi ya kak."></textarea>
         </div>
 
         <div class="total-box">
