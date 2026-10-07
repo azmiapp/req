@@ -42,7 +42,7 @@ async function tampilkanProduk() {
         <p>${escapeHtml(p.desc)}</p>
 
         <div class="price-row">
-          <span>Small</span>
+          <span>Harga</span>
           <strong>${rupiah(p.small)}</strong>
         </div>
 
