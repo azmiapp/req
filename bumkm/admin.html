@@ -1741,6 +1741,43 @@ body{color:var(--ds-ink);background:radial-gradient(circle at 0% 0%,rgba(0,132,6
 .add-product-toolbar{border-color:#D9E7DE;background:linear-gradient(135deg,#F2FAF5,#FBFCFB)}.add-product-btn{background:var(--baznas-green);box-shadow:0 7px 16px rgba(0,132,61,.18)}.add-product-btn:hover{background:var(--baznas-green-dark)}input,textarea,select{border-color:#D6E2DB}input:focus,textarea:focus,select:focus{border-color:var(--baznas-green);box-shadow:0 0 0 4px rgba(0,132,61,.10)}.filebox{border-color:#B9DCC6;background:#F7FCF8}.hinticon{background:#E2F4E8;color:var(--baznas-green-dark)}.progressbar{background:linear-gradient(90deg,var(--baznas-green),#35A85F)}button{background:linear-gradient(135deg,var(--baznas-green),var(--baznas-green-dark))}.auth-icon-btn{border-color:#D5E2DA;color:var(--baznas-green-dark)}.auth-icon-btn:hover{background:var(--baznas-green-soft);color:var(--baznas-green-deep)}.auth-icon-btn.logout{background:var(--baznas-green);border-color:var(--baznas-green)}.utility-panel{border-color:#DCE8E1;background:#F7FAF8}.utility-icon{background:var(--baznas-green-soft);color:var(--baznas-green-dark)}
 @media(max-width:700px){.page{padding:10px 10px 92px}.topbar{position:relative;top:auto;min-height:64px;padding:8px 9px;border-radius:17px}.brandmark{width:42px;height:42px;flex-basis:42px;border-radius:13px;font-size:14px}.brand strong{font-size:13px}.brand span{max-width:190px;font-size:9.5px}.dashboard-nav{position:fixed;left:8px;right:8px;bottom:8px;top:auto;z-index:999;justify-content:space-around;gap:2px;margin:0;padding:6px;border-radius:18px;box-shadow:0 12px 35px rgba(0,40,20,.18)}.nav-item{flex:1 1 0;min-width:0;min-height:52px;padding:6px 4px;flex-direction:column;gap:3px;font-size:9px}.nav-item span{font-size:17px}.nav-item b{max-width:72px;overflow:hidden;text-overflow:ellipsis}.card{padding:16px;border-radius:20px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.stat-card{padding:11px}.stat-card strong{font-size:18px}.catalog-section{padding:13px}.products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.product-card-image{height:145px}.product-card-body{padding:11px}.product-card-title{font-size:12px}.product-card-desc{font-size:10px;min-height:31px}.status-control{flex-direction:column;align-items:stretch}.status-save-btn{width:100%}}
 @media(max-width:430px){.brand span{max-width:145px}.badge{display:none}.products-grid{grid-template-columns:1fr 1fr}.product-card-image{height:125px}.nav-item{min-height:50px}.nav-item b{font-size:8px}}
+
+/* =========================================================
+   EDIT PRODUK + MOBILE BOTTOM NAV
+   ========================================================= */
+.edit-cancel-btn{
+  min-height:40px; padding:10px 14px; border:1px solid #D5E2DA;
+  border-radius:12px; background:#fff; color:var(--baznas-green-dark);
+  font-size:12px; font-weight:800; box-shadow:none;
+}
+.edit-cancel-btn:hover{background:var(--baznas-green-soft);box-shadow:none}
+.product-edit-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.edit-product-btn{min-height:36px;padding:8px 10px;border-radius:10px;background:#fff;color:var(--baznas-green-dark);border:1px solid #CFE0D6;box-shadow:none;font-size:11px}
+.edit-product-btn:hover{background:var(--baznas-green-soft);box-shadow:none}
+.product-card.editing{outline:2px solid rgba(0,132,61,.25)}
+#addProductFormWrap[hidden]{display:none!important}
+@media(max-width:700px){
+  .page{padding-bottom:105px}
+  .dashboard-nav{display:flex!important;position:fixed;left:8px;right:8px;bottom:8px;top:auto;z-index:9999;margin:0;padding:6px;border:1px solid #DCE8E1;border-radius:18px;background:rgba(255,255,255,.97);backdrop-filter:blur(18px);box-shadow:0 14px 40px rgba(0,60,30,.20)}
+  .nav-item{appearance:none;outline:none;border:0!important;box-shadow:none!important;flex:1 1 0;min-width:0;min-height:52px;padding:6px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:13px}
+  .nav-item.active{background:var(--baznas-green)!important;color:#fff!important}
+  .nav-item span{font-size:17px;line-height:1}
+  .nav-item b{font-size:8px;line-height:1.1;max-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .add-product-toolbar{gap:8px;align-items:center}
+  .add-product-toolbar .add-product-btn{flex:1}
+  .edit-cancel-btn{flex:0 0 auto;width:auto!important}
+  .products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .product-card-image{height:135px}
+  .product-card-body{padding:10px}
+  .product-card-footer{align-items:flex-start;flex-direction:column;gap:7px}
+  .status-control{gap:6px}
+  .status-control select,.status-save-btn,.delete-product-btn{min-height:34px}
+}
+@media(max-width:390px){
+  .products-grid{grid-template-columns:1fr}
+  .product-card-image{height:165px}
+  .nav-item b{font-size:7.5px}
+}
 </style>
 
 
@@ -1807,19 +1844,19 @@ body{color:var(--ds-ink);background:radial-gradient(circle at 0% 0%,rgba(0,132,6
       <b>Dashboard</b>
     </button>
 
-    <button class="nav-item" data-target="productSection">
+    <button class="nav-item" data-target="catalogSection" data-view="products">
       <span>🛍️</span>
-      <b>Produk Saya</b>
+      <b>Produk</b>
     </button>
 
-    <button class="nav-item" data-target="productSection">
+    <button class="nav-item" data-target="addProductFormWrap" data-view="add">
       <span>➕</span>
-      <b>Tambah Produk</b>
+      <b>Tambah</b>
     </button>
 
-    <button class="nav-item" data-target="productSection">
+    <button class="nav-item" data-target="catalogSection" data-view="status">
       <span>📦</span>
-      <b>Status Produk</b>
+      <b>Status</b>
     </button>
 
     <button class="nav-item admin-only" id="userManagementNav" data-target="userManagementPanel" hidden>
@@ -1827,7 +1864,7 @@ body{color:var(--ds-ink);background:radial-gradient(circle at 0% 0%,rgba(0,132,6
       <b>Manajemen Pengguna</b>
     </button>
 
-    <button class="nav-item" data-target="settingsPanel">
+    <button class="nav-item" data-target="settingsPanel" data-view="settings">
       <span>⚙️</span>
       <b>Pengaturan</b>
     </button>
@@ -2003,6 +2040,9 @@ body{color:var(--ds-ink);background:radial-gradient(circle at 0% 0%,rgba(0,132,6
         <button type="button" id="toggleAddProductBtn" class="add-product-btn">
           ＋ Tambah Produk
         </button>
+        <button type="button" id="cancelEditBtn" class="edit-cancel-btn" hidden>
+          Batal Edit
+        </button>
       </div>
 
       <div id="addProductFormWrap" hidden>
@@ -2068,20 +2108,13 @@ body{color:var(--ds-ink);background:radial-gradient(circle at 0% 0%,rgba(0,132,6
           <div class="row">
 
             <div>
+              <label for="small">Harga Small</label>
+              <input id="small" name="small" type="number" min="0" required placeholder="10000">
+            </div>
 
-              <label for="small">
-                Harga Produk
-              </label>
-
-              <input
-                id="small"
-                name="small"
-                type="number"
-                min="0"
-                required
-                placeholder="10000"
-              >
-
+            <div>
+              <label for="medium">Harga Medium</label>
+              <input id="medium" name="medium" type="number" min="0" required placeholder="15000">
             </div>
 
           </div>
@@ -2110,7 +2143,6 @@ body{color:var(--ds-ink);background:radial-gradient(circle at 0% 0%,rgba(0,132,6
               id="image"
               type="file"
               accept="image/*"
-              required
             >
 
 
@@ -2122,9 +2154,7 @@ body{color:var(--ds-ink);background:radial-gradient(circle at 0% 0%,rgba(0,132,6
 
               <div>
 
-                <b>
-                  Optimasi otomatis
-                </b>
+                <b id="imageHintTitle">Optimasi otomatis</b>
 
                 <br>
 
@@ -2271,6 +2301,9 @@ body{color:var(--ds-ink);background:radial-gradient(circle at 0% 0%,rgba(0,132,6
           id="idToken"
           name="idToken"
         >
+
+        <input type="hidden" id="editMode" name="editMode" value="0">
+        <input type="hidden" id="existingImageUrl" name="existingImageUrl" value="">
 
 
         <!-- =================================================
@@ -2740,28 +2773,25 @@ document.addEventListener("DOMContentLoaded", function(){
   renderLoginButton();
 
   const navItems = document.querySelectorAll(".nav-item[data-target]");
-
   navItems.forEach(function(item){
     item.addEventListener("click", function(){
-      const targetId = item.getAttribute("data-target");
-      const target = document.getElementById(targetId);
-
-      navItems.forEach(function(nav){
-        nav.classList.remove("active");
-      });
-
+      const targetId=item.getAttribute("data-target");
+      const view=item.getAttribute("data-view") || targetId;
+      navItems.forEach(nav=>nav.classList.remove("active"));
       item.classList.add("active");
 
-      if(target){
-        if(targetId === "userManagementPanel"){
-          target.classList.add("visible");
-        }
-
-        target.scrollIntoView({
-          behavior:"smooth",
-          block:"start"
-        });
+      if(view === "add") {
+        productSection.style.display = "block";
+        const wrap=document.getElementById("addProductFormWrap");
+        if(wrap) { wrap.hidden=false; const toggle=document.getElementById("toggleAddProductBtn"); if(toggle) toggle.textContent="− Tutup Formulir"; }
+        document.getElementById("productSection")?.scrollIntoView({behavior:"smooth",block:"start"});
+        return;
       }
+      if(view === "settings") {
+        document.getElementById("settingsPanel")?.classList.add("visible");
+      }
+      const target=document.getElementById(targetId);
+      if(target) target.scrollIntoView({behavior:"smooth",block:"start"});
     });
   });
 });
@@ -2878,6 +2908,7 @@ function formatRupiah(value){
 }
 
 function renderProducts(products){
+  window.__adminProducts = Array.isArray(products) ? products : [];
   const grid = document.getElementById("productsGrid");
   if(!grid) return;
 
@@ -2920,9 +2951,10 @@ function renderProducts(products){
             <option value="habis" ${status === "habis" ? "selected" : ""}>Tidak tersedia</option>
           </select>
           <button type="button" class="status-save-btn" data-product-id="${escapeHtml(product.id)}">Simpan</button>
-          <button type="button" class="delete-product-btn" data-product-id="${escapeHtml(product.id)}">
-  🗑️ Hapus
-</button>
+        </div>
+        <div class="product-edit-actions">
+          <button type="button" class="edit-product-btn" data-product-id="${escapeHtml(product.id)}">✏️ Edit</button>
+          <button type="button" class="delete-product-btn" data-product-id="${escapeHtml(product.id)}">🗑️ Hapus</button>
         </div>
         <div class="status-update-message" id="status-message-${escapeHtml(product.id)}"></div>
       `
@@ -2963,6 +2995,70 @@ function renderProducts(products){
       });
     });
   }
+}
+
+function openEditProduct(product){
+  if(currentUserRole.toLowerCase() !== "admin") {
+    alert("Hanya admin yang dapat mengedit produk.");
+    return;
+  }
+  const wrap=document.getElementById("addProductFormWrap");
+  const toolbar=document.querySelector(".add-product-toolbar");
+  const editMode=document.getElementById("editMode");
+  const existingImage=document.getElementById("existingImageUrl");
+  const imageHint=document.getElementById("imageHintTitle");
+  if(!wrap) return;
+  document.getElementById("id").value=product.id || "";
+  document.getElementById("name").value=product.name || "";
+  document.getElementById("desc").value=product.desc || "";
+  document.getElementById("small").value=product.small ?? "";
+  const medium=document.getElementById("medium"); if(medium) medium.value=product.medium ?? "";
+  document.getElementById("status").value=normalizeProductStatus(product.status);
+  if(existingImage) existingImage.value=product.image || "";
+  if(editMode) editMode.value="1";
+  imageInput.required=false;
+  if(imageHint) imageHint.textContent="Foto baru opsional saat edit";
+  if(product.image){ preview.src=product.image; previewWrap.style.display="block"; } else { preview.src=""; previewWrap.style.display="none"; }
+  btn.textContent="Simpan Perubahan";
+  resetBtn.style.display="none";
+  const cancel=document.getElementById("cancelEditBtn"); if(cancel) cancel.hidden=false;
+  if(toolbar) toolbar.classList.add("editing");
+  wrap.hidden=false;
+  document.getElementById("productSection").style.display="block";
+  document.getElementById("productSection").scrollIntoView({behavior:"smooth",block:"start"});
+  nameInput.focus();
+}
+
+function cancelEditProduct(){
+  const editMode=document.getElementById("editMode");
+  if(editMode) editMode.value="0";
+  const existingImage=document.getElementById("existingImageUrl"); if(existingImage) existingImage.value="";
+  imageInput.required=true;
+  const imageHint=document.getElementById("imageHintTitle"); if(imageHint) imageHint.textContent="Optimasi otomatis";
+  const cancel=document.getElementById("cancelEditBtn"); if(cancel) cancel.hidden=true;
+  resetProductForm();
+  const wrap=document.getElementById("addProductFormWrap"); if(wrap) wrap.hidden=true;
+  const toggle=document.getElementById("toggleAddProductBtn"); if(toggle) toggle.textContent="＋ Tambah Produk";
+}
+
+async function updateProduct(productData){
+  const user=auth.currentUser;
+  if(!user) throw new Error("Sesi login tidak ditemukan.");
+  const token=await user.getIdToken(true);
+  const body=new URLSearchParams();
+  body.append("action","updateProduct");
+  body.append("idToken",token);
+  body.append("id",productData.id);
+  body.append("name",productData.name);
+  body.append("desc",productData.desc);
+  body.append("small",productData.small);
+  body.append("medium",productData.medium);
+  body.append("status",productData.status);
+  body.append("existingImageUrl",productData.existingImageUrl || "");
+  if(productData.imageBase64){ body.append("imageBase64",productData.imageBase64); body.append("imageName",productData.imageName || (productData.id+".jpg")); body.append("imageMimeType",productData.imageMimeType || "image/jpeg"); }
+  await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",redirect:"follow",body});
+  await new Promise(r=>setTimeout(r,1200));
+  await loadProducts();
 }
 
 async function updateProductStatus(productId, status, button){
@@ -3082,6 +3178,9 @@ document.addEventListener("DOMContentLoaded", function(){
   }
 });
 
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+if(cancelEditBtn) cancelEditBtn.addEventListener("click", cancelEditProduct);
+
 /* =========================================================
  * CHECK ACCESS
  * ========================================================= */
@@ -3152,6 +3251,14 @@ async function checkAccess(
  * ========================================================= */
 
   document.addEventListener("click", function(event) {
+
+  const editButton = event.target.closest(".edit-product-btn");
+  if(editButton){
+    const productId=editButton.dataset.productId;
+    const product=window.__adminProducts?.find(p=>String(p.id)===String(productId));
+    if(product) openEditProduct(product);
+    return;
+  }
 
   const button = event.target.closest(".delete-product-btn");
 
@@ -3900,6 +4007,11 @@ imageInput.addEventListener(
 function resetProductForm(){
 
   form.reset();
+  const editMode=document.getElementById("editMode"); if(editMode) editMode.value="0";
+  const existingImage=document.getElementById("existingImageUrl"); if(existingImage) existingImage.value="";
+  imageInput.required=true;
+  const imageHint=document.getElementById("imageHintTitle"); if(imageHint) imageHint.textContent="Optimasi otomatis";
+  const cancel=document.getElementById("cancelEditBtn"); if(cancel) cancel.hidden=true;
 
 
   idInput.value =
@@ -4178,6 +4290,8 @@ form.addEventListener(
     const file =
       imageInput.files[0];
 
+    const isEdit = document.getElementById("editMode")?.value === "1";
+    const existingImageUrl = document.getElementById("existingImageUrl")?.value || "";
 
     if(!name){
 
@@ -4245,7 +4359,7 @@ form.addEventListener(
     }
 
 
-    if(!file){
+    if(!file && !isEdit){
 
       showMessage(
         "err",
@@ -4301,6 +4415,27 @@ form.addEventListener(
 
 
     try{
+
+      if(isEdit){
+        setProgress(45,"Menyiapkan perubahan produk...");
+        let editBase64="";
+        let editImageName="";
+        let editMimeType="";
+        if(file){
+          const compressedEdit=await compressImage(file,900,900,350*1024);
+          if(compressedEdit.size>500*1024) throw new Error("Foto setelah dikompres masih terlalu besar.");
+          editBase64=await blobToBase64(compressedEdit);
+          editImageName=id+".jpg";
+          editMimeType="image/jpeg";
+          compressedSize.textContent=formatBytes(compressedEdit.size);
+        }
+        setProgress(75,"Menyimpan perubahan...");
+        await updateProduct({id,name,desc,small,medium,status:document.getElementById("status").value,existingImageUrl,imageBase64:editBase64,imageName:editImageName,imageMimeType:editMimeType});
+        setProgress(100,"Produk berhasil diperbarui ✓");
+        showMessage("ok","<b>Produk berhasil diperbarui.</b><br>Perubahan sudah dikirim ke server.");
+        cancelEditProduct();
+        return;
+      }
 
       /*
        * Compress
