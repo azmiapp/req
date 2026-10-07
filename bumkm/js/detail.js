@@ -50,8 +50,7 @@ async function tampilkanDetail() {
         <div class="form-group">
           <label for="size">Pilih Ukuran</label>
           <select id="size">
-            <option value="small">Small — ${rupiah(product.small)}</option>
-            <option value="medium">Large — ${rupiah(product.medium)}</option>
+            <option value="small">Harga — ${rupiah(product.small)}</option>
           </select>
         </div>
 
