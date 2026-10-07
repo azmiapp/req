@@ -46,7 +46,6 @@ async function loadProducts() {
       name: String(p.name || "").trim(),
       desc: String(p.desc || "").trim(),
       small: Number(p.small) || 0,
-      medium: Number(p.medium) || 0,
       image: String(p.image || "").trim(),
       status: String(p.status || "tersedia").trim().toLowerCase()
     }));
