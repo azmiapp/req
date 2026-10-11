@@ -1,6 +1,6 @@
 import { guard,qs,qsa,esc,fmtDate,toast,logout,getMyAssignments,getMyDeliveries,findBcl as apiFindBcl,uploadDeliveryPhoto } from "./common.js";
 
-let me,tasks=[],history=[],selectedTask=null,selectedBcl=null,stream=null,facing="environment",coords=null,photoBlob=null,scanner=null;
+let me,tasks=[],history=[],taskBclInfo={},selectedTask=null,selectedBcl=null,stream=null,facing="environment",coords=null,photoBlob=null,scanner=null;
 
 function setLoading(show,message="Memuat data..."){
   const el=qs("#loadingOverlay"); if(!el)return;
@@ -45,16 +45,29 @@ function bind(){
  qs("#zmartSpjBtn").onclick=showSpjForm;
 }
 function showZView(id){qsa(".mobile-content>.view").forEach(x=>x.classList.toggle("active",x.id===id));qsa(".bottom-nav button").forEach(x=>x.classList.toggle("active",x.dataset.zview===id));window.scrollTo({top:0,behavior:"smooth"})}
-async function loadTasks(){tasks=(await getMyAssignments()).filter(x=>x.status==="ASSIGNED"||x.status==="IN_PROGRESS");}
+async function loadTasks(){
+ tasks=(await getMyAssignments()).filter(x=>x.status==="ASSIGNED"||x.status==="IN_PROGRESS");
+ taskBclInfo={};
+ await Promise.all(tasks.map(async t=>{try{taskBclInfo[t.id]=await apiFindBcl(t.bclId)}catch(_){taskBclInfo[t.id]=null}}));
+}
+function taskLocationMarkup(t){
+ const bcl=taskBclInfo[t.id]||{};
+ const zCoord=extractCoords(me?.mapsUrl),bCoord=extractCoords(bcl.mapsUrl),km=distanceKm(zCoord,bCoord);
+ const destination=bCoord?`https://www.google.com/maps/dir/?api=1&destination=${bCoord.lat},${bCoord.lng}`:mapsLink(bcl.mapsUrl);
+ const cost=Number(t.costPerKm||0);
+ const distance=km!==null?`Jarak garis lurus ± ${km.toFixed(1)} km${cost>0?` • Estimasi ongkir Rp ${(Math.ceil(km)*cost).toLocaleString('id-ID')}`:''}`:'Jarak/ongkir belum tersedia';
+ const map=destination?`<a class="btn small task-map-link" target="_blank" rel="noopener noreferrer" href="${esc(destination)}" aria-label="Buka petunjuk arah ke ${esc(t.bclName)}" onclick="event.stopPropagation()">🗺️ Petunjuk Arah</a>`:`<small class="muted">📍 Link Maps lokasi BCL belum tersedia</small>`;
+ return `<div class="task-active-meta"><small class="task-deadline">⏰ Deadline: ${t.deadline?esc(fmtDate(t.deadline)):'Belum ditentukan'}</small><small class="task-distance">📏 ${esc(distance)}</small><div class="task-map-row">${map}</div></div>`;
+}
 async function loadHistory(){history=await getMyDeliveries();renderHistory();}
 function renderHome(){
  const done=history.length;qs("#taskTotal").textContent=tasks.length;qs("#taskDone").textContent=done;
  const pct=tasks.length?Math.min(100,Math.round(done/tasks.length*100)):0;qs("#progressText").textContent=`${done}/${tasks.length}`;qs("#progressBar").style.width=pct+"%";
- qs("#taskPreview").innerHTML=tasks.slice(0,5).map(t=>`<div class="list-row"><div><b>${esc(t.bclName)}</b><small>${esc(t.packageName||"Paket BCL")}</small></div><button class="btn small" data-task="${esc(t.id)}">Mulai</button></div>`).join("")||`<p class="muted">Belum ada penugasan.</p>`;
+ qs("#taskPreview").innerHTML=tasks.slice(0,5).map(t=>`<div class="task-preview-item"><div class="list-row"><div><b>${esc(t.bclName)}</b><small>${esc(t.packageName||"Paket BCL")}</small></div><button class="btn small" data-task="${esc(t.id)}">Mulai</button></div>${taskLocationMarkup(t)}</div>`).join("")||`<p class="muted">Belum ada penugasan.</p>`;
  qsa("[data-task]").forEach(b=>b.onclick=()=>openTask(b.dataset.task));
 }
 function renderTasks(){
- qs("#taskList").innerHTML=tasks.map(t=>`<button class="task-card" data-task="${esc(t.id)}"><div class="task-avatar">${esc((t.bclName||"?")[0])}</div><div><b>${esc(t.bclName)}</b><span>${esc(t.bclId)} • ${esc(t.packageName||"Paket BCL")}</span><small>${t.status==="DONE"?"SELESAI":"BELUM SELESAI"} • Klik untuk mulai, lalu scan ID BCL</small><small class="task-deadline">⏰ Deadline: ${t.deadline?fmtDate(t.deadline):"Belum ditentukan"}</small></div><span>›</span></button>`).join("")||`<div class="card"><p class="muted">Belum ada tugas dari Admin.</p></div>`;
+ qs("#taskList").innerHTML=tasks.map(t=>`<div class="task-active-item"><button class="task-card" data-task="${esc(t.id)}"><div class="task-avatar">${esc((t.bclName||"?")[0])}</div><div><b>${esc(t.bclName)}</b><span>${esc(t.bclId)} • ${esc(t.packageName||"Paket BCL")}</span><small>${t.status==="DONE"?"SELESAI":"BELUM SELESAI"} • Klik untuk mulai, lalu scan ID BCL</small></div><span>›</span></button>${taskLocationMarkup(t)}</div>`).join("")||`<div class="card"><p class="muted">Belum ada tugas dari Admin.</p></div>`;
  qsa("#taskList [data-task]").forEach(b=>b.onclick=()=>openTask(b.dataset.task));
 }
 function renderHistory(){
