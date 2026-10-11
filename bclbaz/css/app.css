@@ -122,3 +122,16 @@ input,select,textarea{max-width:100%}
  .bottom-nav{backdrop-filter:blur(14px);background:rgba(255,255,255,.94);border-top:1px solid #dce6eb}
 }
 .spj-photo{width:180px;max-width:100%;height:auto;max-height:230px;object-fit:contain;background:#f5f7f8;border:1px solid #dce6eb;border-radius:8px}
+
+/* Detail deadline dan peta pada penugasan aktif ZMart */
+.task-active-item,.task-preview-item{min-width:0;border:1px solid #e0e9ee;border-radius:16px;padding:8px 10px;background:#fff;margin-bottom:10px}
+.task-active-item .task-card{margin:0;border:0;box-shadow:none;padding:8px 4px}
+.task-active-meta{padding:0 8px 8px 54px;display:grid;gap:7px;min-width:0}
+.task-active-meta small{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.task-active-meta .task-deadline{display:block;width:fit-content;max-width:100%;white-space:normal;margin:0}
+.task-distance{color:var(--muted);font-weight:700}
+.task-map-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.task-map-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:#e7f4f8;color:#12657a;border:1px solid #c6e4ec;font-weight:800;min-height:36px}
+.task-preview-item .list-row{padding:5px 0 10px}
+.task-preview-item .task-active-meta{padding-left:0;padding-bottom:5px}
+@media(max-width:480px){.task-active-item{padding:7px}.task-active-meta{padding-left:46px}.task-preview-item .task-active-meta{padding-left:0}.task-map-link{width:100%}}
