@@ -338,10 +338,9 @@ function getJsonp(action,extra={}){
   });
 }
 
-const FAST_GET_ACTIONS=new Set([
-  "firebaseLogin","profile","dashboard","adminDashboard","adminAttendance",
-  "adminMonthly","adminPayroll","adminEmployees","adminRequests","adminAssignments"
-]);
+/* doGet di code.gs hanya melayani firebaseLogin, status, dan ping.
+   Semua aksi data/admin harus lewat doPost lalu diperiksa melalui status. */
+const FAST_GET_ACTIONS=new Set(["firebaseLogin"]);
 function poll(id,done,tryNo=0){
   const cb="cb_"+crypto.randomUUID().replaceAll("-","");let finish=false;
   const end=x=>{if(finish)return;finish=true;delete window[cb];document.getElementById("s_"+cb)?.remove();done(x)};
@@ -359,12 +358,14 @@ function poll(id,done,tryNo=0){
 async function request(action,extra={}){
   if(!sessionToken && action!=="firebaseLogin")return{ok:false,error:"Sesi login tidak ditemukan."};
 
-  /* Read-only + login: direct GET/JSONP, no REQUESTS sheet/cache and no polling. */
+  /* Hanya firebaseLogin yang tersedia lewat doGet/JSONP di code.gs.
+     Aksi lainnya, termasuk pembacaan data admin, harus lewat doPost + polling. */
   if(FAST_GET_ACTIONS.has(action)){
     return getJsonp(action,{sessionToken,...extra});
   }
 
-  /* Mutating actions keep the existing reliable POST + polling transport. */
+  /* Kirim semua aksi selain firebaseLogin melalui doPost dan cek hasilnya
+     lewat endpoint status yang memang disediakan code.gs. */
   const id=crypto.randomUUID().replaceAll("-","");
   if(!(await post({action,requestId:id,sessionToken,...extra})))return{ok:false,error:"Gagal menghubungi server."};
   return new Promise(resolve=>setTimeout(()=>poll(id,resolve),100));
