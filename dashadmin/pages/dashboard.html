@@ -1,0 +1,21 @@
+<section id="page-dashboard" class="page active">
+  <div class="page-head"><div><h1>Dashboard</h1><p id="welcome">Ringkasan aktivitas hari ini.</p></div><div class="actions"><input id="dateFilter" class="input" type="date"><select id="monthFilter" class="select"></select><button class="primary" onclick="loadAll()"><span class="material-symbols-rounded" style="font-size:16px">refresh</span> Refresh</button></div></div>
+  <div class="menu-cards">
+    <button class="menu-card" style="--card-bg:#eef4ff;--card-color:#155eef" onclick="openPage('attendance')"><span class="menu-card-arrow material-symbols-rounded">arrow_forward</span><div class="menu-card-icon"><span class="material-symbols-rounded">fact_check</span></div><strong>Absensi</strong><span>Pantau kehadiran pegawai</span></button>
+    <button class="menu-card" style="--card-bg:#edf9f4;--card-color:#0b9b69" onclick="openPage('employees')"><span class="menu-card-arrow material-symbols-rounded">arrow_forward</span><div class="menu-card-icon"><span class="material-symbols-rounded">groups</span></div><strong>Data Pegawai</strong><span>Kelola data karyawan</span></button>
+    <button class="menu-card" style="--card-bg:#f1efff;--card-color:#7856d9" onclick="openPage('assignment')"><span class="menu-card-arrow material-symbols-rounded">arrow_forward</span><div class="menu-card-icon"><span class="material-symbols-rounded">assignment</span></div><strong>Penugasan</strong><span>Buat & pantau tugas pegawai</span></button>
+    <button class="menu-card" style="--card-bg:#fff5df;--card-color:#d8880b" onclick="openPage('request')"><span class="menu-card-arrow material-symbols-rounded">arrow_forward</span><div class="menu-card-icon"><span class="material-symbols-rounded">description</span></div><strong>Pengajuan</strong><span>Review izin & cuti pegawai</span></button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-top">TOTAL PEGAWAI <span class="stat-icon"><span class="material-symbols-rounded">groups</span></span></div><b id="sTotal">0</b></div>
+    <div class="stat green"><div class="stat-top">SUDAH MASUK <span class="stat-icon"><span class="material-symbols-rounded">login</span></span></div><b id="sMasuk">0</b></div>
+    <div class="stat red"><div class="stat-top">BELUM MASUK <span class="stat-icon"><span class="material-symbols-rounded">person_off</span></span></div><b id="sBelum">0</b></div>
+    <div class="stat orange"><div class="stat-top">TERLAMBAT <span class="stat-icon"><span class="material-symbols-rounded">schedule</span></span></div><b id="sLate">0</b></div>
+    <div class="stat purple"><div class="stat-top">SUDAH PULANG <span class="stat-icon"><span class="material-symbols-rounded">logout</span></span></div><b id="sPulang">0</b></div>
+  </div>
+  <div class="grid">
+    <section class="panel"><div class="panel-head"><div><h2>Absensi Hari Ini</h2><small id="attendanceInfo">-</small></div><div class="tabs"><button id="tabAll" class="tab active" onclick="setAttendanceFilter('ALL')">Semua</button><button id="tabBelum" class="tab" onclick="setAttendanceFilter('BELUM')">Belum Masuk</button></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Pegawai</th><th>Jabatan</th><th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Status</th></tr></thead><tbody id="attendanceBody"></tbody></table></div></section>
+    <section class="panel"><div class="panel-head"><div><h2>Payroll</h2><small id="dashboardPayrollInfo">-</small></div></div><div class="payroll-filter"><select id="dashboardPayrollMonthFilter" class="select"></select><select id="dashboardPayrollEmployeeFilter" class="select"><option value="ALL">Semua Karyawan</option></select><button class="primary" onclick="applyDashboardPayrollFilter()">Tampilkan</button></div><div id="dashboardPayrollSummary" class="payroll-summary hidden"></div><div id="dashboardPayrollList" class="mini-list"></div></section>
+  </div>
+  <section class="panel section"><div class="panel-head"><div><h2>Rekap Bulanan</h2><small>Ringkasan kehadiran berdasarkan bulan yang dipilih</small></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Pegawai</th><th>Hari Kerja</th><th>Hadir</th><th>Terlambat</th><th>Izin</th><th>Sakit</th><th>Tidak Hadir</th><th>Jam Kerja</th></tr></thead><tbody id="monthlyBody"></tbody></table></div></section>
+</section>

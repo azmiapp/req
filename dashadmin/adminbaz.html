@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#155eef">
+<title>Admin Absensi • Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,600,0,0" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+
+<style id="font-size-override">
+/* ===== FONT UI DIPERBESAR ===== */
+body{font-size:13px}
+.login-card p{font-size:13px}
+.login-card h1{font-size:27px}
+.google-btn{font-size:13px}
+
+.logo-area b{font-size:14px}
+.logo-area small{font-size:9px}
+.side-label{font-size:9px}
+.nav-btn{font-size:12px}
+.nav-count{font-size:9px}
+.profile-text b{font-size:11px}
+.profile-text span{font-size:9px}
+
+.top-title{font-size:14px}
+.top-date{font-size:10px}
+.logout{font-size:11px}
+
+.page-head h1{font-size:28px}
+.page-head p{font-size:12px}
+.input,.select{font-size:12px}
+.primary,.secondary{font-size:12px}
+
+.menu-card strong{font-size:12px}
+.menu-card span{font-size:10px}
+
+.stat-top{font-size:9px}
+.stat b{font-size:26px}
+
+.panel-head h2{font-size:14px}
+.panel-head small{font-size:10px}
+.table th{font-size:9px}
+.table td{font-size:11px}
+.sub{font-size:9px}
+.badge{font-size:9px}
+.tab{font-size:9px}
+
+.money{font-size:11px}
+.mini-main b{font-size:11px}
+.mini-main span{font-size:9px}
+
+.module-hero h2{font-size:17px}
+.module-hero p{font-size:10px}
+.hint{font-size:10px}
+.form-label{font-size:10px}
+.textarea{font-size:11px}
+.btn{font-size:10px}
+.toolbar .select,.toolbar .input{font-size:11px}
+
+.payroll-page .eyebrow{font-size:9px}
+.payroll-page .section-head h2{font-size:28px}
+.payroll-page .muted{font-size:11px}
+.payroll-page .field label{font-size:10px}
+.payroll-page .field input,.payroll-page .field select{font-size:11px}
+.payroll-page .stat-card span{font-size:9px}
+.payroll-page .stat-card strong{font-size:19px}
+.payroll-page .table-head h3{font-size:14px}
+.payroll-page th{font-size:9px}
+.payroll-page td{font-size:11px}
+.detail-item span{font-size:9px}
+.detail-item b{font-size:12px}
+
+@media(max-width:620px){
+  .page-head h1{font-size:24px}
+  .stat b{font-size:23px}
+  .menu-card strong{font-size:11px}
+  .menu-card span{font-size:10px}
+}
+</style>
+
+</head>
+<body>
+
+<section id="login" class="login">
+  <div class="login-card">
+    <div class="login-logo"><span class="material-symbols-rounded">admin_panel_settings</span></div>
+    <h1>Admin Absensi</h1>
+    <p>Kelola absensi, pegawai, penugasan, pengajuan, dan payroll melalui satu dashboard yang praktis.</p>
+    <button id="loginBtn" class="google-btn" onclick="loginAdmin()"><span class="material-symbols-rounded">login</span> Masuk dengan Google</button>
+  </div>
+</section>
+
+<section id="app" class="hidden">
+<aside id="sidebar" class="sidebar">
+  <div class="logo-area"><div class="logo-box"><span class="material-symbols-rounded">admin_panel_settings</span></div><div><b>Absensi Admin</b><small>Management System</small></div></div>
+  <div class="side-label">Menu Utama</div>
+  <nav class="nav">
+    <button class="nav-btn active" data-page="dashboard" onclick="openPage('dashboard')"><span class="icon"><span class="material-symbols-rounded">dashboard</span></span>Dashboard</button>
+    <button class="nav-btn" data-page="attendance" onclick="openPage('attendance')"><span class="icon"><span class="material-symbols-rounded">fact_check</span></span>Absensi</button>
+    <button class="nav-btn" data-page="employees" onclick="openPage('employees')"><span class="icon"><span class="material-symbols-rounded">groups</span></span>Data Pegawai</button>
+    <button class="nav-btn" data-page="assignment" onclick="openPage('assignment')"><span class="icon"><span class="material-symbols-rounded">assignment</span></span>Penugasan <span id="assignmentBadge" class="nav-count">0</span></button>
+    <button class="nav-btn" data-page="request" onclick="openPage('request')"><span class="icon"><span class="material-symbols-rounded">description</span></span>Pengajuan <span id="requestBadge" class="nav-count">0</span></button>
+    <button class="nav-btn" data-page="payroll" onclick="openPage('payroll')"><span class="icon"><span class="material-symbols-rounded">payments</span></span>Payroll</button>
+  </nav>
+  <div class="side-spacer"></div><div class="side-label">Sistem</div>
+  <nav class="nav"><button class="nav-btn" onclick="toast('Menu pengaturan siap dikembangkan.')"><span class="icon"><span class="material-symbols-rounded">settings</span></span>Pengaturan</button></nav>
+  <div class="side-profile"><img id="sideAvatar" class="avatar" alt=""><div class="profile-text"><b id="sideName">Admin</b><span>Administrator</span></div></div>
+</aside>
+<div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+<header class="topbar"><div class="topbar-inner"><div class="top-left"><button class="mobile-menu" onclick="toggleSidebar()"><span class="material-symbols-rounded">menu</span></button><div><div id="topTitle" class="top-title">Dashboard</div><div id="topDate" class="top-date">-</div></div></div><div class="top-right"><img id="avatar" class="avatar" alt=""><button class="logout" onclick="logout()"><span class="material-symbols-rounded" style="font-size:15px">logout</span> Keluar</button></div></div></header>
+
+<main class="main">
+<div id="pageLoadProgress" class="load-progress" aria-live="polite"><div class="load-progress-label"><span id="pageLoadLabel">Memuat data...</span><span id="pageLoadPercent">0%</span></div><div class="load-progress-track"><div id="pageLoadFill" class="load-progress-fill"></div></div></div>
+</main>
+
+</section>
+
+<div id="loading" class="hidden" style="position:fixed;z-index:200;inset:0;background:rgba(255,255,255,.78);backdrop-filter:blur(5px);display:grid;place-items:center"><div style="background:#fff;padding:23px 27px;border:1px solid var(--line);border-radius:17px;text-align:center;box-shadow:var(--shadow)"><div style="width:28px;height:28px;border:3px solid #dbe7f8;border-top-color:var(--primary);border-radius:50%;margin:auto auto 10px;animation:spin .8s linear infinite"></div><b style="font-size:11px">Memuat data...</b></div></div>
+<div id="toast" class="hidden" style="position:fixed;z-index:250;left:50%;bottom:22px;transform:translateX(-50%);background:#13243b;color:#fff;border-radius:11px;padding:11px 15px;font-size:10px;box-shadow:0 10px 30px rgba(0,0,0,.15)"></div>
+
+
+
+<script>
+(async function(){
+  const pageNames = ["dashboard","attendance","employees","assignment","request","payroll"];
+  const main = document.querySelector(".main");
+  const progress = document.getElementById("pageLoadProgress");
+  const anchor = progress ? progress.nextSibling : null;
+  // Fetch the separate menu HTML files and mount them in their original order.
+  const fragments = await Promise.all(pageNames.map(async name => {
+    const response = await fetch("pages/" + name + ".html", {cache:"no-cache"});
+    if (!response.ok) throw new Error("Gagal memuat menu " + name);
+    return response.text();
+  }));
+  const holder = document.createElement("div");
+  holder.innerHTML = fragments.join("\\n");
+  // Keep progress bar first and insert the page sections after it.
+  while (holder.firstChild) main.appendChild(holder.firstChild);
+  await Promise.all([
+    ...pageNames.map(name => new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "js/menus/" + name + ".js";
+      script.onload = resolve; script.onerror = () => reject(new Error("Gagal memuat JS menu " + name));
+      document.body.appendChild(script);
+    }))
+  ]);
+  const appScript = document.createElement("script");
+  appScript.src = "js/app.js";
+  appScript.onload = () => window.dispatchEvent(new Event("dashboard:modules-ready"));
+  appScript.onerror = () => console.error("Gagal memuat js/app.js");
+  document.body.appendChild(appScript);
+})().catch(err => {
+  console.error(err);
+  const main = document.querySelector(".main");
+  if (main) main.insertAdjacentHTML("afterbegin", '<div style="padding:16px;background:#fff0f1;border-radius:12px;color:#b42318">Menu gagal dimuat. Pastikan folder pages dan js ikut diunggah bersama adminbaz.html.</div>');
+});
+</script>
+
+</body>
+</html>
