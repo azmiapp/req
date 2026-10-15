@@ -471,8 +471,22 @@ function attendanceHtml(rows){
     return`<tr><td><span class="name">${esc(val(r,"nama","name","pegawai","employeeName")||"-")}</span><span class="sub">${esc(val(r,"nip","NIP")||"")}</span></td><td>${esc(val(r,"jabatan","position")||"-")}</td><td>${esc(val(r,"masuk","Masuk","jamMasuk","checkIn")||"-")}</td><td>${esc(val(r,"pulang","Pulang","jamPulang","checkOut")||"-")}</td><td>${esc(attendanceDuration(r))}</td><td><span class="badge ${cls}">${esc(val(r,"status","Status")||"Belum")}</span></td></tr>`;
   }).join("");
 }
-function renderAttendance(rows){$("attendanceBody").innerHTML=attendanceHtml(rows);$("attendanceInfo").textContent=`${rows.length} data`;$("attendanceInfo2").textContent=`${rows.length} data`}
-function renderAttendance2(rows){$("attendanceBody2").innerHTML=attendanceHtml(rows)}
+function renderAttendance(rows){
+  rows=Array.isArray(rows)?rows:[];
+  const html=attendanceHtml(rows);
+  const body=$("attendanceBody");
+  const info=$("attendanceInfo");
+  const info2=$("attendanceInfo2");
+  // Elemen info dapat tidak tersedia pada variasi layout dashboard; jangan hentikan render.
+  if(body) body.innerHTML=html;
+  if(info) info.textContent=`${rows.length} data`;
+  if(info2) info2.textContent=`${rows.length} data`;
+}
+function renderAttendance2(rows){
+  rows=Array.isArray(rows)?rows:[];
+  const body=$("attendanceBody2");
+  if(body) body.innerHTML=attendanceHtml(rows);
+}
 
 function populateAttendanceEmployees(rows){
   const exportSel=$("attendanceExportEmployeeFilter");
