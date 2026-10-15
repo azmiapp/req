@@ -174,9 +174,7 @@ body{font-size:13px}
     <section class="panel"><div class="panel-head"><div><h2>Absensi Hari Ini</h2><small id="attendanceInfo">-</small></div><div class="tabs"><button id="tabAll" class="tab active" onclick="setAttendanceFilter('ALL')">Semua</button><button id="tabBelum" class="tab" onclick="setAttendanceFilter('BELUM')">Belum Masuk</button></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Pegawai</th><th>Jabatan</th><th>Masuk</th><th>Pulang</th><th>Durasi</th><th>Status</th></tr></thead><tbody id="attendanceBody"></tbody></table></div></section>
     <section class="panel"><div class="panel-head"><div><h2>Payroll</h2><small id="dashboardPayrollInfo">-</small></div></div><div class="payroll-filter"><select id="dashboardPayrollMonthFilter" class="select"></select><select id="dashboardPayrollEmployeeFilter" class="select"><option value="ALL">Semua Karyawan</option></select><button class="primary" onclick="applyDashboardPayrollFilter()">Tampilkan</button></div><div id="dashboardPayrollSummary" class="payroll-summary hidden"></div><div id="dashboardPayrollList" class="mini-list"></div></section>
   </div>
-  <section class="panel section"><div class="panel-head"><div><h2>Rekap Bulanan</h2><small>Ringkasan kehadiran berdasarkan bulan yang dipilih</small></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Pegawai</th><th>Hari Kerja</th><th>Hadir</th><th>Terlambat</th><th>Izin</th><th>Sakit</th><th>Tidak Hadir</th><th>Jam Kerja</th></tr></thead><tbody id="monthlyBody"></tbody></table></div></section>
-</section>
-
+  
 <section id="page-attendance" class="page">
   <div class="module-hero"><div class="module-left"><div class="module-icon"><span class="material-symbols-rounded">fact_check</span></div><div><h2>Rekap Absensi Bulanan</h2><p>Lihat absensi karyawan lengkap dan hubungkan otomatis dengan pengajuan Izin, Cuti, dan Sakit yang disetujui.</p></div></div><button class="btn gray" onclick="loadMonthlyAttendance(true)"><span class="material-symbols-rounded" style="font-size:15px">refresh</span> Refresh</button></div>
 
