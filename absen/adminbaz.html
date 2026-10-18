@@ -20,6 +20,134 @@
 @media(max-width:760px){.sidebar{transform:translateX(-105%);transition:transform .2s;box-shadow:15px 0 35px #132b4a20}.sidebar.open{transform:translateX(0)}.overlay.show{display:block;position:fixed;inset:0;background:#10243d55;z-index:19}.topbar{left:0;height:62px;padding:0 13px}.mobile-menu{display:inline-flex;border:0;background:#eef3f8;border-radius:9px;width:36px;height:36px;align-items:center;justify-content:center}.top-left{display:flex;align-items:center;gap:10px}.top-date{display:none}.main{margin:0;padding:80px 12px 30px}.page-head{display:block}.page-head h1{font-size:22px}.page-head .toolbar{margin-top:13px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{padding:13px}.metric .value{font-size:24px}.top-actions .avatar{display:none}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.table{min-width:650px}.login-card{padding:28px 22px}}
 /* Kelola Amil: never display email column */
 #page-amil th[data-field="email"], #page-amil td[data-field="email"] { display:none !important; }
+
+/* ===== BAZNAS UI refinement: readability, hierarchy, responsive polish ===== */
+:root{
+  --navy:#123b70;--blue:#1767c2;--pale:#eaf4ff;--ink:#17283f;--muted:#66788f;
+  --line:#e3eaf2;--bg:#f5f8fc;--green:#087f5b;--greenbg:#e5f6ef;
+  --amber:#a96c08;--amberbg:#fff4d6;--red:#bf3441;--redbg:#ffeded;
+  --purple:#6950b5;--purplebg:#f0ebff;--shadow:0 5px 18px rgba(25,55,90,.045);
+}
+html{scroll-behavior:smooth}
+body{font-size:13px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+button{transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid #1767c244;outline-offset:2px
+}
+.login{
+  background:
+    radial-gradient(ellipse at 12% 8%,#dcecff 0,transparent 38%),
+    radial-gradient(ellipse at 90% 88%,#d9f5e8 0,transparent 36%),
+    #f7faff
+}
+.login-card{padding:40px 36px;border-radius:26px;box-shadow:0 22px 65px rgba(18,59,112,.12);border-color:#e4ebf4}
+.login .brand-mark{box-shadow:0 10px 22px #123b7028}
+.login h1{letter-spacing:-.045em;font-size:26px;color:#16385f}
+.login p{font-size:13px;line-height:1.75}
+.btn{min-height:36px;padding:9px 13px;border-radius:10px;letter-spacing:-.01em}
+.btn-primary{background:linear-gradient(135deg,#176fc9,#1457a2);box-shadow:0 4px 10px #1767c21c}
+.btn-primary:hover{background:linear-gradient(135deg,#125eaf,#104b8e);box-shadow:0 6px 15px #1767c22b;transform:translateY(-1px)}
+.btn-green{background:#087f5b}
+.btn-green:hover{background:#066a4b;transform:translateY(-1px)}
+.btn-red:hover{background:#a92b35;transform:translateY(-1px)}
+.btn-light{background:#fff;border-color:#dce5ef}
+.btn-light:hover{background:#f3f7fb;border-color:#c7d5e5}
+.sidebar{padding:21px 13px;background:linear-gradient(180deg,#fff 0%,#fbfdff 100%);box-shadow:4px 0 20px #183a5c05}
+.brand{padding:3px 9px 27px}
+.brand .brand-mark{background:linear-gradient(145deg,#0b8b63,#075c48);box-shadow:0 6px 15px #087f5b25}
+.brand strong{font-size:13px;letter-spacing:-.02em}
+.nav-label{font-size:10px;letter-spacing:.13em}
+.nav{gap:5px}
+.nav button{position:relative;padding:11px 12px;border-radius:10px;font-size:12px;transition:all .18s ease}
+.nav button:hover{background:#f0f6fc;transform:translateX(2px)}
+.nav button.active{background:linear-gradient(90deg,#e7f3ff,#f1f7ff);color:#145ca8;font-weight:750}
+.nav button.active:before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 4px 4px 0;background:#1767c2}
+.nav .ico{font-size:16px;opacity:.9}
+.side-bottom{padding-top:16px}
+.topbar{height:70px;background:rgba(255,255,255,.94);box-shadow:0 3px 15px rgba(24,50,80,.025)}
+.top-title{font-size:14px;letter-spacing:-.025em}
+.top-date{font-size:11px}
+.main{padding-top:96px}
+.page-head{margin-bottom:22px;align-items:center}
+.page-head h1{font-size:27px;line-height:1.2;letter-spacing:-.05em;color:#172e4b}
+.page-head p{font-size:12px;line-height:1.65;margin-top:8px}
+.field{height:40px;border-color:#dbe5ef;border-radius:10px;font-size:12px;transition:border-color .18s,box-shadow .18s}
+.field:hover{border-color:#c2d3e5}
+.cards{gap:14px;margin-bottom:18px}
+.metric{position:relative;isolation:isolate;border-radius:17px;padding:18px 17px;box-shadow:0 4px 18px rgba(20,49,85,.035);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.metric:after{content:"";position:absolute;z-index:-1;right:0;top:0;width:76px;height:76px;border-radius:0 16px 0 100%;background:linear-gradient(135deg,rgba(23,103,194,.055),transparent)}
+.metric:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(20,49,85,.075);border-color:#d4e1ef}
+.metric .label{font-size:10px;line-height:1.5;letter-spacing:.07em;color:#64758a}
+.metric .value{font-size:30px;line-height:1.1;margin-top:12px;letter-spacing:-.055em}
+.metric .foot{font-size:11px;line-height:1.5;margin-top:8px}
+.metric.green .value{color:#087f5b}
+.panel{border-radius:17px;box-shadow:0 5px 20px rgba(20,49,85,.035);margin-bottom:18px}
+.panel-head{padding:17px 20px}
+.panel-head h2{font-size:13px;font-weight:800;letter-spacing:-.015em;color:#203955}
+.panel-head p{font-size:11px;line-height:1.6}
+.table-wrap{scrollbar-color:#cbd8e6 #f6f9fc;scrollbar-width:thin}
+.table{min-width:720px}
+.table th{padding:13px 15px;background:#f5f8fc;color:#687b91;font-size:10px;letter-spacing:.065em}
+.table td{padding:13px 15px;font-size:12px;line-height:1.55}
+.table tbody tr{transition:background .15s ease}
+.table tbody tr:hover{background:#f5faff}
+.primary-text{font-weight:750;color:#213a58}
+.sub{font-size:10px;line-height:1.5;color:#77889b;overflow-wrap:anywhere}
+.pill{padding:5px 9px;font-size:10px;letter-spacing:.01em}
+.filters{padding:14px 18px}
+.form-layout{gap:22px;padding:22px}
+.form-grid{gap:14px}
+.form-grid label{font-size:11px;color:#465d76;margin-bottom:6px}
+.form-grid input,.form-grid select,.form-grid textarea{font-size:12px;border-color:#dbe5ef;border-radius:10px;min-height:40px}
+.form-grid textarea{line-height:1.6}
+.loadingbar{border-radius:11px;border-color:#d8e8f7;background:#f6fbff;color:#245b8c;padding:12px 15px}
+.toast{border-radius:13px;padding:13px 17px;box-shadow:0 12px 35px #142b4628;line-height:1.5}
+.empty{padding:42px 20px!important;font-size:12px!important}
+#page-amil .table td{padding:10px}
+#page-amil .field{min-width:90px}
+#page-amil .btn{white-space:nowrap}
+@media(max-width:1100px){
+  .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cards[style*="repeat(4"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .cards[style*="repeat(3"]{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .two-col,.form-layout{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .topbar{height:64px}
+  .main{padding:80px 13px 28px}
+  .page-head{margin-bottom:17px}
+  .page-head h1{font-size:23px}
+  .page-head p{font-size:12px}
+  .page-head .toolbar{gap:7px}
+  .toolbar .field{min-width:0;max-width:100%;flex:1 1 135px}
+  .toolbar .btn{flex:0 0 auto}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .cards[style*="repeat(4"],.cards[style*="repeat(3"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .metric{padding:14px 13px;border-radius:14px}
+  .metric .label{font-size:9px}
+  .metric .value{font-size:25px;margin-top:9px}
+  .metric .foot{font-size:10px}
+  .panel{border-radius:14px;margin-bottom:14px}
+  .panel-head{padding:14px}
+  .table th{padding:11px 12px}
+  .table td{padding:11px 12px;font-size:11px}
+  .filters{padding:12px;gap:7px}
+  .filters .field{flex:1 1 130px;min-width:0}
+  .form-layout{padding:15px;gap:18px}
+  .login-card{padding:30px 22px;border-radius:22px}
+}
+@media(max-width:390px){
+  .cards{grid-template-columns:1fr 1fr}
+  .metric .value{font-size:23px}
+  .top-title{font-size:13px}
+  .top-actions{gap:5px}
+  .top-actions .btn{padding:8px 10px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
 </style>
 </head>
 <body>
