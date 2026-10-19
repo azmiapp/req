@@ -140,7 +140,7 @@ async function tampilkanDetail() {
     /*
      WA CS LEK
      */
-    const whatsappNumber = "6285800129107";
+    const whatsappNumber = "6283168451215";
 
     const message = [
       "🌿 *PESANAN RESTU BUMI HERB & SPICES*",
