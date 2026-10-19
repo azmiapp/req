@@ -6,7 +6,7 @@
  * GANTI API_URL DI BAWAH DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA.
  */
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxmMwbY-tp3-x5rHHafcJIPfsgytoB1laST8458D2hBBGXETkuLuFFaC8Jz13TGdLrF/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyXsJU86lCcUi9ZdGJNzjXN7D14UkisQWr4CIDsE9ytMgc64iW-Tqr7No3MDJExBfrR/exec";
 
 let PRODUCTS = [];
 
