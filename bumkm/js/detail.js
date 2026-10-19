@@ -140,7 +140,7 @@ async function tampilkanDetail() {
     /*
      WA CS LEK
      */
-    const whatsappNumber = "6287767283778";
+    const whatsappNumber = "6285800129107";
 
     const message = [
       "🧼 *PESANAN DHARMA SUKOWATI*",
