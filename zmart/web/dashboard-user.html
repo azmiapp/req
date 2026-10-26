@@ -1052,7 +1052,7 @@ tr:hover{
             
 
         </div>
-        <div class="form-group"> <label>Tanggal Pengisian</label> <input id="tanggalPengisian" type="date"> </div>
+        <div class="form-group"><label for="tanggalPengisian">Tanggal Laporan</label><input id="tanggalPengisian" type="date" required><div class="nama-hint">Pilih tanggal kegiatan/laporan yang sebenarnya. Tanggal submit dicatat otomatis saat dikirim.</div></div>
 
 
         <!-- TAHUN -->
@@ -1200,13 +1200,15 @@ tr:hover{
 
                 <tr>
 
-                    <th>Tanggal</th>
+                    <th>Tanggal Laporan</th>
+                    <th>Tanggal Submit</th>
                     <th>Bulan</th>
                     <th>Kecamatan</th>
                     <th>Omset</th>
                     <th>Kulakan</th>
                     <th>Bersih</th>
                     <th>Tambahan</th>
+                    <th>Aksi</th>
 
                 </tr>
 
@@ -1326,6 +1328,7 @@ let financeChart = null;
 let userDashboardData = [];
 
 let userSelectedBulan = "";
+let editingReportRow = null;
 
 
 /* =====================================================
@@ -2558,7 +2561,7 @@ function renderUserTable(
             <tr>
 
                 <td
-                    colspan="7"
+                    colspan="9"
                     class="empty">
 
                     Belum ada laporan pada periode ini.
@@ -2583,20 +2586,9 @@ function renderUserTable(
                 `
                 <tr>
 
-                    <td>
-                        ${escapeHTML(
-                            formatTanggal(
-                                row.waktu
-                            )
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            row.bulanTahun ||
-                            ""
-                        )}
-                    </td>
+                    <td>${escapeHTML(formatTanggal(row.tanggalLaporan || row.waktu))}</td>
+                    <td>${escapeHTML(formatTanggal(row.waktu))}</td>
+                    <td>${escapeHTML(row.bulanTahun || "")}</td>
 
                     <td>
                         ${escapeHTML(
@@ -2624,10 +2616,9 @@ function renderUserTable(
                     </td>
 
                     <td>
-                        ${rupiah(
-                            row.pendapatanTambahan
-                        )}
+                        ${rupiah(row.pendapatanTambahan)}
                     </td>
+                    <td><button type="button" class="reset-btn" onclick="editUserReport(${Number(row.rowNumber)||0})">✏️ Edit</button></td>
 
                 </tr>
                 `;
@@ -2637,6 +2628,34 @@ function renderUserTable(
 
 }
 
+
+
+function editUserReport(rowNumber){
+    const row = userDashboardData.find(r => Number(r.rowNumber) === Number(rowNumber));
+    if(!row){ alert("Data laporan tidak ditemukan. Muat ulang riwayat."); return; }
+    editingReportRow = Number(rowNumber);
+    document.getElementById("namaMustahik").value = row.namaMustahik || "";
+    document.getElementById("kecamatan").value = row.kecamatan || "";
+    const parts = String(row.bulanTahun || "").split(/\s+/);
+    document.getElementById("bulan").value = parts.slice(0,-1).join(" ").toLowerCase().replace(/^\w/,c=>c.toUpperCase());
+    document.getElementById("tahun").value = parts[parts.length-1] || "";
+    document.getElementById("tanggalPengisian").value = toInputDate(row.tanggalLaporan || row.waktu);
+    document.getElementById("omset").value = Number(row.omset)||0;
+    document.getElementById("kulakan").value = Number(row.kulakan)||0;
+    document.getElementById("pendapatanTambahan").value = Number(row.pendapatanTambahan)||0;
+    hitungBersih();
+    const btn=document.getElementById("saveBtn"); btn.innerText="💾 Simpan Perubahan";
+    document.getElementById("saveStatus").className="status loading";
+    document.getElementById("saveStatus").innerText="Mode edit aktif. Tanggal submit asli akan tetap tersimpan.";
+    document.getElementById("namaMustahik").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function toInputDate(value){
+    if(!value) return new Date().toISOString().slice(0,10);
+    const t=String(value);
+    let m=t.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m) return `${m[1]}-${m[2]}-${m[3]}`;
+    m=t.match(/^(\d{2})\/(\d{2})\/(\d{4})/); if(m) return `${m[3]}-${m[2]}-${m[1]}`;
+    const d=new Date(value); return isNaN(d)?new Date().toISOString().slice(0,10):`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
 
 /* =====================================================
    HITUNG BERSIH
@@ -2792,6 +2811,8 @@ async function saveData(){
 
     }
 
+    if(!document.getElementById("tanggalPengisian").value){ alert("Tanggal laporan wajib dipilih."); return; }
+
 
     const bulanTahun =
         bulan +
@@ -2854,6 +2875,9 @@ async function saveData(){
 
         const payload = {
 
+            action: editingReportRow ? "updateReport" : "saveReport",
+            rowNumber: editingReportRow || "",
+            tanggalLaporan: document.getElementById("tanggalPengisian").value,
             idToken:
                 token,
 
@@ -2918,10 +2942,9 @@ async function saveData(){
         status.className =
             "status success";
 
-        status.innerText =
-            "✅ " +
-            result.message;
-
+        status.innerText = "✅ " + result.message;
+        editingReportRow = null;
+        saveBtn.innerText = "💾 Simpan Laporan";
 
         /*
            Reset form
