@@ -1093,7 +1093,8 @@ tr:hover{
 
                 <tr>
 
-                    <th>Waktu</th>
+                    <th>Tanggal Laporan</th>
+                    <th>Tanggal Submit</th>
                     <th>Nama Mustahik</th>
                     <th>Bulan</th>
                     <th>Email</th>
@@ -3050,7 +3051,7 @@ function renderAdminTable(rows){
             <tr>
 
                 <td
-                    colspan="9"
+                    colspan="10"
                     class="empty">
 
                     Tidak ada data sesuai filter.
@@ -3074,13 +3075,8 @@ function renderAdminTable(rows){
             `
             <tr>
 
-                <td>
-                    ${escapeHTML(
-                        formatTanggal(
-                            row.waktu
-                        )
-                    )}
-                </td>
+                <td>${escapeHTML(formatTanggal(row.tanggalLaporan || row.waktu))}</td>
+                <td>${escapeHTML(formatTanggal(row.waktu))}</td>
 
                 <td>
                     <b>
