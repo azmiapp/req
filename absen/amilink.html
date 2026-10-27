@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard Administrasi</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+
+    background:linear-gradient(135deg,#0b6b4a,#0f9d58,#2fbf71);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    position:relative;
+
+}
+
+/* Background Blur Circle */
+
+body::before{
+content:'';
+position:absolute;
+width:500px;
+height:500px;
+background:rgba(255,255,255,.08);
+border-radius:50%;
+top:-180px;
+left:-180px;
+filter:blur(15px);
+animation:float1 12s infinite alternate;
+}
+
+body::after{
+content:'';
+position:absolute;
+width:400px;
+height:400px;
+background:rgba(255,255,255,.08);
+border-radius:50%;
+right:-120px;
+bottom:-120px;
+filter:blur(20px);
+animation:float2 10s infinite alternate;
+}
+
+@keyframes float1{
+
+0%{transform:translateY(0px);}
+100%{transform:translateY(40px);}
+
+}
+
+@keyframes float2{
+
+0%{transform:translateY(0px);}
+100%{transform:translateY(-50px);}
+
+}
+
+.container{
+
+width:95%;
+max-width:1100px;
+
+background:rgba(255,255,255,.12);
+
+backdrop-filter:blur(18px);
+
+border:1px solid rgba(255,255,255,.25);
+
+border-radius:30px;
+
+padding:40px;
+
+box-shadow:0 25px 60px rgba(0,0,0,.25);
+
+position:relative;
+z-index:10;
+
+}
+
+.header{
+
+text-align:center;
+
+margin-bottom:35px;
+
+}
+
+.header .logo{
+
+width:95px;
+height:95px;
+
+margin:auto;
+
+background:white;
+
+border-radius:50%;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:42px;
+
+color:#0f9d58;
+
+box-shadow:0 10px 25px rgba(0,0,0,.2);
+
+margin-bottom:18px;
+
+}
+
+.header h1{
+
+color:white;
+
+font-size:34px;
+
+font-weight:700;
+
+}
+
+.header p{
+
+margin-top:8px;
+
+color:#e8fff2;
+
+font-size:15px;
+
+}
+
+.datetime{
+
+margin-top:20px;
+
+display:flex;
+
+justify-content:center;
+
+gap:30px;
+
+flex-wrap:wrap;
+
+}
+
+.timebox{
+
+background:rgba(255,255,255,.15);
+
+padding:10px 22px;
+
+border-radius:50px;
+
+color:white;
+
+font-weight:600;
+
+}
+
+.cards{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+
+gap:30px;
+
+margin-top:40px;
+
+}
+
+.card{
+
+background:white;
+
+border-radius:25px;
+
+padding:35px;
+
+text-align:center;
+
+transition:.35s;
+
+position:relative;
+
+overflow:hidden;
+
+box-shadow:0 15px 35px rgba(0,0,0,.15);
+
+}
+
+.card::before{
+
+content:'';
+
+position:absolute;
+
+width:140px;
+
+height:140px;
+
+background:#f1f5f9;
+
+border-radius:50%;
+
+right:-45px;
+
+top:-45px;
+
+}
+
+.card:hover{
+
+transform:translateY(-10px);
+
+box-shadow:0 20px 50px rgba(0,0,0,.28);
+
+}
+
+.icon{
+
+width:110px;
+
+height:110px;
+
+margin:auto;
+
+border-radius:50%;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:46px;
+
+color:white;
+
+margin-bottom:22px;
+
+position:relative;
+
+z-index:5;
+
+}
+
+.baznas{
+
+background:linear-gradient(135deg,#16a34a,#22c55e);
+
+}
+
+.rsb{
+
+background:linear-gradient(135deg,#2563eb,#3b82f6);
+
+}
+
+.card h2{
+
+font-size:26px;
+
+margin-bottom:12px;
+
+color:#222;
+
+}
+
+.card p{
+
+font-size:15px;
+
+color:#666;
+
+line-height:1.7;
+
+margin-bottom:30px;
+
+}
+
+.btn{
+
+display:inline-flex;
+
+align-items:center;
+
+gap:10px;
+
+padding:15px 35px;
+
+border-radius:50px;
+
+text-decoration:none;
+
+font-weight:600;
+
+font-size:15px;
+
+transition:.3s;
+
+color:white;
+
+}
+
+.btn:hover{
+
+transform:scale(1.05);
+
+}
+
+.btn-baznas{
+
+background:#16a34a;
+
+}
+
+.btn-rsb{
+
+background:#2563eb;
+
+}
+
+.footer{
+
+margin-top:35px;
+
+text-align:center;
+
+color:white;
+
+font-size:14px;
+
+opacity:.9;
+
+}
+
+@media(max-width:768px){
+
+.container{
+
+padding:25px;
+
+}
+
+.header h1{
+
+font-size:28px;
+
+}
+
+.cards{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<div class="logo">
+<i class="fa-solid fa-user-shield"></i>
+</div>
+
+<h1>Dashboard Administrasi</h1>
+
+<p>
+Selamat Datang Administrator<br>
+Silakan pilih sistem administrasi yang akan dikelola.
+</p>
+
+<div class="datetime">
+
+<div class="timebox">
+🕒 <span id="clock"></span>
+</div>
+
+<div class="timebox">
+📅 <span id="date"></span>
+</div>
+
+</div>
+
+</div>
+
+<div class="cards">
+
+<div class="card">
+
+<div class="icon baznas">
+<i class="fa-solid fa-building-columns"></i>
+</div>
+
+<h2>Admin BAZNAS</h2>
+
+<p>
+Kelola absensi, data pegawai, laporan, serta administrasi BAZNAS Kabupaten Sragen.
+</p>
+
+<a class="btn btn-baznas"
+href="https://azmiapp.github.io/req/absen/adminbaz.html">
+
+<i class="fa-solid fa-arrow-right"></i>
+Masuk Dashboard
+
+</a>
+
+</div>
+
+<div class="card">
+
+<div class="icon rsb">
+<i class="fa-solid fa-heart-pulse"></i>
+</div>
+
+<h2>Admin Rumah Sehat BAZNAS</h2>
+
+<p>
+Kelola administrasi, absensi, dan seluruh data Rumah Sehat BAZNAS Kabupaten Sragen.
+</p>
+
+<a class="btn btn-rsb"
+href="https://azmiapp.github.io/req/absen/adminrsb.html">
+
+<i class="fa-solid fa-arrow-right"></i>
+Masuk Dashboard
+
+</a>
+
+</div>
+
+</div>
+
+<div class="footer">
+© 2026 Dashboard Administrasi Terpadu • BAZNAS Kabupaten Sragen
+</div>
+
+</div>
+
+<script>
+
+function updateClock(){
+
+const now=new Date();
+
+const hari=[
+"Minggu","Senin","Selasa","Rabu",
+"Kamis","Jumat","Sabtu"
+];
+
+const bulan=[
+"Januari","Februari","Maret","April","Mei","Juni",
+"Juli","Agustus","September","Oktober","November","Desember"
+];
+
+document.getElementById("clock").innerHTML=
+now.toLocaleTimeString("id-ID");
+
+document.getElementById("date").innerHTML=
+`${hari[now.getDay()]}, ${now.getDate()} ${bulan[now.getMonth()]} ${now.getFullYear()}`;
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+</script>
+
+</body>
+</html>
