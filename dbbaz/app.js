@@ -2,7 +2,7 @@
  * Set API_URL to the deployed Google Apps Script Web App URL.
  * API responses are JSON. See README for cross-origin deployment notes.
  */
-const API_URL = "PASTE_APPS_SCRIPT_WEB_APP_URL_HERE";
+const API_URL = "https://script.google.com/macros/s/AKfycbzByLmIc-bguo_Fr7GmOHqhasgvjMAE5_iSIEBMPdZo9PJhce9NLZPKWPA_BKQNQPAI/exec";
 const $ = (id) => document.getElementById(id);
 const state = { token: "", user: null, page: "dashboard", data: {} };
 const modules = [
