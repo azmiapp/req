@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153b63">
+  <title>Pusat Database ZIS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toast" class="toast" role="status"></div>
+  <section id="loginView" class="login-shell">
+    <div class="login-brand">
+      <div class="brand-mark">ZIS</div>
+      <p class="eyebrow">SISTEM INFORMASI TERINTEGRASI</p>
+      <h1>Pusat Database ZIS</h1>
+      <p class="muted light">Pengumpulan • Pendistribusian • Pendayagunaan • Keuangan • Pelaporan</p>
+    </div>
+    <form id="loginForm" class="panel login-card">
+      <h2>Masuk ke aplikasi</h2>
+      <p class="muted">Gunakan akun yang dibuat oleh Admin Sistem.</p>
+      <label>Email<input id="loginEmail" type="email" autocomplete="username" required placeholder="nama@lembaga.id"></label>
+      <label>Password<input id="loginPassword" type="password" autocomplete="current-password" required minlength="8" placeholder="Minimal 8 karakter"></label>
+      <button class="btn primary full" type="submit">Masuk</button>
+      <p class="hint">Akun pertama dibuat melalui fungsi bootstrap Admin di Google Apps Script. Jangan membagikan password.</p>
+    </form>
+  </section>
+
+  <div id="appView" class="app-shell hidden">
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand"><div class="brand-mark small">ZIS</div><div><b>Pusat Database</b><small>Manajemen ZIS</small></div></div>
+      <nav id="nav"></nav>
+      <div class="side-bottom">
+        <div class="user-chip"><span class="avatar" id="userAvatar">U</span><div><b id="userName">Pengguna</b><small id="userRole">Role</small></div></div>
+        <button id="logoutBtn" class="btn ghost full">Keluar</button>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <button id="menuToggle" class="icon-btn" aria-label="Buka menu">☰</button>
+        <div><p class="eyebrow" id="crumb">RINGKASAN</p><h1 id="pageTitle">Dashboard</h1></div>
+        <div class="top-actions"><span class="status-dot"></span><span class="muted">Terhubung ke API</span><button id="refreshBtn" class="btn secondary">↻ Refresh</button></div>
+      </header>
+      <div id="pageContent" class="content"></div>
+      <footer> Pusat Database ZIS <span>•</span> Hak akses berbasis role <span>•</span> Audit trail aktif</footer>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
