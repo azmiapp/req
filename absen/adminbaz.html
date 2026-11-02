@@ -325,11 +325,11 @@ function proofCoordinates(x,kind="masuk"){
  const lat=kind==="pulang"?pick(x,"pulangLatitude","latitudePulang","checkOutLatitude","latPulang"):pick(x,"latitude","lattitude","lat","gpsLatitude","lokasiLatitude","locationLatitude","checkInLatitude","masukLatitude");
  const lon=kind==="pulang"?pick(x,"pulangLongitude","longitudePulang","checkOutLongitude","lngPulang","lonPulang"):pick(x,"longitude","longgitude","lng","lon","gpsLongitude","lokasiLongitude","locationLongitude","checkInLongitude","masukLongitude");
  if(lat!==undefined&&lat!==null&&lat!==""&&lon!==undefined&&lon!==null&&lon!==""){const a=Number(lat),b=Number(lon);if(Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a)<=90&&Math.abs(b)<=180)return {lat:a,lon:b,url:`https://www.google.com/maps?q=${encodeURIComponent(a)},${encodeURIComponent(b)}`}}
- const raw=kind==="pulang"?pick(x,"mapsPulangUrl","mapPulangUrl","locationPulangUrl","lokasiPulangUrl","googleMapsPulangUrl"):pick(x,"mapsUrl","mapUrl","locationUrl","lokasiUrl","googleMapsUrl");
+ const raw=kind==="pulang"?pick(x,"checkOutMapUrl","mapsPulangUrl","mapPulangUrl","locationPulangUrl","lokasiPulangUrl","googleMapsPulangUrl"):pick(x,"checkInMapUrl","mapsUrl","mapUrl","locationUrl","lokasiUrl","googleMapsUrl");
  if(raw&&/^https?:\/\//i.test(String(raw)))return {url:String(raw)};return null
 }
 function proofPhoto(x,kind="masuk"){
- const v=kind==="pulang"?pick(x,"photoPulangUrl","fotoPulangUrl","foto_pulang_url","fotoPulang","pulangFoto","checkOutPhoto","checkOutPhotoUrl","photoOutUrl","fotoKeluar","fotoUrlPulang","buktiFotoPulang","pulangPhotoUrl"):pick(x,"photoUrl","fotoUrl","foto url","foto_url","fotoAbsen","foto","photo","imageUrl","selfieUrl","checkInPhoto","photoURL","buktiFoto","urlFoto","masukFoto");
+ const v=kind==="pulang"?pick(x,"photoPulangUrl","fotoPulangUrl","foto_pulang_url","fotoPulang","pulangFoto","checkOutPhoto","checkOutPhotoUrl","photoOutUrl","fotoKeluar","fotoUrlPulang","buktiFotoPulang","pulangPhotoUrl"):pick(x,"photoUrl","fotoUrl","foto url","foto_url","fotoAbsen","foto","photo","imageUrl","selfieUrl","checkInPhoto","checkInPhotoUrl","photoURL","buktiFoto","urlFoto","masukFoto");
  if(v===undefined||v===null)return "";const raw=String(v).trim();if(!raw)return "";if(/^data:image\//i.test(raw))return raw;if(!/^https?:\/\//i.test(raw)){return /^[a-zA-Z0-9_-]{20,}$/.test(raw)?`https://drive.google.com/thumbnail?id=${encodeURIComponent(raw)}&sz=w480`:""}return raw
 }
 function proofPhotoSources(photo){if(!photo)return [];const id=driveFileIdFromUrl(photo);if(id)return [`https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w480`,`https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`,photo];return [photo]}
@@ -390,7 +390,7 @@ async function loadMonthlyDailyDetail(month){
  populateRecapEmployeeSelect();
 }
 function monthlyMapLink(x){
- const raw=pick(x,"mapsUrl","mapUrl","locationUrl","lokasiUrl","googleMapsUrl");
+ const raw=pick(x,"checkInMapUrl","mapsUrl","mapUrl","locationUrl","lokasiUrl","googleMapsUrl");
  if(raw&&/^https?:\/\//i.test(String(raw)))return String(raw);
  const lat=pick(x,"latitude","lattitude","lat","gpsLatitude","lokasiLatitude","locationLatitude"),lon=pick(x,"longitude","longgitude","lng","lon","gpsLongitude","lokasiLongitude","locationLongitude");
  return lat!==undefined&&lat!==""&&lon!==undefined&&lon!==""?`https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lon)}`:"";
@@ -398,14 +398,14 @@ function monthlyMapLink(x){
 function monthlyPhotoLink(x,kind="masuk"){
  const raw=kind==="pulang"
   ?pick(x,"photoPulangUrl","fotoPulangUrl","foto_pulang_url","fotoPulang","pulangFoto","checkOutPhoto","checkOutPhotoUrl","photoOutUrl","fotoKeluar","fotoUrlPulang","buktiFotoPulang","pulangPhotoUrl")
-  :pick(x,"photoUrl","fotoUrl","foto_url","fotoAbsen","foto","photo","imageUrl","selfieUrl","checkInPhoto","photoURL","buktiFoto","urlFoto","masukFoto","photoMasukUrl");
+  :pick(x,"photoUrl","fotoUrl","foto_url","fotoAbsen","foto","photo","imageUrl","selfieUrl","checkInPhoto","checkInPhotoUrl","photoURL","buktiFoto","urlFoto","masukFoto","photoMasukUrl");
  if(!raw)return "";const value=String(raw).trim();
  if(/^https?:\/\//i.test(value))return value;
  return /^[a-zA-Z0-9_-]{20,}$/.test(value)?`https://drive.google.com/file/d/${encodeURIComponent(value)}/view`:"";
 }
 function monthlyMapLinkByType(x,kind="masuk"){
  if(kind==="pulang"){
-  const raw=pick(x,"mapsPulangUrl","mapPulangUrl","locationPulangUrl","lokasiPulangUrl","googleMapsPulangUrl");
+  const raw=pick(x,"checkOutMapUrl","mapsPulangUrl","mapPulangUrl","locationPulangUrl","lokasiPulangUrl","googleMapsPulangUrl");
   if(raw&&/^https?:\/\//i.test(String(raw)))return String(raw);
   const lat=pick(x,"pulangLatitude","latitudePulang","checkOutLatitude","latPulang"),lon=pick(x,"pulangLongitude","longitudePulang","checkOutLongitude","lngPulang","lonPulang");
   return lat!==undefined&&lat!==""&&lon!==undefined&&lon!==""?`https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lon)}`:"";
