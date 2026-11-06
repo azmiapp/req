@@ -31,8 +31,8 @@ button:disabled{opacity:.55;cursor:wait}
 </div>
 <label>Alamat Lengkap</label><textarea name="alamat" rows="2"></textarea>
 <div class="grid">
-<div><label>Desa/Kelurahan</label><select name="desa" id="desa" required><option value="">Memuat data...</option></select></div>
-<div><label>Kecamatan</label><select name="kecamatan" id="kecamatan" required><option value="">Pilih desa terlebih dahulu</option></select></div>
+<div><label>Desa/Kelurahan</label><input name="desa" id="desa" type="text" required placeholder="Masukkan desa/kelurahan"></div>
+<div><label>Kecamatan</label><input name="kecamatan" id="kecamatan" type="text" required placeholder="Masukkan kecamatan"></div>
 </div>
 <div class="grid">
 <div><label>SHM Atas Nama</label><select name="shm"><option>Sendiri</option><option>Suami/Istri</option><option>Orang Tua</option><option>Kakek/Nenek</option></select></div>
@@ -68,47 +68,9 @@ button:disabled{opacity:.55;cursor:wait}
 <script>
 const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzlwoVsE2ShpPN2-U1MBQbBMIOiZ9-6yf682Aj0QNsD8MZZz0UXoO6WcDIfOJKDAjfccA/exec';
 const $ = id => document.getElementById(id);
-let wilayahData = [];
 
 function setStatus(id, text) { $(id).textContent = text; }
 
-function loadWilayah() {
-  if (!GAS_API_URL.startsWith('https://script.google.com/macros/s/')) {
-    setStatus('formStatus', 'Atur GAS_API_URL terlebih dahulu pada file index.html.');
-    $('desa').innerHTML = '<option value="">URL backend belum diatur</option>';
-    return;
-  }
-  const callbackName = 'baznasWilayahCallback';
-  window[callbackName] = result => {
-    delete window[callbackName];
-    if (!result || !result.success) {
-      setStatus('formStatus', 'Gagal memuat data wilayah dari backend.');
-      return;
-    }
-    wilayahData = result.wilayah || [];
-    const select = $('desa');
-    select.innerHTML = '<option value="">Pilih desa/kelurahan</option>';
-    [...new Set(wilayahData.map(x => x.desa))].sort().forEach(desa => {
-      const opt = document.createElement('option');
-      opt.value = desa; opt.textContent = desa; select.appendChild(opt);
-    });
-    if (!wilayahData.length) setStatus('formStatus', 'Daftar wilayah kosong. Isi sheet Wilayah kolom A dan B.');
-  };
-  const script = document.createElement('script');
-  script.src = GAS_API_URL + '?action=wilayah&callback=' + callbackName + '&_=' + Date.now();
-  script.onerror = () => setStatus('formStatus', 'Tidak dapat menghubungi backend. Periksa URL dan deployment Apps Script.');
-  document.body.appendChild(script);
-}
-
-$('desa').addEventListener('change', () => {
-  const desa = $('desa').value;
-  const kec = [...new Set(wilayahData.filter(x => x.desa === desa).map(x => x.kecamatan))];
-  $('kecamatan').innerHTML = '<option value="">Pilih kecamatan</option>';
-  kec.forEach(k => {
-    const o = document.createElement('option'); o.value = k; o.textContent = k;
-    $('kecamatan').appendChild(o);
-  });
-});
 
 $('getLocationBtn').addEventListener('click', () => {
   if (!navigator.geolocation) {
@@ -231,7 +193,6 @@ $('surveyForm').addEventListener('submit', async e => {
   }
 });
 
-loadWilayah();
 </script>
 </body>
 </html>
