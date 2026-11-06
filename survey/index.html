@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Form Survey Bantuan - BAZNAS Sragen</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#eef5ef;margin:0;color:#24352b}
+.header{background:#0f8a4b;color:#fff;padding:18px;text-align:center;font-weight:bold}
+.card{max-width:760px;margin:15px auto;background:#fff;padding:18px;border-radius:12px;box-shadow:0 2px 8px #0002}
+label{display:block;margin-top:12px;font-weight:600}
+input,select,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin-top:5px;font:inherit}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{width:100%;padding:14px;background:#0f8a4b;color:#fff;border:0;border-radius:8px;font-size:16px;margin-top:16px;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
+.location{background:#f1f8f3;border:1px solid #cfe5d5;padding:14px;border-radius:9px;margin-top:12px}
+.status{font-size:13px;color:#555;white-space:pre-wrap;margin-top:8px}
+.note{font-size:12px;color:#666}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.card{margin:10px;padding:14px}}
+</style>
+</head>
+<body>
+<div class="header">FORM SURVEY BANTUAN<br>BAZNAS KABUPATEN SRAGEN</div>
+<div class="card">
+<form id="surveyForm">
+<label>Nama Lengkap</label><input name="nama" required maxlength="150">
+<div class="grid">
+<div><label>Jenis Kelamin</label><select name="jk"><option>Laki-laki</option><option>Perempuan</option></select></div>
+<div><label>NIK</label><input name="nik" inputmode="numeric" maxlength="16" pattern="[0-9]{16}" placeholder="16 digit NIK"></div>
+</div>
+<label>Alamat Lengkap</label><textarea name="alamat" rows="2"></textarea>
+<div class="grid">
+<div><label>Desa/Kelurahan</label><select name="desa" id="desa" required><option value="">Memuat data...</option></select></div>
+<div><label>Kecamatan</label><select name="kecamatan" id="kecamatan" required><option value="">Pilih desa terlebih dahulu</option></select></div>
+</div>
+<div class="grid">
+<div><label>SHM Atas Nama</label><select name="shm"><option>Sendiri</option><option>Suami/Istri</option><option>Orang Tua</option><option>Kakek/Nenek</option></select></div>
+<div><label>Luas Rumah (m²)</label><input name="luasRumah" type="number" min="0" step="any"></div>
+<div><label>Atap</label><select name="atap"><option>Genteng</option><option>Seng</option><option>Asbes</option></select></div>
+<div><label>Rangka Atap</label><select name="rangkaAtap"><option>Kayu</option><option>Baja Ringan</option><option>Bambu</option></select></div>
+<div><label>Dinding</label><select name="dinding"><option>Tembok</option><option>Papan</option><option>Bambu</option></select></div>
+<div><label>Lantai</label><select name="lantai"><option>Keramik</option><option>Semen</option><option>Tanah</option></select></div>
+<div><label>Daya Listrik</label><select name="dayaListrik"><option>450 VA</option><option>900 VA</option><option>1300 VA</option></select></div>
+<div><label>Sumber Air</label><select name="sumberAir"><option>PDAM</option><option>Sumur</option><option>Sungai</option></select></div>
+</div>
+<label>Jumlah Jiwa</label><input name="jumlahJiwa" type="number" min="1" step="1">
+<div class="location">
+<strong>Penanda Lokasi Rumah (GPS)</strong>
+<div class="note">Aktifkan GPS/lokasi pada perangkat dan izinkan akses lokasi di browser. Pengambilan lokasi sebaiknya dilakukan di titik rumah.</div>
+<button type="button" id="getLocationBtn">AMBIL LOKASI AKURAT</button>
+<div id="locationStatus" class="status">Lokasi belum direkam.</div>
+<input type="hidden" name="latitude" id="latitude">
+<input type="hidden" name="longitude" id="longitude">
+<input type="hidden" name="accuracy" id="accuracy">
+<input type="hidden" name="locationTime" id="locationTime">
+</div>
+<label>Foto KTP (maks. 5 MB)</label><input name="fotoKtp" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto KK (maks. 5 MB)</label><input name="fotoKk" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Depan (maks. 5 MB)</label><input name="fotoRumahDepan" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Samping (maks. 5 MB)</label><input name="fotoRumahSamping" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Belakang (maks. 5 MB)</label><input name="fotoRumahBelakang" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Dalam (maks. 5 MB)</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<button type="submit" id="submitBtn">SIMPAN DATA</button>
+<div id="formStatus" class="status" role="status"></div>
+</form>
+</div>
+<script>
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzlwoVsE2ShpPN2-U1MBQbBMIOiZ9-6yf682Aj0QNsD8MZZz0UXoO6WcDIfOJKDAjfccA/exec';
+const $ = id => document.getElementById(id);
+let wilayahData = [];
+
+function setStatus(id, text) { $(id).textContent = text; }
+
+function loadWilayah() {
+  if (!GAS_API_URL.startsWith('https://script.google.com/macros/s/')) {
+    setStatus('formStatus', 'Atur GAS_API_URL terlebih dahulu pada file index.html.');
+    $('desa').innerHTML = '<option value="">URL backend belum diatur</option>';
+    return;
+  }
+  const callbackName = 'baznasWilayahCallback';
+  window[callbackName] = result => {
+    delete window[callbackName];
+    if (!result || !result.success) {
+      setStatus('formStatus', 'Gagal memuat data wilayah dari backend.');
+      return;
+    }
+    wilayahData = result.wilayah || [];
+    const select = $('desa');
+    select.innerHTML = '<option value="">Pilih desa/kelurahan</option>';
+    [...new Set(wilayahData.map(x => x.desa))].sort().forEach(desa => {
+      const opt = document.createElement('option');
+      opt.value = desa; opt.textContent = desa; select.appendChild(opt);
+    });
+    if (!wilayahData.length) setStatus('formStatus', 'Daftar wilayah kosong. Isi sheet Wilayah kolom A dan B.');
+  };
+  const script = document.createElement('script');
+  script.src = GAS_API_URL + '?action=wilayah&callback=' + callbackName + '&_=' + Date.now();
+  script.onerror = () => setStatus('formStatus', 'Tidak dapat menghubungi backend. Periksa URL dan deployment Apps Script.');
+  document.body.appendChild(script);
+}
+
+$('desa').addEventListener('change', () => {
+  const desa = $('desa').value;
+  const kec = [...new Set(wilayahData.filter(x => x.desa === desa).map(x => x.kecamatan))];
+  $('kecamatan').innerHTML = '<option value="">Pilih kecamatan</option>';
+  kec.forEach(k => {
+    const o = document.createElement('option'); o.value = k; o.textContent = k;
+    $('kecamatan').appendChild(o);
+  });
+});
+
+$('getLocationBtn').addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    setStatus('locationStatus', 'Browser/perangkat tidak mendukung GPS.'); return;
+  }
+  const btn = $('getLocationBtn'); btn.disabled = true;
+  setStatus('locationStatus', 'Sedang mengambil lokasi GPS... Pastikan izin lokasi aktif.');
+  navigator.geolocation.getCurrentPosition(pos => {
+    const c = pos.coords;
+    $('latitude').value = c.latitude;
+    $('longitude').value = c.longitude;
+    $('accuracy').value = c.accuracy;
+    $('locationTime').value = new Date(pos.timestamp).toISOString();
+    const map = `https://www.google.com/maps?q=${c.latitude},${c.longitude}`;
+    setStatus('locationStatus', `Lokasi berhasil direkam.
+Latitude: ${c.latitude}
+Longitude: ${c.longitude}
+Perkiraan akurasi: ±${Math.round(c.accuracy)} meter
+Peta: ${map}`);
+    btn.disabled = false;
+  }, err => {
+    const messages = {
+      1: 'Izin lokasi ditolak. Izinkan akses lokasi pada browser.',
+      2: 'Lokasi tidak tersedia. Aktifkan GPS dan coba di area terbuka.',
+      3: 'Waktu pengambilan lokasi habis. Coba kembali.'
+    };
+    setStatus('locationStatus', messages[err.code] || err.message);
+    btn.disabled = false;
+  }, { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 });
+});
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    if (file.size > 4 * 1024 * 1024) return reject(new Error(file.name + ' melebihi 4 MB.'));
+    const reader = new FileReader();
+    reader.onload = () => resolve({ name: file.name, data: reader.result });
+    reader.onerror = () => reject(new Error('Gagal membaca file ' + file.name));
+    reader.readAsDataURL(file);
+  });
+}
+
+function sendPayloadToAppsScript(payload) {
+  return new Promise((resolve, reject) => {
+    const iframe = document.createElement('iframe');
+    const targetName = 'baznasSubmitFrame_' + Date.now();
+    iframe.name = targetName;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const cleanup = () => {
+      window.removeEventListener('message', onMessage);
+      setTimeout(() => iframe.remove(), 1000);
+    };
+    const onMessage = event => {
+      if (!event.data || event.data.type !== 'BAZNAS_SURVEY_RESULT') return;
+      cleanup();
+      resolve(event.data.result);
+    };
+    window.addEventListener('message', onMessage);
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = GAS_API_URL;
+    form.target = targetName;
+    form.style.display = 'none';
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'payload';
+    input.value = JSON.stringify(payload);
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    form.remove();
+
+    setTimeout(() => {
+      cleanup();
+      reject(new Error('Backend tidak memberikan respons. Periksa URL Web App dan izin deployment.'));
+    }, 90000);
+  });
+}
+
+$('surveyForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.currentTarget;
+  if (!GAS_API_URL.startsWith('https://script.google.com/macros/s/')) {
+    setStatus('formStatus', 'URL backend belum diatur. Isi GAS_API_URL pada index.html.');
+    return;
+  }
+  if (!$('latitude').value || !$('longitude').value) {
+    setStatus('formStatus', 'Ambil lokasi GPS terlebih dahulu sebelum menyimpan.'); return;
+  }
+  const btn = $('submitBtn'); btn.disabled = true;
+  setStatus('formStatus', 'Mengunggah data dan foto. Mohon tunggu, jangan tutup halaman...');
+  try {
+    const fd = new FormData(form);
+    const payload = {};
+    for (const [key, value] of fd.entries()) {
+      if (!(value instanceof File)) payload[key] = value;
+    }
+    payload.files = {
+      fotoKtp: await fileToDataUrl(form.elements.fotoKtp.files[0]),
+      fotoKk: await fileToDataUrl(form.elements.fotoKk.files[0]),
+      fotoRumahDepan: await fileToDataUrl(form.elements.fotoRumahDepan.files[0]),
+      fotoRumahSamping: await fileToDataUrl(form.elements.fotoRumahSamping.files[0]),
+      fotoRumahBelakang: await fileToDataUrl(form.elements.fotoRumahBelakang.files[0]),
+      fotoRumahDalam: await fileToDataUrl(form.elements.fotoRumahDalam.files[0])
+    };
+    const result = await sendPayloadToAppsScript(payload);
+    if (!result || !result.success) throw new Error((result && result.message) || 'Data gagal disimpan.');
+    setStatus('formStatus', result.message + ' Nomor baris: ' + result.row);
+    form.reset();
+    ['latitude','longitude','accuracy','locationTime'].forEach(id => $(id).value = '');
+    setStatus('locationStatus', 'Lokasi belum direkam.');
+    $('kecamatan').innerHTML = '<option value="">Pilih desa terlebih dahulu</option>';
+  } catch (err) {
+    setStatus('formStatus', 'Gagal menyimpan: ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+loadWilayah();
+</script>
+</body>
+</html>
