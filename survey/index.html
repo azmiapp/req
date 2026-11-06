@@ -17,6 +17,22 @@ button:disabled{opacity:.55;cursor:wait}
 .location{background:#f1f8f3;border:1px solid #cfe5d5;padding:14px;border-radius:9px;margin-top:12px}
 .status{font-size:13px;color:#555;white-space:pre-wrap;margin-top:8px}
 .note{font-size:12px;color:#666}
+
+.progress-wrap{display:none;margin-top:14px;background:#edf2ee;border-radius:10px;padding:12px}
+.progress-top{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:8px}
+.progress-track{height:10px;background:#dce7df;border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:#0f8a4b;border-radius:99px;transition:width .25s ease}
+.progress-fill.indeterminate{width:35%;animation:moveProgress 1.2s ease-in-out infinite}
+@keyframes moveProgress{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
+.cache-indicator{font-size:12px;margin-top:8px;color:#45634f}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:9999;align-items:center;justify-content:center;padding:18px}
+.modal.show{display:flex}
+.modal-box{width:min(420px,100%);background:#fff;border-radius:16px;padding:24px;text-align:center;box-shadow:0 12px 40px #0003}
+.modal-icon{width:58px;height:58px;border-radius:50%;background:#e5f6eb;color:#0f8a4b;display:grid;place-items:center;font-size:30px;margin:0 auto 12px}
+.modal-box h3{margin:8px 0;color:#176b3d}
+.modal-box p{font-size:14px;color:#56645b;line-height:1.5}
+.modal-box button{margin-top:10px}
+
 @media(max-width:600px){.grid{grid-template-columns:1fr}.card{margin:10px;padding:14px}}
 </style>
 </head>
@@ -64,6 +80,14 @@ button:disabled{opacity:.55;cursor:wait}
 <button type="submit" id="submitBtn">SIMPAN DATA</button>
 <div id="formStatus" class="status" role="status"></div>
 </form>
+</div>
+<div class="modal" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+ <div class="modal-box">
+   <div class="modal-icon">✓</div>
+   <h3 id="successTitle">UPLOAD BERKAS SELESAI</h3>
+   <p id="successMessage">Data survey dan berkas berhasil disimpan.</p>
+   <button type="button" id="closeSuccessModal">SELESAI</button>
+ </div>
 </div>
 <script>
 const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzlwoVsE2ShpPN2-U1MBQbBMIOiZ9-6yf682Aj0QNsD8MZZz0UXoO6WcDIfOJKDAjfccA/exec';
@@ -153,45 +177,227 @@ function sendPayloadToAppsScript(payload) {
   });
 }
 
+
+// Penyimpanan lokal menggunakan IndexedDB: tetap tersedia saat offline/halaman ditutup.
+const DB_NAME = 'BaznasSurveyOfflineDB';
+const STORE_NAME = 'survey';
+const DRAFT_KEY = 'currentDraft';
+const QUEUE_KEY = 'pendingUploads';
+
+function openSurveyDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function dbGet(key) {
+  const db = await openSurveyDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const req = tx.objectStore(STORE_NAME).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+    tx.oncomplete = () => db.close();
+  });
+}
+async function dbSet(key, value) {
+  const db = await openSurveyDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).put(value, key);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+  });
+}
+async function dbDelete(key) {
+  const db = await openSurveyDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).delete(key);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+  });
+}
+
+const fileFields = ['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam'];
+let savedFiles = {};
+let savingDraft = false;
+let draftTimer = null;
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve({name:file.name, data:reader.result, type:file.type, size:file.size});
+    reader.onerror = () => reject(new Error('Gagal membaca file ' + file.name));
+    reader.readAsDataURL(file);
+  });
+}
+function currentFields() {
+  const data = {};
+  for (const [key, value] of new FormData($('surveyForm')).entries()) {
+    if (!(value instanceof File)) data[key] = value;
+  }
+  return data;
+}
+async function saveDraftNow() {
+  if (savingDraft) return;
+  savingDraft = true;
+  try {
+    // File yang sudah dipilih disalin ke IndexedDB agar tetap ada setelah reload/offline.
+    for (const name of fileFields) {
+      const file = $('surveyForm').elements[name].files[0];
+      if (file) {
+        if (file.size > 4 * 1024 * 1024) throw new Error(file.name + ' melebihi 4 MB.');
+        savedFiles[name] = await readFileAsDataUrl(file);
+      }
+    }
+    await dbSet(DRAFT_KEY, {fields:currentFields(), files:savedFiles, savedAt:new Date().toISOString()});
+    $('cacheStatus').textContent = '✓ Draft dan berkas tersimpan di perangkat ini.';
+  } catch (err) {
+    $('cacheStatus').textContent = 'Cache belum lengkap: ' + err.message;
+  } finally {
+    savingDraft = false;
+  }
+}
+function scheduleDraftSave() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(saveDraftNow, 500);
+}
+async function restoreDraft() {
+  try {
+    const draft = await dbGet(DRAFT_KEY);
+    if (!draft) return;
+    Object.entries(draft.fields || {}).forEach(([name,value]) => {
+      const field = $('surveyForm').elements[name];
+      if (field && field.type !== 'file') field.value = value;
+    });
+    savedFiles = draft.files || {};
+    $('cacheStatus').textContent = '✓ Draft sebelumnya dipulihkan (' +
+      new Date(draft.savedAt).toLocaleString('id-ID') + '). Foto tersimpan dan siap diunggah.';
+  } catch (err) {
+    $('cacheStatus').textContent = 'Penyimpanan lokal tidak dapat dibuka: ' + err.message;
+  }
+}
+$('surveyForm').addEventListener('input', scheduleDraftSave);
+$('surveyForm').addEventListener('change', scheduleDraftSave);
+window.addEventListener('online', () => {
+  $('cacheStatus').textContent = 'Koneksi kembali. Draft aman; tekan SIMPAN DATA untuk mengunggah.';
+});
+
+function setProgress(label, percent, indeterminate=false) {
+  $('progressWrap').style.display = 'block';
+  $('progressLabel').textContent = label;
+  $('progressPercent').textContent = indeterminate ? '...' : percent + '%';
+  $('progressFill').classList.toggle('indeterminate', indeterminate);
+  $('progressFill').style.width = indeterminate ? '35%' : percent + '%';
+}
+function hideProgress() {
+  $('progressWrap').style.display = 'none';
+  $('progressFill').classList.remove('indeterminate');
+}
+function showSuccess(message) {
+  $('successMessage').textContent = message || 'Data survey dan berkas berhasil disimpan.';
+  $('successModal').classList.add('show');
+}
+$('closeSuccessModal').addEventListener('click', () => $('successModal').classList.remove('show'));
+
+async function makePayloadFromDraft() {
+  await saveDraftNow();
+  const fields = currentFields();
+  const files = {};
+  for (const name of fileFields) files[name] = savedFiles[name] || null;
+  return {...fields, files};
+}
+async function enqueuePayload(payload) {
+  const queue = (await dbGet(QUEUE_KEY)) || [];
+  queue.push({payload, queuedAt:new Date().toISOString()});
+  await dbSet(QUEUE_KEY, queue);
+}
+async function uploadPayload(payload) {
+  setProgress('Mengirim data dan berkas ke Google Drive...', 35, true);
+  const result = await sendPayloadToAppsScript(payload);
+  if (!result || !result.success) throw new Error((result && result.message) || 'Data gagal disimpan.');
+  setProgress('Upload selesai.', 100);
+  return result;
+}
+
+// Saat online, coba kirim antrean yang sebelumnya gagal. Tidak menghapus antrean
+// sebelum server memberi konfirmasi berhasil.
+async function retryQueuedUploads() {
+  if (!navigator.onLine) return;
+  let queue = (await dbGet(QUEUE_KEY)) || [];
+  while (queue.length) {
+    const item = queue[0];
+    try {
+      const result = await sendPayloadToAppsScript(item.payload);
+      if (!result || !result.success) break;
+      queue.shift();
+      await dbSet(QUEUE_KEY, queue);
+    } catch (_) { break; }
+  }
+}
+window.addEventListener('online', retryQueuedUploads);
+
 $('surveyForm').addEventListener('submit', async e => {
   e.preventDefault();
   const form = e.currentTarget;
+  if (!form.reportValidity()) return;
   if (!GAS_API_URL.startsWith('https://script.google.com/macros/s/')) {
     setStatus('formStatus', 'URL backend belum diatur. Isi GAS_API_URL pada index.html.');
     return;
   }
   if (!$('latitude').value || !$('longitude').value) {
-    setStatus('formStatus', 'Ambil lokasi GPS terlebih dahulu sebelum menyimpan.'); return;
+    setStatus('formStatus', 'Ambil lokasi GPS terlebih dahulu sebelum menyimpan.');
+    return;
   }
-  const btn = $('submitBtn'); btn.disabled = true;
-  setStatus('formStatus', 'Mengunggah data dan foto. Mohon tunggu, jangan tutup halaman...');
+
+  const btn = $('submitBtn');
+  btn.disabled = true;
+  $('getLocationBtn').disabled = true;
+  setProgress('Menyimpan cache formulir dan foto...', 10);
   try {
-    const fd = new FormData(form);
-    const payload = {};
-    for (const [key, value] of fd.entries()) {
-      if (!(value instanceof File)) payload[key] = value;
+    const payload = await makePayloadFromDraft();
+    if (!navigator.onLine) {
+      await enqueuePayload(payload);
+      setStatus('formStatus', 'Perangkat sedang offline. Data dan foto sudah masuk antrean lokal. Hubungkan internet, lalu tekan SIMPAN DATA untuk mengunggah.');
+      setProgress('Tersimpan offline — menunggu koneksi.', 100);
+      return;
     }
-    payload.files = {
-      fotoKtp: await fileToDataUrl(form.elements.fotoKtp.files[0]),
-      fotoKk: await fileToDataUrl(form.elements.fotoKk.files[0]),
-      fotoRumahDepan: await fileToDataUrl(form.elements.fotoRumahDepan.files[0]),
-      fotoRumahSamping: await fileToDataUrl(form.elements.fotoRumahSamping.files[0]),
-      fotoRumahBelakang: await fileToDataUrl(form.elements.fotoRumahBelakang.files[0]),
-      fotoRumahDalam: await fileToDataUrl(form.elements.fotoRumahDalam.files[0])
-    };
-    const result = await sendPayloadToAppsScript(payload);
-    if (!result || !result.success) throw new Error((result && result.message) || 'Data gagal disimpan.');
-    setStatus('formStatus', result.message + ' Nomor baris: ' + result.row);
+
+    setProgress('Cache aman. Mengunggah ke server...', 25);
+    const result = await uploadPayload(payload);
+    await dbDelete(DRAFT_KEY);
+    await dbDelete(QUEUE_KEY);
+    setStatus('formStatus', (result.message || 'Berhasil disimpan.') + ' Nomor baris: ' + (result.row || '-'));
     form.reset();
+    savedFiles = {};
     ['latitude','longitude','accuracy','locationTime'].forEach(id => $(id).value = '');
     setStatus('locationStatus', 'Lokasi belum direkam.');
-    $('kecamatan').innerHTML = '<option value="">Pilih desa terlebih dahulu</option>';
+    $('cacheStatus').textContent = 'Upload berhasil. Draft lokal telah dibersihkan.';
+    showSuccess('Data survey dan berkas berhasil diunggah. Nomor baris: ' + (result.row || '-'));
   } catch (err) {
-    setStatus('formStatus', 'Gagal menyimpan: ' + err.message);
+    try {
+      const payload = await makePayloadFromDraft();
+      await enqueuePayload(payload);
+      setStatus('formStatus', 'Upload belum berhasil: ' + err.message + '. Data dan foto sudah diamankan dalam antrean lokal. Coba lagi saat koneksi stabil.');
+    } catch (cacheErr) {
+      setStatus('formStatus', 'Gagal upload dan cache: ' + err.message + ' / ' + cacheErr.message);
+    }
   } finally {
     btn.disabled = false;
+    $('getLocationBtn').disabled = false;
+    if (navigator.onLine) setTimeout(hideProgress, 1800);
   }
 });
+
+// Pulihkan draft sebelum pengguna mulai mengisi; cache tidak hilang hanya karena reload.
+restoreDraft();
+
 
 </script>
 </body>
