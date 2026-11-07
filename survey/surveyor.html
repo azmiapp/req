@@ -18,6 +18,14 @@ button:disabled{opacity:.55;cursor:wait}
 .status{font-size:13px;color:#555;white-space:pre-wrap;margin-top:8px}.progress-wrap{display:none;margin:14px 0;padding:12px;background:#f1f8f3;border-radius:10px}.progress-track{height:12px;background:#dce9df;border-radius:20px;overflow:hidden}.progress-fill{height:100%;width:0;background:#0f8a4b;border-radius:20px;transition:width .25s}.progress-label{font-size:13px;margin-bottom:7px;color:#28543a}.result-card{border:1px solid #cfe5d5;background:#f8fcf9;border-radius:12px;padding:18px;margin-top:14px}.result-total{font-size:32px;font-weight:700;color:#0f8a4b}.result-table{width:100%;border-collapse:collapse;margin-top:12px}.result-table td,.result-table th{border:1px solid #d5e1d8;padding:8px;text-align:left;font-size:13px}.result-table th{background:#e8f3eb}
 .note{font-size:12px;color:#666}
 @media(max-width:600px){.grid{grid-template-columns:1fr}.card{margin:10px;padding:14px}}
+
+.app-shell{padding-bottom:92px;max-width:900px;margin:0 auto}
+.bottom-nav{position:fixed;z-index:100;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #dce7df;box-shadow:0 -5px 20px #173b2414;display:flex;justify-content:center;padding:8px max(10px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom));}
+.bottom-nav button{width:auto;flex:1;max-width:190px;margin:0;background:transparent;color:#64756a;padding:8px 4px;border-radius:12px;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bottom-nav button .nav-icon{font-size:20px;line-height:1.2}.bottom-nav button.active{background:#eaf6ee;color:#087b43}
+.page-panel{max-width:760px;margin:12px auto}.history-item{border:1px solid #dce8df;border-radius:12px;padding:14px;margin:10px 0;background:#fff}.history-item h4{margin:0 0 6px;color:#17452d}.history-meta{font-size:12px;color:#64756a;line-height:1.6}.history-actions{display:flex;gap:8px;flex-wrap:wrap}.history-actions button{flex:1;min-width:120px;margin-top:10px;padding:10px;font-size:13px}.secondary-btn{background:#64748b}.empty-state{text-align:center;padding:32px 14px;color:#64756a;background:#f7faf8;border-radius:12px}
+.profile-row{padding:12px 0;border-bottom:1px solid #edf1ee}.profile-row:last-child{border:0}
+@media(max-width:600px){.page-panel{margin:10px}.bottom-nav button{font-size:10px}.bottom-nav button .nav-icon{font-size:19px}}
 </style>
 </head>
 <body>
@@ -30,7 +38,12 @@ button:disabled{opacity:.55;cursor:wait}
 </div>
 <div id="appCard" style="display:none">
 <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span id="userBar"></span><button type="button" id="logoutBtn" style="width:auto;margin:0;padding:9px 16px;background:#64748b">KELUAR</button></div>
-<div class="card">
+<div class="card page-panel" id="homePanel">
+  <div style="padding:8px 2px 14px"><div class="note" style="color:#0f8a4b;font-weight:700;letter-spacing:.08em">DASHBOARD SURVEYOR</div><h2 style="margin:8px 0 6px">Selamat bertugas, <span id="homeUserName">Surveyor</span></h2><div class="note">Kelola survei lapangan dan pantau kembali hasil survei Anda dari satu tempat.</div></div>
+  <div class="location"><strong>Mulai Survei Baru</strong><div class="note">Isi data penerima bantuan, rekam lokasi GPS, lampirkan foto, dan simpan hasil penilaian.</div><button type="button" id="startSurveyBtn">＋ MULAI SURVEI</button></div>
+  <div class="location"><strong>Riwayat Survei</strong><div class="note">Buka kembali survei yang telah Anda simpan, lihat rincian nilai, atau ekspor hasilnya ke PDF.</div><button type="button" id="openHistoryBtn" class="secondary-btn">LIHAT RIWAYAT</button></div>
+</div>
+<div class="card page-panel" id="surveyPanel" style="display:none">
 <form id="surveyForm">
 <label>Nama Lengkap</label><input name="nama" required maxlength="150">
 <div class="grid">
@@ -64,18 +77,35 @@ button:disabled{opacity:.55;cursor:wait}
 <input type="hidden" name="accuracy" id="accuracy">
 <input type="hidden" name="locationTime" id="locationTime">
 </div>
-<label>Foto KTP (maks. 4 MB)</label><input name="fotoKtp" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto KK (maks. 4 MB)</label><input name="fotoKk" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Depan (maks. 4 MB)</label><input name="fotoRumahDepan" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Samping (maks. 4 MB)</label><input name="fotoRumahSamping" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Belakang (maks. 4 MB)</label><input name="fotoRumahBelakang" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Dalam (maks. 4 MB)</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto KTP (otomatis dikompres maks. 700 KB)</label><input name="fotoKtp" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto KK (otomatis dikompres maks. 700 KB)</label><input name="fotoKk" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Depan (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahDepan" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Samping (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahSamping" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Belakang (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahBelakang" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Dalam (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<div class="status">Setiap lampiran foto akan otomatis dikompres menjadi JPG dengan ukuran maksimal 700 KB sebelum diunggah.</div>
 <button type="submit" id="submitBtn">SIMPAN DATA</button>
 <div id="formStatus" class="status" role="status"></div>
 <div class="progress-wrap" id="saveProgress" aria-live="polite"><div class="progress-label" id="progressLabel">Menyiapkan data...</div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
 </form>
 <div class="result-card" id="surveyResult" style="display:none"></div>
 </div>
+<div class="card page-panel" id="historyPanel" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div><h3 style="margin:0">Riwayat Survei</h3><div class="note">Daftar survei yang pernah Anda simpan.</div></div><button type="button" id="refreshHistoryBtn" style="width:auto;margin:0;padding:10px 14px">Muat ulang</button></div>
+  <div id="historyStatus" class="status" aria-live="polite"></div><div id="historyList"></div><div id="historyDetail"></div>
+</div>
+<div class="card page-panel" id="profilePanel" style="display:none">
+  <h3 style="margin-top:0">Profil Surveyor</h3><div class="profile-row"><div class="note">Nama Surveyor</div><strong id="profileName">-</strong></div>
+  <div class="profile-row"><div class="note">Username</div><strong id="profileUsername">-</strong></div>
+  <div class="profile-row"><div class="note">Hak Akses</div><strong id="profileRole">Surveyor</strong></div>
+  <button type="button" id="profileLogoutBtn" style="background:#64748b">Keluar dari akun</button>
+</div>
+<nav class="bottom-nav" id="bottomNav" aria-label="Navigasi utama" style="display:none">
+  <button type="button" class="active" data-page="home"><span class="nav-icon">⌂</span>Beranda</button>
+  <button type="button" data-page="survey"><span class="nav-icon">＋</span>Survei</button>
+  <button type="button" data-page="history"><span class="nav-icon">▤</span>Riwayat</button>
+  <button type="button" data-page="profile"><span class="nav-icon">♙</span>Profil</button>
+</nav>
 </div>
 <script>
 const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyQAp6dbJv6d99DeSF8HbyC6ON4R9bohMozmcBDTCqkXel8ybmZ843ibQV4q3yz8ORk/exec';
@@ -98,10 +128,13 @@ $('loginBtn').addEventListener('click', async () => {
     const sr=await api({action:'getScoring',token:authToken}); if(!sr.success) throw new Error(sr.message); scoringRules=sr.rules||[]; scoringThresholds=sr.thresholds||scoringThresholds; previewScore();
     $('loginCard').style.display='none'; $('appCard').style.display='block';
     $('userBar').textContent='Login: '+currentUser.name+' ('+currentUser.role+')';
+    $('profileName').textContent=currentUser.name||'-'; $('profileUsername').textContent=currentUser.username||'-'; $('profileRole').textContent=currentUser.role||'Surveyor'; $('homeUserName').textContent=currentUser.name||'Surveyor';
+    $('bottomNav').style.display='flex'; navigateTo('home'); loadSurveyHistory();
   } catch(e) { setStatus('loginStatus',e.message); }
   finally { btn.disabled=false; }
 });
-$('logoutBtn').addEventListener('click',()=>{authToken='';currentUser=null;scoringRules=[];$('appCard').style.display='none';$('loginCard').style.display='block';$('loginPassword').value='';});
+$('logoutBtn').addEventListener('click',logoutSurveyor); $('profileLogoutBtn').addEventListener('click',logoutSurveyor);
+function logoutSurveyor(){authToken='';currentUser=null;scoringRules=[];$('bottomNav').style.display='none';$('appCard').style.display='none';$('loginCard').style.display='block';$('loginPassword').value='';}
 
 function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
@@ -155,15 +188,71 @@ Peta: ${map}`);
   }, { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 });
 });
 
-function fileToDataUrl(file) {
+const MAX_PHOTO_BYTES = 700 * 1024; // Batas final setiap foto: 700 KB
+
+function loadImageForCompression(file) {
   return new Promise((resolve, reject) => {
-    if (!file) return resolve(null);
-    if (file.size > 4 * 1024 * 1024) return reject(new Error(file.name + ' melebihi 4 MB.'));
-    const reader = new FileReader();
-    reader.onload = () => resolve({ name: file.name, data: reader.result });
-    reader.onerror = () => reject(new Error('Gagal membaca file ' + file.name));
-    reader.readAsDataURL(file);
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(objectUrl); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('Foto ' + file.name + ' tidak dapat dibaca.')); };
+    img.src = objectUrl;
   });
+}
+
+function canvasToBlob(canvas, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Gagal mengompres foto.')), 'image/jpeg', quality);
+  });
+}
+
+async function compressPhoto(file) {
+  if (!file) return null;
+  if (!/^image\/(jpeg|jpg|png|webp)$/i.test(file.type || '')) {
+    throw new Error(file.name + ': gunakan foto JPG, PNG, atau WEBP.');
+  }
+  // Tolak file sumber yang terlalu besar untuk mencegah browser kehabisan memori.
+  if (file.size > 15 * 1024 * 1024) throw new Error(file.name + ' terlalu besar untuk diproses (maksimal file awal 15 MB).');
+
+  const img = await loadImageForCompression(file);
+  const canvas = document.createElement('canvas');
+  let scale = Math.min(1, 1800 / Math.max(img.naturalWidth, img.naturalHeight));
+  let blob = null;
+  const qualities = [0.84, 0.78, 0.72, 0.66, 0.60, 0.54, 0.48, 0.42, 0.36, 0.30];
+
+  // Turunkan kualitas terlebih dahulu, lalu dimensi bila masih di atas 700 KB.
+  for (let resize = 0; resize < 9; resize++) {
+    const width = Math.max(1, Math.round(img.naturalWidth * scale));
+    const height = Math.max(1, Math.round(img.naturalHeight * scale));
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+    for (const quality of qualities) {
+      blob = await canvasToBlob(canvas, quality);
+      if (blob.size <= MAX_PHOTO_BYTES) break;
+    }
+    if (blob && blob.size <= MAX_PHOTO_BYTES) break;
+    scale *= 0.82;
+  }
+  if (!blob || blob.size > MAX_PHOTO_BYTES) {
+    throw new Error('Foto ' + file.name + ' belum dapat dikompres hingga 700 KB. Silakan pilih foto lain.');
+  }
+
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Gagal membaca hasil kompresi ' + file.name));
+    reader.readAsDataURL(blob);
+  });
+  const kb = Math.max(1, Math.round(blob.size / 1024));
+  return { name: file.name.replace(/\.[^.]+$/, '') + '.jpg', data: dataUrl, size: blob.size, compressed: true, displaySize: kb + ' KB' };
+}
+
+async function fileToDataUrl(file) {
+  return compressPhoto(file);
 }
 
 function jsonpRequest(url, timeoutMs=12000) {
@@ -232,14 +321,16 @@ function setSaveProgress(percent,label){
   $('progressFill').style.width=Math.max(0,Math.min(100,percent))+'%';
   $('progressLabel').textContent=label;
 }
+function displayScore(value){const raw=String(value==null?'0':value).trim();const m=raw.match(/^T?\s*(-?\d+(?:[.,]\d+)?)(?:\s*\/\s*\d+(?:[.,]\d+)?)?$/i);return m?m[1].replace(',','.'):raw.replace(/\s*\/\s*\d+(?:[.,]\d+)?$/,'').replace(/^T\s*/i,'');}
+
 function showSurveyResult(result, payload){
   const s=result.scoring||{};
   const items=Array.isArray(s.items)?s.items:[];
-  $('surveyResult').innerHTML='<h3>Hasil Nilai Survey</h3><div class="result-total">'+esc(s.total||0)+' Poin</div><div><strong>Kategori: '+esc(s.category||'-')+'</strong></div><div class="note">Data berhasil disimpan. Nomor data: '+esc(result.row||'-')+'</div><table class="result-table"><thead><tr><th>Indeks Rumah</th><th>Skor</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(x.score)+' / '+esc(x.maxScore)+'</td></tr>').join('')+'</tbody><tfoot><tr><th>Total</th><th>'+esc(s.total||0)+' poin</th></tr></tfoot></table><button type="button" id="exportPdfBtn">EKSPOR HASIL SURVEY PDF</button><button type="button" id="newSurveyBtn">INPUT SURVEY BERIKUTNYA</button>';
-  $('surveyResult').style.display='block'; $('surveyForm').style.display='none';
+  $('surveyResult').innerHTML='<h3>Hasil Nilai Survey</h3><div class="result-total">'+esc(s.total||0)+' Poin</div><div><strong>Kategori: '+esc(s.category||'-')+'</strong></div><div class="note">Data berhasil disimpan. Nomor data: '+esc(result.row||'-')+'</div><table class="result-table"><thead><tr><th>Indeks Rumah</th><th>Skor</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('')+'</tbody><tfoot><tr><th>Total</th><th>'+esc(s.total||0)+' poin</th></tr></tfoot></table><button type="button" id="exportPdfBtn">EKSPOR HASIL SURVEY PDF</button><button type="button" id="newSurveyBtn">INPUT SURVEY BERIKUTNYA</button>';
+  $('surveyResult').style.display='block'; $('surveyForm').style.display='none'; navigateTo('survey');
   $('exportPdfBtn').addEventListener('click',()=>exportSurveyPdf(payload,result));
   $('newSurveyBtn').addEventListener('click',()=>{
-    $('surveyForm').reset(); $('surveyForm').style.display='block'; $('surveyResult').style.display='none';
+    $('surveyForm').reset(); $('surveyForm').style.display='block'; $('surveyResult').style.display='none'; navigateTo('survey');
     ['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');
     setStatus('locationStatus','Lokasi belum direkam.'); $('saveProgress').style.display='none'; $('progressFill').style.width='0%'; setStatus('formStatus',''); previewScore();
     window.scrollTo({top:0,behavior:'smooth'});
@@ -252,12 +343,59 @@ function exportSurveyPdf(payload,result){
   const dateText=dateValue.toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
   const fields=Object.keys(labels).filter(k=>payload[k]!==undefined && payload[k]!=='').map(k=>'<tr><th>'+esc(labels[k])+'</th><td>'+esc(payload[k])+'</td></tr>').join('');
   const items=Array.isArray(result.scoring?.items)?result.scoring.items:[];
-  const scoring=items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(x.score)+' / '+esc(x.maxScore)+'</td></tr>').join('');
+  const scoring=items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('');
   const w=window.open('','_blank');
   if(!w){setStatus('formStatus','Izinkan pop-up browser untuk membuat PDF.');return;}
   w.document.open();
   w.document.write('<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Hasil Survey - '+esc(payload.nama)+'</title><style>body{font:12px Arial,sans-serif;color:#222;margin:28px}h1{text-align:center;font-size:18px;margin:0}h2{font-size:14px;margin:22px 0 8px;border-bottom:1px solid #777;padding-bottom:6px}.sub{text-align:center;margin:5px 0 18px;color:#555}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f2f6f2;padding:12px;margin:16px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:7px;text-align:left;vertical-align:top}th{width:32%;background:#f3f5f3}.score{font-size:22px;font-weight:bold;color:#087b43}.sign{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:55px;text-align:center}.sign div{padding-top:55px;border-top:1px solid #777}@media print{body{margin:15mm}.noprint{display:none}}</style></head><body><h1>HASIL SURVEY BANTUAN</h1><div class="sub">BAZNAS KABUPATEN SRAGEN</div><div class="meta"><div><b>Surveyor:</b> '+esc(result.surveyor||currentUser?.name||'-')+'</div><div><b>Tanggal Survey:</b> '+esc(dateText)+'</div><div><b>Nomor Data:</b> '+esc(result.row||'-')+'</div><div><b>Nama Penerima:</b> '+esc(payload.nama||'-')+'</div></div><h2>Identitas dan Kondisi Penerima</h2><table>'+fields+'</table><h2>Hasil Scoring</h2><div class="score">'+esc(result.scoring?.total||0)+' Poin — '+esc(result.scoring?.category||'-')+'</div><table><thead><tr><th>Kriteria</th><th>Skor</th></tr></thead><tbody>'+scoring+'</tbody></table><p><b>Lokasi:</b> '+esc(result.mapUrl||'-')+'</p><div class="sign"><div>Surveyor<br><b>'+esc(result.surveyor||currentUser?.name||'-')+'</b></div><div>Penerima / Mengetahui</div></div><p class="noprint"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></p><script>window.onload=function(){setTimeout(function(){window.print()},400)};<\/script></body></html>');
   w.document.close();
+}
+
+
+function navigateTo(page){
+  const panels={home:'homePanel',survey:'surveyPanel',history:'historyPanel',profile:'profilePanel'};
+  Object.keys(panels).forEach(key=>$(panels[key]).style.display=(key===page || (page==='home'&&key==='home'))?'block':'none');
+  if(page==='survey' && $('surveyForm').style.display==='none' && $('surveyResult').style.display==='none') $('surveyForm').style.display='block';
+  document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  if(page==='history') loadSurveyHistory();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.bottom-nav button').forEach(b=>b.addEventListener('click',()=>navigateTo(b.dataset.page)));
+$('refreshHistoryBtn').addEventListener('click',()=>loadSurveyHistory());
+$('startSurveyBtn').addEventListener('click',()=>navigateTo('survey')); $('openHistoryBtn').addEventListener('click',()=>navigateTo('history'));
+
+let surveyHistoryRows=[];
+async function loadSurveyHistory(silent=false){
+  if(!authToken)return;
+  if(!silent)setStatus('historyStatus','Memuat riwayat survei...');
+  $('refreshHistoryBtn').disabled=true;
+  try{
+    const r=await api({action:'getSurveyorHistory',token:authToken});
+    if(!r.success)throw new Error(r.message||'Riwayat tidak dapat dimuat.');
+    surveyHistoryRows=Array.isArray(r.rows)?r.rows:[];
+    renderSurveyHistory();
+    setStatus('historyStatus',surveyHistoryRows.length+' survei ditemukan.');
+  }catch(e){setStatus('historyStatus','Gagal memuat riwayat: '+e.message);}
+  finally{$('refreshHistoryBtn').disabled=false;}
+}
+function renderSurveyHistory(){
+  const host=$('historyList');
+  if(!surveyHistoryRows.length){host.innerHTML='<div class="empty-state">Belum ada riwayat survei yang tersimpan pada akun ini.</div>';return;}
+  host.innerHTML=surveyHistoryRows.map((r,i)=>{
+    const d=r.submittedAt?new Date(r.submittedAt):null;
+    const date=d&&!isNaN(d)?d.toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}):esc(r.submittedAt||'-');
+    return '<article class="history-item"><h4>'+esc(r.nama||'Tanpa nama')+'</h4><div class="history-meta">'+esc(r.desa||'-')+', '+esc(r.kecamatan||'-')+'<br>'+esc(date)+'<br>Skor: <b>'+esc(displayScore(r.scoring?.total||0))+'</b> poin · '+esc(r.scoring?.category||'-')+'</div><div class="history-actions"><button type="button" data-detail="'+i+'">Lihat detail</button><button type="button" class="secondary-btn" data-pdf="'+i+'">Ekspor PDF</button></div></article>';
+  }).join('');
+  host.querySelectorAll('[data-detail]').forEach(b=>b.addEventListener('click',()=>showHistoryDetail(surveyHistoryRows[Number(b.dataset.detail)])));
+  host.querySelectorAll('[data-pdf]').forEach(b=>b.addEventListener('click',()=>{const r=surveyHistoryRows[Number(b.dataset.pdf)];exportSurveyPdf(historyPayload(r),historyResult(r));}));
+}
+function historyPayload(r){return {nama:r.nama,jk:r.jk,nik:r.nik,alamat:r.alamat,desa:r.desa,kecamatan:r.kecamatan,kepemilikanRumah:r.kepemilikanRumah,luasRumah:r.luasRumah,atap:r.atap,rangkaAtap:r.rangkaAtap,dinding:r.dinding,lantai:r.lantai,sanitasi:r.sanitasi,dayaListrik:r.dayaListrik,sumberAir:r.sumberAir,jumlahJiwa:r.jumlahJiwa,penghasilan:r.penghasilan,latitude:r.latitude,longitude:r.longitude,accuracy:r.accuracy};}
+function historyResult(r){return {row:r.rowNumber,surveyor:r.surveyor,submittedAt:r.submittedAt,mapUrl:r.mapUrl,scoring:r.scoring||{total:0,category:'-',items:[]}};}
+function showHistoryDetail(r){
+  const s=r.scoring||{},items=Array.isArray(s.items)?s.items:[];
+  $('historyDetail').innerHTML='<div class="result-card"><h3>Detail Hasil Survei</h3><div><b>'+esc(r.nama)+'</b></div><div class="note">Surveyor: '+esc(r.surveyor||'-')+' · '+esc(r.submittedAt||'-')+'</div><div class="result-total">'+esc(displayScore(s.total||0))+' Poin</div><b>Kategori: '+esc(s.category||'-')+'</b><table class="result-table"><thead><tr><th>Kriteria</th><th>Nilai</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('')+'</tbody></table><button type="button" id="historyPdfDetailBtn">EKSPOR PDF</button></div>';
+  $('historyPdfDetailBtn').addEventListener('click',()=>exportSurveyPdf(historyPayload(r),historyResult(r)));
+  $('historyDetail').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 $('surveyForm').addEventListener('submit', async e => {
@@ -279,7 +417,7 @@ $('surveyForm').addEventListener('submit', async e => {
       if (!(value instanceof File)) payload[key] = value;
     }
     payload.token = authToken;
-    setSaveProgress(20,'Memproses foto dan dokumen...');
+    setSaveProgress(20,'Mengompres setiap foto maksimal 700 KB...');
     payload.files = {
       fotoKtp: await fileToDataUrl(form.elements.fotoKtp.files[0]),
       fotoKk: await fileToDataUrl(form.elements.fotoKk.files[0]),
@@ -292,7 +430,7 @@ $('surveyForm').addEventListener('submit', async e => {
     const result = await sendPayloadToAppsScript(payload);
     if (!result || !result.success) throw new Error((result && result.message) || 'Data gagal disimpan.');
     setSaveProgress(100,'Berhasil! Data terkonfirmasi tersimpan. Membuka halaman Skoring...');
-    showSurveyResult(result,payload);
+    showSurveyResult(result,payload); loadSurveyHistory(true);
   } catch (err) {
     setStatus('formStatus', 'Gagal menyimpan: ' + err.message); $('saveProgress').style.display='none';
   } finally {
