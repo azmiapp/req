@@ -66,12 +66,12 @@ button:disabled{opacity:.55;cursor:wait}
 <input type="hidden" name="accuracy" id="accuracy">
 <input type="hidden" name="locationTime" id="locationTime">
 </div>
-<label>Foto KTP (maks. 5 MB)</label><input name="fotoKtp" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto KK (maks. 5 MB)</label><input name="fotoKk" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Depan (maks. 5 MB)</label><input name="fotoRumahDepan" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Samping (maks. 5 MB)</label><input name="fotoRumahSamping" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Belakang (maks. 5 MB)</label><input name="fotoRumahBelakang" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Dalam (maks. 5 MB)</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto KTP (maks. 4 MB)</label><input name="fotoKtp" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto KK (maks. 4 MB)</label><input name="fotoKk" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Depan (maks. 4 MB)</label><input name="fotoRumahDepan" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Samping (maks. 4 MB)</label><input name="fotoRumahSamping" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Belakang (maks. 4 MB)</label><input name="fotoRumahBelakang" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+<label>Foto Rumah Dalam (maks. 4 MB)</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
 <button type="submit" id="submitBtn">SIMPAN DATA</button>
 <div id="formStatus" class="status" role="status"></div>
 </form>
@@ -84,6 +84,8 @@ const $ = id => document.getElementById(id);
 function setStatus(id, text) { $(id).textContent = text; }
 let authToken = '';
 let currentUser = null;
+let scoringRules = [];
+let scoringThresholds = {high:70,medium:40};
 async function api(payload) { return sendPayloadToAppsScript(payload); }
 
 $('loginBtn').addEventListener('click', async () => {
@@ -93,31 +95,30 @@ $('loginBtn').addEventListener('click', async () => {
     if(!r.success) throw new Error(r.message);
     if(r.user.role!=='Surveyor') throw new Error('Halaman ini khusus akun Surveyor. Silakan gunakan halaman Admin.');
     authToken=r.token; currentUser=r.user;
+    const sr=await api({action:'getScoring',token:authToken}); if(!sr.success) throw new Error(sr.message); scoringRules=sr.rules||[]; scoringThresholds=sr.thresholds||scoringThresholds; previewScore();
     $('loginCard').style.display='none'; $('appCard').style.display='block';
     $('userBar').textContent='Login: '+currentUser.name+' ('+currentUser.role+')';
   } catch(e) { setStatus('loginStatus',e.message); }
   finally { btn.disabled=false; }
 });
-$('logoutBtn').addEventListener('click',()=>{authToken='';currentUser=null;$('appCard').style.display='none';$('loginCard').style.display='block';$('loginPassword').value='';});
+$('logoutBtn').addEventListener('click',()=>{authToken='';currentUser=null;scoringRules=[];$('appCard').style.display='none';$('loginCard').style.display='block';$('loginPassword').value='';});
 
 function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
 function previewScore() {
- const f=$('surveyForm');
- const get=n=>f.elements[n] ? f.elements[n].value : '';
- const scores=[
-  !get('luasRumah')?0:(+get('luasRumah')<=8?10:+get('luasRumah')<=12?7:+get('luasRumah')<=20?4:1),
-  ({Asbes:8,Seng:6,Genteng:2})[get('atap')]||0,
-  ({Bambu:8,Kayu:4,'Baja Ringan':1})[get('rangkaAtap')]||0,
-  ({Bambu:10,Seng:9,'Papan Kayu':7,'Kasibot/GRC':6,'Tembok Setengah':4,'Tembok Full':1})[get('dinding')]||0,
-  ({Tanah:10,Semen:6,'Tegel/Ubin':3,Keramik:1})[get('lantai')]||0,
-  ({Menyambung:10,'450 VA':8,'900 VA':5,'1300 VA':2})[get('dayaListrik')]||0,
-  ({Menyambung:10,Sumur:6,PAMSIMAS:3,PDAM:1})[get('sumberAir')]||0,
-  (+get('jumlahJiwa')>=7?10:+get('jumlahJiwa')>=5?7:+get('jumlahJiwa')>=3?4:+get('jumlahJiwa')>0?1:0),
-  ({'Orang Tua':7,'Kakek/Nenek':8,'Suami/Istri':3,Sendiri:1})[get('shm')]||0
- ];
- const total=scores.reduce((a,b)=>a+b,0), pct=Math.round(total/84*100);
- $('scorePreview').textContent='Estimasi: '+total+'/84 ('+pct+'%) — '+(pct>=70?'Prioritas Tinggi':pct>=40?'Prioritas Sedang':'Prioritas Rendah');
+ const f=$('surveyForm'); const get=n=>f.elements[n] ? f.elements[n].value : '';
+ const grouped={};
+ scoringRules.forEach(r=>{
+  if(!grouped[r.field]) grouped[r.field]={name:r.criterion,score:0,max:Number(r.maxScore)||0};
+  const raw=get(r.field); if(raw==='') return;
+  let ok=false; const n=Number(raw);
+  if(r.operator==='EQUALS') ok=String(raw).trim()===String(r.value);
+  else if(r.operator==='RANGE') ok=Number.isFinite(n)&&(r.min==null||n>=Number(r.min))&&(r.max==null||n<=Number(r.max));
+  else if(r.operator==='GT') ok=n>Number(r.min);
+  if(ok) grouped[r.field].score=Number(r.score)||0;
+ });
+ const vals=Object.values(grouped), total=vals.reduce((a,x)=>a+x.score,0), max=vals.reduce((a,x)=>a+x.max,0), pct=max?Math.round(total/max*100):0;
+ $('scorePreview').textContent='Estimasi: '+total+'/'+max+' ('+pct+'%) — '+(pct>=scoringThresholds.high?'Prioritas Tinggi':pct>=scoringThresholds.medium?'Prioritas Sedang':'Prioritas Rendah');
 }
 $('surveyForm').addEventListener('change',previewScore);
 $('surveyForm').addEventListener('input',previewScore);
@@ -177,7 +178,7 @@ function sendPayloadToAppsScript(payload) {
       setTimeout(() => iframe.remove(), 1000);
     };
     const onMessage = event => {
-      if (event.source !== iframe.contentWindow || !event.data || event.data.type !== 'BAZNAS_SURVEY_RESULT') return;
+      if (!event.data || event.data.type !== 'BAZNAS_SURVEY_RESULT') return;
       cleanup();
       resolve(event.data.result);
     };
