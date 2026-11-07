@@ -19,14 +19,14 @@ button:disabled{opacity:.55;cursor:wait}
 .note{font-size:12px;color:#666}
 @media(max-width:600px){.grid{grid-template-columns:1fr}.card{margin:10px;padding:14px}}
 
-.app-shell{padding-bottom:92px;max-width:900px;margin:0 auto}
-.bottom-nav{position:fixed;z-index:100;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #dce7df;box-shadow:0 -5px 20px #173b2414;display:flex;justify-content:center;padding:8px max(10px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom));}
+.app-shell{padding-bottom:calc(150px + env(safe-area-inset-bottom));max-width:900px;margin:0 auto}
+.bottom-nav{position:fixed;z-index:100;min-height:68px;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #dce7df;box-shadow:0 -5px 20px #173b2414;display:flex;justify-content:center;padding:8px max(10px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom));}
 .bottom-nav button{width:auto;flex:1;max-width:190px;margin:0;background:transparent;color:#64756a;padding:8px 4px;border-radius:12px;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px}
 .bottom-nav button .nav-icon{font-size:20px;line-height:1.2}.bottom-nav button.active{background:#eaf6ee;color:#087b43}
 .page-panel{max-width:760px;margin:12px auto}.history-item{border:1px solid #dce8df;border-radius:12px;padding:14px;margin:10px 0;background:#fff}.history-item h4{margin:0 0 6px;color:#17452d}.history-meta{font-size:12px;color:#64756a;line-height:1.6}.history-actions{display:flex;gap:8px;flex-wrap:wrap}.history-actions button{flex:1;min-width:120px;margin-top:10px;padding:10px;font-size:13px}.secondary-btn{background:#64748b}.empty-state{text-align:center;padding:32px 14px;color:#64756a;background:#f7faf8;border-radius:12px}
 .profile-row{padding:12px 0;border-bottom:1px solid #edf1ee}.profile-row:last-child{border:0}
 @media(max-width:600px){.page-panel{margin:10px}.bottom-nav button{font-size:10px}.bottom-nav button .nav-icon{font-size:19px}}
-</style>
+form{padding-bottom:24px} .page-panel{scroll-margin-bottom:120px} @media(max-width:600px){.app-shell{padding-bottom:calc(170px + env(safe-area-inset-bottom))}.bottom-nav{min-height:76px}}\n</style>
 </head>
 <body>
 <div class="header">FORM SURVEY BANTUAN<br>BAZNAS KABUPATEN SRAGEN</div>
@@ -47,35 +47,35 @@ button:disabled{opacity:.55;cursor:wait}
 <form id="surveyForm">
 <label>Nama Lengkap</label><input name="nama" required maxlength="150">
 <div class="grid">
-<div><label>Jenis Kelamin</label><select name="jk"><option>Laki-laki</option><option>Perempuan</option></select></div>
-<div><label>NIK</label><input name="nik" inputmode="numeric" maxlength="16" pattern="[0-9]{16}" placeholder="16 digit NIK"></div>
-  <div><label>NOMOR KK</label><input name="nomorkk" inputmode="numeric" maxlength="16" pattern="[0-9]{16}" placeholder="16 digit NOMOR KK"></div>
+<div><label>Jenis Kelamin</label><select name="jk" required><option>Laki-laki</option><option>Perempuan</option></select></div>
+<div><label>NIK</label><input name="nik" inputmode="numeric" maxlength="16" pattern="[0-9]{16}" placeholder="16 digit NIK" required></div>
+<div><label>Nomor KK</label><input name="nomorkk" inputmode="numeric" maxlength="16" pattern="[0-9]{16}" placeholder="16 digit Nomor KK" required></div>
 </div>
-<label>Alamat Lengkap</label><textarea name="alamat" rows="2"></textarea>
+<label>Alamat Lengkap</label><textarea name="alamat" rows="2" required></textarea>
 <div class="grid">
 <div><label>Desa/Kelurahan</label><input name="desa" id="desa" type="text" required placeholder="Masukkan desa/kelurahan"></div>
 <div><label>Kecamatan</label><input name="kecamatan" id="kecamatan" type="text" required placeholder="Masukkan kecamatan"></div>
-</div>
-<div class="grid">
+<div><label>SHM Atas Nama</label><input name="shm" maxlength="150" placeholder="Nama pada sertifikat"></div>
+<div><label>Luas Rumah (m²)</label><input name="luasRumah" type="number" min="0" step="any" required></div>
+<div><label>Atap</label><select name="atap" required><option>Genteng</option><option>Seng Metal</option><option>Asbes</option><option>Beton</option><option>Daun/Rumbia</option><option>Lainnya</option></select></div>
+<div><label>Rangka Atap</label><select name="rangkaAtap" required><option>Kayu</option><option>Baja Ringan</option><option>Bambu</option><option>Beton</option><option>Lainnya</option></select></div>
+<div><label>Dinding</label><select name="dinding" required><option>Tembok Plester</option><option>Campuran Tembok Kayu</option><option>Kayu Rotan</option><option>Bilik Bambu</option><option>Lainnya</option></select></div>
+<div><label>Lantai</label><select name="lantai" required><option>Keramik</option><option>Semen</option><option>Kayu</option><option>Tanah</option><option>Lainnya</option></select></div>
+<div><label>Daya Listrik</label><select name="dayaListrik" required><option>KWH Pribadi</option><option>Menyambung</option><option>Tidak Ada</option></select></div>
+<div><label>Sumber Air</label><select name="sumberAir" required><option>PDAM</option><option>Sumur Sendiri</option><option>Sumur Bersama</option><option>Sungai</option><option>Mata Air</option><option>Lainnya</option></select></div>
+<div><label>Jumlah Jiwa</label><input name="jumlahJiwa" type="number" min="1" step="1" required></div>
+<div><label>Sanitasi</label><select name="sanitasi" required><option>Kamar Mandi</option><option>MCK</option><option>Sumur / Sumber Air</option><option>Tidak Ada</option></select></div>
 <div><label>Kepemilikan Rumah</label><select name="kepemilikanRumah" required><option value="Milik Sendiri">Milik Sendiri</option><option value="Keluarga">Keluarga</option><option value="Sewa">Sewa</option></select></div>
-<div><label>Luas Rumah (m²)</label><input name="luasRumah" type="number" min="0" step="any"></div>
-<div><label>Atap</label><select name="atap" required><option>Genteng</option><option>Seng Metal</option><option>Asbes</option></select></div>
-<div><label>Dinding</label><select name="dinding" required><option>Tembok Plester</option><option>Campuran Tembok Kayu</option><option>Kayu Rotan</option><option>Bilik Bambu</option></select></div>
-<div><label>Lantai</label><select name="lantai" required><option>Keramik</option><option>Semen</option><option>Kayu</option><option>Tanah</option></select></div>
-<div><label>Sanitasi</label><select name="sanitasi" required><option>Kamar Mandi</option><option>MCK</option><option>Sumur / Sumber Air</option></select></div>
-<div><label>Listrik</label><select name="dayaListrik" required><option>KWH Pribadi</option><option>Menyambung</option></select></div>
+<div><label>Penghasilan (Rp/bulan)</label><input name="penghasilanBulanan" type="number" min="0" step="1" placeholder="Total penghasilan per bulan" required></div>
+<div><label>Penghasilan per Tahun (Rp)</label><input name="penghasilan" type="number" min="0" step="1" placeholder="Total penghasilan per tahun" required></div>
 </div>
-<label>Total Penghasilan per Tahun (Rp)</label><input name="penghasilan" type="number" min="0" step="1" placeholder="Contoh: 12000000" required>
-<div class="location"><strong>Pratinjau Scoring Otomatis</strong><div id="scorePreview" class="status">Isi kondisi rumah untuk melihat estimasi skor.</div><div class="note">Skor sementara dihitung dari kondisi rumah, listrik, air, luas rumah, dan jumlah penghuni. Penilaian akhir tersimpan saat survey dikirim.</div></div>
+<div class="location"><strong>Pratinjau Scoring Otomatis</strong><div id="scorePreview" class="status">Isi kondisi rumah untuk melihat estimasi skor.</div><div class="note">Skor sementara dihitung berdasarkan aturan pada sheet Scoring.</div></div>
 <div class="location">
 <strong>Penanda Lokasi Rumah (GPS)</strong>
 <div class="note">Aktifkan GPS/lokasi pada perangkat dan izinkan akses lokasi di browser. Pengambilan lokasi sebaiknya dilakukan di titik rumah.</div>
 <button type="button" id="getLocationBtn">AMBIL LOKASI AKURAT</button>
 <div id="locationStatus" class="status">Lokasi belum direkam.</div>
-<input type="hidden" name="latitude" id="latitude">
-<input type="hidden" name="longitude" id="longitude">
-<input type="hidden" name="accuracy" id="accuracy">
-<input type="hidden" name="locationTime" id="locationTime">
+<input type="hidden" name="latitude" id="latitude"><input type="hidden" name="longitude" id="longitude"><input type="hidden" name="accuracy" id="accuracy"><input type="hidden" name="locationTime" id="locationTime">
 </div>
 <label>Foto KTP (otomatis dikompres maks. 700 KB)</label><input name="fotoKtp" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
 <label>Foto KK (otomatis dikompres maks. 700 KB)</label><input name="fotoKk" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
@@ -84,8 +84,7 @@ button:disabled{opacity:.55;cursor:wait}
 <label>Foto Rumah Belakang (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahBelakang" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
 <label>Foto Rumah Dalam (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
 <div class="status">Setiap lampiran foto akan otomatis dikompres menjadi JPG dengan ukuran maksimal 700 KB sebelum diunggah.</div>
-<button type="submit" id="submitBtn">SIMPAN DATA</button>
-<div id="formStatus" class="status" role="status"></div>
+<button type="submit" id="submitBtn">SIMPAN DATA</button><div id="formStatus" class="status" role="status"></div>
 <div class="progress-wrap" id="saveProgress" aria-live="polite"><div class="progress-label" id="progressLabel">Menyiapkan data...</div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
 </form>
 <div class="result-card" id="surveyResult" style="display:none"></div>
@@ -338,7 +337,7 @@ function showSurveyResult(result, payload){
 }
 
 function exportSurveyPdf(payload,result){
-  const labels={nama:'Nama Lengkap',jk:'Jenis Kelamin',nik:'NIK',nomorkk:'Nomor KK',alamat:'Alamat Lengkap',desa:'Desa/Kelurahan',kecamatan:'Kecamatan',kepemilikanRumah:'Kepemilikan Rumah',luasRumah:'Luas Rumah (m²)',atap:'Atap',rangkaAtap:'Rangka Atap',dinding:'Dinding',lantai:'Lantai',sanitasi:'Sanitasi',dayaListrik:'Daya Listrik',sumberAir:'Sumber Air',jumlahJiwa:'Jumlah Jiwa',penghasilan:'Penghasilan per Tahun (Rp)',latitude:'Latitude',longitude:'Longitude',accuracy:'Akurasi GPS (meter)'};
+  const labels={nama:'Nama Lengkap',jk:'Jenis Kelamin',nik:'NIK',nomorkk:'Nomor KK',alamat:'Alamat Lengkap',desa:'Desa/Kelurahan',kecamatan:'Kecamatan',shm:'SHM Atas Nama',kepemilikanRumah:'Kepemilikan Rumah',luasRumah:'Luas Rumah (m²)',atap:'Atap',rangkaAtap:'Rangka Atap',dinding:'Dinding',lantai:'Lantai',sanitasi:'Sanitasi',dayaListrik:'Daya Listrik',sumberAir:'Sumber Air',jumlahJiwa:'Jumlah Jiwa',penghasilanBulanan:'Penghasilan (Rp/bulan)',penghasilan:'Penghasilan per Tahun (Rp)',latitude:'Latitude',longitude:'Longitude',accuracy:'Akurasi GPS (meter)'};
   const dateValue=result.submittedAt?new Date(result.submittedAt):new Date();
   const dateText=dateValue.toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
   const fields=Object.keys(labels).filter(k=>payload[k]!==undefined && payload[k]!=='').map(k=>'<tr><th>'+esc(labels[k])+'</th><td>'+esc(payload[k])+'</td></tr>').join('');
@@ -347,7 +346,7 @@ function exportSurveyPdf(payload,result){
   const w=window.open('','_blank');
   if(!w){setStatus('formStatus','Izinkan pop-up browser untuk membuat PDF.');return;}
   w.document.open();
-  w.document.write('<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Hasil Survey - '+esc(payload.nama)+'</title><style>body{font:12px Arial,sans-serif;color:#222;margin:28px}h1{text-align:center;font-size:18px;margin:0}h2{font-size:14px;margin:22px 0 8px;border-bottom:1px solid #777;padding-bottom:6px}.sub{text-align:center;margin:5px 0 18px;color:#555}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f2f6f2;padding:12px;margin:16px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:7px;text-align:left;vertical-align:top}th{width:32%;background:#f3f5f3}.score{font-size:22px;font-weight:bold;color:#087b43}.sign{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:55px;text-align:center}.sign div{padding-top:55px;border-top:1px solid #777}@media print{body{margin:15mm}.noprint{display:none}}</style></head><body><h1>HASIL SURVEY BANTUAN</h1><div class="sub">BAZNAS KABUPATEN SRAGEN</div><div class="meta"><div><b>Surveyor:</b> '+esc(result.surveyor||currentUser?.name||'-')+'</div><div><b>Tanggal Survey:</b> '+esc(dateText)+'</div><div><b>Nomor Data:</b> '+esc(result.row||'-')+'</div><div><b>Nama Penerima:</b> '+esc(payload.nama||'-')+'</div></div><h2>Identitas dan Kondisi Penerima</h2><table>'+fields+'</table><h2>Hasil Scoring</h2><div class="score">'+esc(result.scoring?.total||0)+' Poin — '+esc(result.scoring?.category||'-')+'</div><table><thead><tr><th>Kriteria</th><th>Skor</th></tr></thead><tbody>'+scoring+'</tbody></table><p><b>Lokasi:</b> '+esc(result.mapUrl||'-')+'</p><div class="sign"><div>Surveyor<br><b>'+esc(result.surveyor||currentUser?.name||'-')+'</b></div><div>Penerima / Mengetahui</div></div><p class="noprint"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></p><script>window.onload=function(){setTimeout(function(){window.print()},400)};<\/script></body></html>');
+  w.document.write('<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Hasil Survey - '+esc(payload.nama)+'</title><style>body{font:12px Arial,sans-serif;color:#222;margin:28px}h1{text-align:center;font-size:18px;margin:0}h2{font-size:14px;margin:22px 0 8px;border-bottom:1px solid #777;padding-bottom:6px}.sub{text-align:center;margin:5px 0 18px;color:#555}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f2f6f2;padding:12px;margin:16px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:7px;text-align:left;vertical-align:top}th{width:32%;background:#f3f5f3}.score{font-size:22px;font-weight:bold;color:#087b43}.sign{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:55px;text-align:center}.sign div{padding-top:55px;border-top:1px solid #777}@media print{body{margin:15mm}.noprint{display:none}}form{padding-bottom:24px} .page-panel{scroll-margin-bottom:120px} @media(max-width:600px){.app-shell{padding-bottom:calc(170px + env(safe-area-inset-bottom))}.bottom-nav{min-height:76px}}\n</style></head><body><h1>HASIL SURVEY BANTUAN</h1><div class="sub">BAZNAS KABUPATEN SRAGEN</div><div class="meta"><div><b>Surveyor:</b> '+esc(result.surveyor||currentUser?.name||'-')+'</div><div><b>Tanggal Survey:</b> '+esc(dateText)+'</div><div><b>Nomor Data:</b> '+esc(result.row||'-')+'</div><div><b>Nama Penerima:</b> '+esc(payload.nama||'-')+'</div></div><h2>Identitas dan Kondisi Penerima</h2><table>'+fields+'</table><h2>Hasil Scoring</h2><div class="score">'+esc(result.scoring?.total||0)+' Poin — '+esc(result.scoring?.category||'-')+'</div><table><thead><tr><th>Kriteria</th><th>Skor</th></tr></thead><tbody>'+scoring+'</tbody></table><p><b>Lokasi:</b> '+esc(result.mapUrl||'-')+'</p><div class="sign"><div>Surveyor<br><b>'+esc(result.surveyor||currentUser?.name||'-')+'</b></div><div>Penerima / Mengetahui</div></div><p class="noprint"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></p><script>window.onload=function(){setTimeout(function(){window.print()},400)};<\/script></body></html>');
   w.document.close();
 }
 
