@@ -93,7 +93,7 @@ $('loginBtn').addEventListener('click', async () => {
   try {
     const r=await api({action:'login',username:$('loginUsername').value,password:$('loginPassword').value});
     if(!r.success) throw new Error(r.message);
-    if(r.user.role!=='Surveyor') throw new Error('Halaman ini khusus akun Surveyor. Silakan gunakan halaman Admin.');
+    if(String(r.user.role).trim().toLowerCase()!=='surveyor') throw new Error('Halaman ini khusus akun Surveyor. Silakan gunakan halaman Admin.');
     authToken=r.token; currentUser=r.user;
     const sr=await api({action:'getScoring',token:authToken}); if(!sr.success) throw new Error(sr.message); scoringRules=sr.rules||[]; scoringThresholds=sr.thresholds||scoringThresholds; previewScore();
     $('loginCard').style.display='none'; $('appCard').style.display='block';
@@ -167,23 +167,30 @@ function fileToDataUrl(file) {
 
 function sendPayloadToAppsScript(payload) {
   return new Promise((resolve, reject) => {
+    const requestId = 'req_' + Date.now() + '_' + Math.random().toString(36).slice(2);
     const iframe = document.createElement('iframe');
-    const targetName = 'baznasSubmitFrame_' + Date.now();
+    const targetName = 'baznasSubmitFrame_' + requestId;
     iframe.name = targetName;
     iframe.style.display = 'none';
     document.body.appendChild(iframe);
-
+    let finished = false;
+    let timer;
     const cleanup = () => {
       window.removeEventListener('message', onMessage);
-      setTimeout(() => iframe.remove(), 1000);
+      clearTimeout(timer);
+      setTimeout(() => iframe.remove(), 500);
+    };
+    const done = (err, result) => {
+      if (finished) return;
+      finished = true;
+      cleanup();
+      err ? reject(err) : resolve(result);
     };
     const onMessage = event => {
-      if (!event.data || event.data.type !== 'BAZNAS_SURVEY_RESULT') return;
-      cleanup();
-      resolve(event.data.result);
+      if (!event.data || event.data.type !== 'BAZNAS_SURVEY_RESULT' || event.data.requestId !== requestId) return;
+      done(null, event.data.result);
     };
     window.addEventListener('message', onMessage);
-
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = GAS_API_URL;
@@ -192,16 +199,13 @@ function sendPayloadToAppsScript(payload) {
     const input = document.createElement('input');
     input.type = 'hidden';
     input.name = 'payload';
-    input.value = JSON.stringify(payload);
+    input.value = JSON.stringify({...payload, _requestId: requestId});
     form.appendChild(input);
     document.body.appendChild(form);
-    form.submit();
-    form.remove();
-
-    setTimeout(() => {
-      cleanup();
-      reject(new Error('Backend tidak memberikan respons. Periksa URL Web App dan izin deployment.'));
-    }, 90000);
+    try { form.submit(); }
+    catch (err) { done(new Error('Gagal mengirim permintaan ke Apps Script: ' + err.message)); }
+    finally { form.remove(); }
+    timer = setTimeout(() => done(new Error('Backend tidak memberikan respons dalam 30 detik. Periksa deployment Apps Script, akses Web App, dan URL /exec.')), 30000);
   });
 }
 
