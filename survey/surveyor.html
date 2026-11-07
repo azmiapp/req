@@ -15,7 +15,7 @@ input,select,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radiu
 button{width:100%;padding:14px;background:#0f8a4b;color:#fff;border:0;border-radius:8px;font-size:16px;margin-top:16px;cursor:pointer}
 button:disabled{opacity:.55;cursor:wait}
 .location{background:#f1f8f3;border:1px solid #cfe5d5;padding:14px;border-radius:9px;margin-top:12px}
-.status{font-size:13px;color:#555;white-space:pre-wrap;margin-top:8px}
+.status{font-size:13px;color:#555;white-space:pre-wrap;margin-top:8px}.progress-wrap{display:none;margin:14px 0;padding:12px;background:#f1f8f3;border-radius:10px}.progress-track{height:12px;background:#dce9df;border-radius:20px;overflow:hidden}.progress-fill{height:100%;width:0;background:#0f8a4b;border-radius:20px;transition:width .25s}.progress-label{font-size:13px;margin-bottom:7px;color:#28543a}.result-card{border:1px solid #cfe5d5;background:#f8fcf9;border-radius:12px;padding:18px;margin-top:14px}.result-total{font-size:32px;font-weight:700;color:#0f8a4b}.result-table{width:100%;border-collapse:collapse;margin-top:12px}.result-table td,.result-table th{border:1px solid #d5e1d8;padding:8px;text-align:left;font-size:13px}.result-table th{background:#e8f3eb}
 .note{font-size:12px;color:#666}
 @media(max-width:600px){.grid{grid-template-columns:1fr}.card{margin:10px;padding:14px}}
 </style>
@@ -44,17 +44,15 @@ button:disabled{opacity:.55;cursor:wait}
 <div><label>Kecamatan</label><input name="kecamatan" id="kecamatan" type="text" required placeholder="Masukkan kecamatan"></div>
 </div>
 <div class="grid">
-<div><label>SHM Atas Nama</label><select name="shm"><option>Sendiri</option><option>Suami/Istri</option><option>Orang Tua</option><option>Kakek/Nenek</option></select></div>
+<div><label>Kepemilikan Rumah</label><select name="kepemilikanRumah" required><option value="Milik Sendiri">Milik Sendiri</option><option value="Keluarga">Keluarga</option><option value="Sewa">Sewa</option></select></div>
 <div><label>Luas Rumah (m²)</label><input name="luasRumah" type="number" min="0" step="any"></div>
-<div><label>Atap</label><select name="atap"><option>Genteng</option><option>Seng</option><option>Asbes</option></select></div>
-<div><label>Rangka Atap</label><select name="rangkaAtap"><option>Kayu</option><option>Baja Ringan</option><option>Bambu</option></select></div>
-<div><label>Dinding</label><select name="dinding"><option>Tembok Full</option><option>Tembok Setengah</option><option>Papan Kayu</option><option>Bambu</option><option>Kasibot/GRC</option><option>Seng</option></select></div>
-<div><label>Lantai</label><select name="lantai"><option>Keramik</option><option>Tegel/Ubin</option><option>Semen</option><option>Tanah</option></select></div>
-<div><label>Daya Listrik</label><select name="dayaListrik"><option>Menyambung</option><option>450 VA</option><option>900 VA</option><option>1300 VA</option></select></div>
-<div><label>Sumber Air</label><select name="sumberAir"><option>PDAM</option><option>PAMSIMAS</option><option>Sumur</option><option>Menyambung</option></select></div>
+<div><label>Atap</label><select name="atap" required><option>Genteng</option><option>Seng Metal</option><option>Asbes</option></select></div>
+<div><label>Dinding</label><select name="dinding" required><option>Tembok Plester</option><option>Campuran Tembok Kayu</option><option>Kayu Rotan</option><option>Bilik Bambu</option></select></div>
+<div><label>Lantai</label><select name="lantai" required><option>Keramik</option><option>Semen</option><option>Kayu</option><option>Tanah</option></select></div>
+<div><label>Sanitasi</label><select name="sanitasi" required><option>Kamar Mandi</option><option>MCK</option><option>Sumur / Sumber Air</option></select></div>
+<div><label>Listrik</label><select name="dayaListrik" required><option>KWH Pribadi</option><option>Menyambung</option></select></div>
 </div>
-<label>Jumlah Jiwa</label><input name="jumlahJiwa" type="number" min="1" step="1">
-<label>Penghasilan per Bulan</label><input name="penghasilan" type="text" maxlength="100" placeholder="Contoh: Rp1.500.000 / Tidak tetap" required>
+<label>Total Penghasilan per Tahun (Rp)</label><input name="penghasilan" type="number" min="0" step="1" placeholder="Contoh: 12000000" required>
 <div class="location"><strong>Pratinjau Scoring Otomatis</strong><div id="scorePreview" class="status">Isi kondisi rumah untuk melihat estimasi skor.</div><div class="note">Skor sementara dihitung dari kondisi rumah, listrik, air, luas rumah, dan jumlah penghuni. Penilaian akhir tersimpan saat survey dikirim.</div></div>
 <div class="location">
 <strong>Penanda Lokasi Rumah (GPS)</strong>
@@ -74,7 +72,9 @@ button:disabled{opacity:.55;cursor:wait}
 <label>Foto Rumah Dalam (maks. 4 MB)</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
 <button type="submit" id="submitBtn">SIMPAN DATA</button>
 <div id="formStatus" class="status" role="status"></div>
+<div class="progress-wrap" id="saveProgress" aria-live="polite"><div class="progress-label" id="progressLabel">Menyiapkan data...</div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
 </form>
+<div class="result-card" id="surveyResult" style="display:none"></div>
 </div>
 </div>
 <script>
@@ -117,8 +117,9 @@ function previewScore() {
   else if(r.operator==='GT') ok=n>Number(r.min);
   if(ok) grouped[r.field].score=Number(r.score)||0;
  });
- const vals=Object.values(grouped), total=vals.reduce((a,x)=>a+x.score,0), max=vals.reduce((a,x)=>a+x.max,0), pct=max?Math.round(total/max*100):0;
- $('scorePreview').textContent='Estimasi: '+total+'/'+max+' ('+pct+'%) — '+(pct>=scoringThresholds.high?'Prioritas Tinggi':pct>=scoringThresholds.medium?'Prioritas Sedang':'Prioritas Rendah');
+ const vals=Object.values(grouped), total=vals.reduce((a,x)=>a+x.score,0), max=vals.reduce((a,x)=>a+x.max,0);
+ const category=total<=20?'Approve':total<=39?'Komite':'Reject';
+ $('scorePreview').textContent='Estimasi total: '+total+' poin dari maksimal '+max+' poin — Kategori: '+category;
 }
 $('surveyForm').addEventListener('change',previewScore);
 $('surveyForm').addEventListener('input',previewScore);
@@ -209,6 +210,24 @@ function sendPayloadToAppsScript(payload) {
   });
 }
 
+function setSaveProgress(percent,label){
+  $('saveProgress').style.display='block';
+  $('progressFill').style.width=Math.max(0,Math.min(100,percent))+'%';
+  $('progressLabel').textContent=label;
+}
+function showSurveyResult(result){
+  const s=result.scoring||{};
+  const items=Array.isArray(s.items)?s.items:[];
+  $('surveyResult').innerHTML='<h3>Hasil Nilai Survey</h3><div class="result-total">'+esc(s.total||0)+' Poin</div><div><strong>Kategori: '+esc(s.category||'-')+'</strong></div><div class="note">Data berhasil disimpan. Nomor data: '+esc(result.row||'-')+'</div><table class="result-table"><thead><tr><th>Indeks Rumah</th><th>Skor</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(x.score)+' / '+esc(x.maxScore)+'</td></tr>').join('')+'</tbody><tfoot><tr><th>Total</th><th>'+esc(s.total||0)+' poin</th></tr></tfoot></table><button type="button" id="newSurveyBtn">INPUT SURVEY BERIKUTNYA</button>';
+  $('surveyResult').style.display='block';
+  $('surveyForm').style.display='none';
+  $('newSurveyBtn').addEventListener('click',()=>{
+    $('surveyForm').reset(); $('surveyForm').style.display='block'; $('surveyResult').style.display='none';
+    ['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');
+    setStatus('locationStatus','Lokasi belum direkam.'); $('saveProgress').style.display='none'; $('progressFill').style.width='0%'; setStatus('formStatus',''); previewScore();
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+}
 $('surveyForm').addEventListener('submit', async e => {
   e.preventDefault();
   const form = e.currentTarget;
@@ -220,7 +239,7 @@ $('surveyForm').addEventListener('submit', async e => {
     setStatus('formStatus', 'Ambil lokasi GPS terlebih dahulu sebelum menyimpan.'); return;
   }
   const btn = $('submitBtn'); btn.disabled = true;
-  setStatus('formStatus', 'Mengunggah data dan foto. Mohon tunggu, jangan tutup halaman...');
+  setStatus('formStatus', ''); setSaveProgress(5,'Menyiapkan data survey...');
   try {
     const fd = new FormData(form);
     const payload = {};
@@ -228,6 +247,7 @@ $('surveyForm').addEventListener('submit', async e => {
       if (!(value instanceof File)) payload[key] = value;
     }
     payload.token = authToken;
+    setSaveProgress(20,'Memproses foto dan dokumen...');
     payload.files = {
       fotoKtp: await fileToDataUrl(form.elements.fotoKtp.files[0]),
       fotoKk: await fileToDataUrl(form.elements.fotoKk.files[0]),
@@ -236,16 +256,13 @@ $('surveyForm').addEventListener('submit', async e => {
       fotoRumahBelakang: await fileToDataUrl(form.elements.fotoRumahBelakang.files[0]),
       fotoRumahDalam: await fileToDataUrl(form.elements.fotoRumahDalam.files[0])
     };
+    setSaveProgress(65,'Mengirim data ke server dan menyimpan foto...');
     const result = await sendPayloadToAppsScript(payload);
     if (!result || !result.success) throw new Error((result && result.message) || 'Data gagal disimpan.');
-    setStatus('formStatus', result.message + ' Nomor baris: ' + result.row + '\nHASIL SCORING: ' + result.scoring.total + '/' + result.scoring.max + ' (' + result.scoring.percent + '%) — ' + result.scoring.category);
-    form.reset();
-    ['latitude','longitude','accuracy','locationTime'].forEach(id => $(id).value = '');
-    setStatus('locationStatus', 'Lokasi belum direkam.');
-    previewScore();
-    $('kecamatan').innerHTML = '<option value="">Pilih desa terlebih dahulu</option>';
+    setSaveProgress(100,'Berhasil! Menampilkan hasil nilai survey...');
+    showSurveyResult(result);
   } catch (err) {
-    setStatus('formStatus', 'Gagal menyimpan: ' + err.message);
+    setStatus('formStatus', 'Gagal menyimpan: ' + err.message); $('saveProgress').style.display='none';
   } finally {
     btn.disabled = false;
   }
