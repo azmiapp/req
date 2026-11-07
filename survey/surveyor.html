@@ -166,25 +166,34 @@ function fileToDataUrl(file) {
   });
 }
 
+function jsonpRequest(url, timeoutMs=12000) {
+  return new Promise((resolve,reject)=>{
+    const cb='__surveyJsonp_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const script=document.createElement('script'); let done=false;
+    const finish=(err,value)=>{if(done)return;done=true;clearTimeout(timer);delete window[cb];script.remove();err?reject(err):resolve(value);};
+    window[cb]=value=>finish(null,value);
+    script.onerror=()=>finish(new Error('Gagal membaca status backend.'));
+    script.src=url+(url.includes('?')?'&':'?')+'callback='+cb;
+    const timer=setTimeout(()=>finish(new Error('Pemeriksaan status backend habis waktu.')),timeoutMs);
+    document.head.appendChild(script);
+  });
+}
+
 function sendPayloadToAppsScript(payload) {
   return new Promise((resolve, reject) => {
     const requestId = 'req_' + Date.now() + '_' + Math.random().toString(36).slice(2);
     const iframe = document.createElement('iframe');
     const targetName = 'baznasSubmitFrame_' + requestId;
-    iframe.name = targetName;
-    iframe.style.display = 'none';
+    iframe.name = targetName; iframe.style.display = 'none';
     document.body.appendChild(iframe);
-    let finished = false;
-    let timer;
+    let finished = false, timer, pollTimer, pollStarted=false;
     const cleanup = () => {
       window.removeEventListener('message', onMessage);
-      clearTimeout(timer);
+      clearTimeout(timer); clearTimeout(pollTimer);
       setTimeout(() => iframe.remove(), 500);
     };
     const done = (err, result) => {
-      if (finished) return;
-      finished = true;
-      cleanup();
+      if (finished) return; finished = true; cleanup();
       err ? reject(err) : resolve(result);
     };
     const onMessage = event => {
@@ -192,21 +201,29 @@ function sendPayloadToAppsScript(payload) {
       done(null, event.data.result);
     };
     window.addEventListener('message', onMessage);
+
+    // Fallback JSONP: tidak bergantung pada event postMessage dari iframe GAS.
+    const poll = async () => {
+      if (finished) return;
+      try {
+        const status = await jsonpRequest(GAS_API_URL+'?action=status&requestId='+encodeURIComponent(requestId));
+        if (status && status.pending !== true) return done(null, status);
+      } catch (e) { /* respons iframe tetap dipantau; polling berikutnya mencoba lagi */ }
+      if (!finished) pollTimer=setTimeout(poll, 1800);
+    };
+    pollTimer=setTimeout(poll, 2200);
+
     const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = GAS_API_URL;
-    form.target = targetName;
-    form.style.display = 'none';
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'payload';
+    form.method = 'POST'; form.action = GAS_API_URL; form.target = targetName; form.style.display = 'none';
+    const input = document.createElement('input'); input.type = 'hidden'; input.name = 'payload';
     input.value = JSON.stringify({...payload, _requestId: requestId});
-    form.appendChild(input);
-    document.body.appendChild(form);
+    form.appendChild(input); document.body.appendChild(form);
     try { form.submit(); }
     catch (err) { done(new Error('Gagal mengirim permintaan ke Apps Script: ' + err.message)); }
     finally { form.remove(); }
-    timer = setTimeout(() => done(new Error('Backend tidak memberikan respons dalam 30 detik. Periksa deployment Apps Script, akses Web App, dan URL /exec.')), 30000);
+    // Upload foto ke Drive dapat memerlukan waktu lebih dari 30 detik.
+    // Jangan nyatakan gagal terlalu cepat; status diperiksa sampai 3 menit.
+    timer = setTimeout(() => done(new Error('Server belum mengirim konfirmasi setelah 3 menit. Jangan kirim ulang dulu; periksa Data Survey agar tidak terjadi data ganda.')), 180000);
   });
 }
 
@@ -215,12 +232,12 @@ function setSaveProgress(percent,label){
   $('progressFill').style.width=Math.max(0,Math.min(100,percent))+'%';
   $('progressLabel').textContent=label;
 }
-function showSurveyResult(result){
+function showSurveyResult(result, payload){
   const s=result.scoring||{};
   const items=Array.isArray(s.items)?s.items:[];
-  $('surveyResult').innerHTML='<h3>Hasil Nilai Survey</h3><div class="result-total">'+esc(s.total||0)+' Poin</div><div><strong>Kategori: '+esc(s.category||'-')+'</strong></div><div class="note">Data berhasil disimpan. Nomor data: '+esc(result.row||'-')+'</div><table class="result-table"><thead><tr><th>Indeks Rumah</th><th>Skor</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(x.score)+' / '+esc(x.maxScore)+'</td></tr>').join('')+'</tbody><tfoot><tr><th>Total</th><th>'+esc(s.total||0)+' poin</th></tr></tfoot></table><button type="button" id="newSurveyBtn">INPUT SURVEY BERIKUTNYA</button>';
-  $('surveyResult').style.display='block';
-  $('surveyForm').style.display='none';
+  $('surveyResult').innerHTML='<h3>Hasil Nilai Survey</h3><div class="result-total">'+esc(s.total||0)+' Poin</div><div><strong>Kategori: '+esc(s.category||'-')+'</strong></div><div class="note">Data berhasil disimpan. Nomor data: '+esc(result.row||'-')+'</div><table class="result-table"><thead><tr><th>Indeks Rumah</th><th>Skor</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(x.score)+' / '+esc(x.maxScore)+'</td></tr>').join('')+'</tbody><tfoot><tr><th>Total</th><th>'+esc(s.total||0)+' poin</th></tr></tfoot></table><button type="button" id="exportPdfBtn">EKSPOR HASIL SURVEY PDF</button><button type="button" id="newSurveyBtn">INPUT SURVEY BERIKUTNYA</button>';
+  $('surveyResult').style.display='block'; $('surveyForm').style.display='none';
+  $('exportPdfBtn').addEventListener('click',()=>exportSurveyPdf(payload,result));
   $('newSurveyBtn').addEventListener('click',()=>{
     $('surveyForm').reset(); $('surveyForm').style.display='block'; $('surveyResult').style.display='none';
     ['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');
@@ -228,6 +245,21 @@ function showSurveyResult(result){
     window.scrollTo({top:0,behavior:'smooth'});
   });
 }
+
+function exportSurveyPdf(payload,result){
+  const labels={nama:'Nama Lengkap',jk:'Jenis Kelamin',nik:'NIK',nomorkk:'Nomor KK',alamat:'Alamat Lengkap',desa:'Desa/Kelurahan',kecamatan:'Kecamatan',kepemilikanRumah:'Kepemilikan Rumah',luasRumah:'Luas Rumah (m²)',atap:'Atap',rangkaAtap:'Rangka Atap',dinding:'Dinding',lantai:'Lantai',sanitasi:'Sanitasi',dayaListrik:'Daya Listrik',sumberAir:'Sumber Air',jumlahJiwa:'Jumlah Jiwa',penghasilan:'Penghasilan per Tahun (Rp)',latitude:'Latitude',longitude:'Longitude',accuracy:'Akurasi GPS (meter)'};
+  const dateValue=result.submittedAt?new Date(result.submittedAt):new Date();
+  const dateText=dateValue.toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
+  const fields=Object.keys(labels).filter(k=>payload[k]!==undefined && payload[k]!=='').map(k=>'<tr><th>'+esc(labels[k])+'</th><td>'+esc(payload[k])+'</td></tr>').join('');
+  const items=Array.isArray(result.scoring?.items)?result.scoring.items:[];
+  const scoring=items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(x.score)+' / '+esc(x.maxScore)+'</td></tr>').join('');
+  const w=window.open('','_blank');
+  if(!w){setStatus('formStatus','Izinkan pop-up browser untuk membuat PDF.');return;}
+  w.document.open();
+  w.document.write('<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Hasil Survey - '+esc(payload.nama)+'</title><style>body{font:12px Arial,sans-serif;color:#222;margin:28px}h1{text-align:center;font-size:18px;margin:0}h2{font-size:14px;margin:22px 0 8px;border-bottom:1px solid #777;padding-bottom:6px}.sub{text-align:center;margin:5px 0 18px;color:#555}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f2f6f2;padding:12px;margin:16px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:7px;text-align:left;vertical-align:top}th{width:32%;background:#f3f5f3}.score{font-size:22px;font-weight:bold;color:#087b43}.sign{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:55px;text-align:center}.sign div{padding-top:55px;border-top:1px solid #777}@media print{body{margin:15mm}.noprint{display:none}}</style></head><body><h1>HASIL SURVEY BANTUAN</h1><div class="sub">BAZNAS KABUPATEN SRAGEN</div><div class="meta"><div><b>Surveyor:</b> '+esc(result.surveyor||currentUser?.name||'-')+'</div><div><b>Tanggal Survey:</b> '+esc(dateText)+'</div><div><b>Nomor Data:</b> '+esc(result.row||'-')+'</div><div><b>Nama Penerima:</b> '+esc(payload.nama||'-')+'</div></div><h2>Identitas dan Kondisi Penerima</h2><table>'+fields+'</table><h2>Hasil Scoring</h2><div class="score">'+esc(result.scoring?.total||0)+' Poin — '+esc(result.scoring?.category||'-')+'</div><table><thead><tr><th>Kriteria</th><th>Skor</th></tr></thead><tbody>'+scoring+'</tbody></table><p><b>Lokasi:</b> '+esc(result.mapUrl||'-')+'</p><div class="sign"><div>Surveyor<br><b>'+esc(result.surveyor||currentUser?.name||'-')+'</b></div><div>Penerima / Mengetahui</div></div><p class="noprint"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></p><script>window.onload=function(){setTimeout(function(){window.print()},400)};<\/script></body></html>');
+  w.document.close();
+}
+
 $('surveyForm').addEventListener('submit', async e => {
   e.preventDefault();
   const form = e.currentTarget;
@@ -256,11 +288,11 @@ $('surveyForm').addEventListener('submit', async e => {
       fotoRumahBelakang: await fileToDataUrl(form.elements.fotoRumahBelakang.files[0]),
       fotoRumahDalam: await fileToDataUrl(form.elements.fotoRumahDalam.files[0])
     };
-    setSaveProgress(65,'Mengirim data ke server dan menyimpan foto...');
+    setSaveProgress(65,'Mengirim data dan menyimpan foto. Proses dapat memerlukan beberapa menit; jangan tutup halaman...');
     const result = await sendPayloadToAppsScript(payload);
     if (!result || !result.success) throw new Error((result && result.message) || 'Data gagal disimpan.');
-    setSaveProgress(100,'Berhasil! Menampilkan hasil nilai survey...');
-    showSurveyResult(result);
+    setSaveProgress(100,'Berhasil! Data terkonfirmasi tersimpan. Membuka halaman Skoring...');
+    showSurveyResult(result,payload);
   } catch (err) {
     setStatus('formStatus', 'Gagal menyimpan: ' + err.message); $('saveProgress').style.display='none';
   } finally {
