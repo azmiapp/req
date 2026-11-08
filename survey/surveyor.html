@@ -104,14 +104,14 @@ button:active{transform:translateY(1px)}
 <div><label>Kecamatan</label><input name="kecamatan" id="kecamatan" type="text" required placeholder="Masukkan kecamatan"></div>
 <div><label>SHM Atas Nama</label><input name="shm" maxlength="150" placeholder="Nama pada sertifikat"></div>
 <div><label>Luas Rumah (m²)</label><input name="luasRumah" type="number" min="0" step="any" required></div>
-<div><label>Atap</label><select name="atap" required><option>Genteng</option><option>Seng</option><option>Asbes</option><option>Beton</option><option>Lainnya</option></select></div>
-<div><label>Rangka Atap</label><select name="rangkaAtap" required><option>Kayu</option><option>Baja Ringan</option><option>Bambu</option><option>Lainnya</option></select></div>
-<div><label>Dinding</label><select name="dinding" required><option>Tembok Plester Full</option><option>Setengah Tembok</option><option>Kayu</option><option>Bilik Bambu</option><option>Kasibot/GRC</option><option>Seng</option><option>Lainnya</option></select></div>
-<div><label>Lantai</label><select name="lantai" required><option>Keramik</option><option>Semen</option><option>Tanah</option><option>Lainnya</option></select></div>
-<div><label>Daya Listrik</label><select name="dayaListrik" required><option>KWH Pribadi 450VA</option><option>KWH Pribadi 900VA</option><option>KWH Pribadi 1300</option><option>Menyambung</option><option>Tidak Ada</option></select></div>
-<div><label>Sumber Air</label><select name="sumberAir" required><option>PDAM</option><option>Sumur Sendiri</option><option>Sumur Bersama</option><option>Sungai</option><option>PAMSIMAS</option><option>Lainnya</option></select></div>
+<div><label>Atap</label><select name="atap" required><option>Genteng</option><option>Seng Metal</option><option>Asbes</option><option>Beton</option><option>Daun/Rumbia</option><option>Lainnya</option></select></div>
+<div><label>Rangka Atap</label><select name="rangkaAtap" required><option>Kayu</option><option>Baja Ringan</option><option>Bambu</option><option>Beton</option><option>Lainnya</option></select></div>
+<div><label>Dinding</label><select name="dinding" required><option>Tembok Plester</option><option>Campuran Tembok Kayu</option><option>Kayu Rotan</option><option>Bilik Bambu</option><option>Lainnya</option></select></div>
+<div><label>Lantai</label><select name="lantai" required><option>Keramik</option><option>Semen</option><option>Kayu</option><option>Tanah</option><option>Lainnya</option></select></div>
+<div><label>Daya Listrik</label><select name="dayaListrik" required><option>KWH Pribadi</option><option>Menyambung</option><option>Tidak Ada</option></select></div>
+<div><label>Sumber Air</label><select name="sumberAir" required><option>PDAM</option><option>Sumur Sendiri</option><option>Sumur Bersama</option><option>Sungai</option><option>Mata Air</option><option>Lainnya</option></select></div>
 <div><label>Jumlah Jiwa</label><input name="jumlahJiwa" type="number" min="1" step="1" required></div>
-<div><label>Sanitasi</label><select name="sanitasi" required><option>Kamar Mandi Saja</option><option>MCK Lengkap</option><option>Menumpang</option><option>Tidak Ada</option></select></div>
+<div><label>Sanitasi</label><select name="sanitasi" required><option>Kamar Mandi</option><option>MCK</option><option>Sumur / Sumber Air</option><option>Tidak Ada</option></select></div>
 <div><label>Kepemilikan Rumah</label><select name="kepemilikanRumah" required><option value="Milik Sendiri">Milik Sendiri</option><option value="Keluarga">Keluarga</option><option value="Sewa">Sewa</option></select></div>
 <div><label>Penghasilan (Rp/bulan)</label><input name="penghasilanBulanan" type="number" min="0" step="1" placeholder="Total penghasilan per bulan" required></div>
 <div><label>Penghasilan per Tahun (Rp)</label><input name="penghasilan" type="number" min="0" step="1" placeholder="Total penghasilan per tahun" required></div>
@@ -439,30 +439,46 @@ function showSurveyResult(result, payload){
   });
 }
 
-function exportSurveyPdf(payload,result){
-  const labels={nama:'Nama Lengkap',jk:'Jenis Kelamin',nik:'NIK',nomorkk:'Nomor KK',alamat:'Alamat Lengkap',desa:'Desa/Kelurahan',kecamatan:'Kecamatan',shm:'SHM Atas Nama',kepemilikanRumah:'Kepemilikan Rumah',luasRumah:'Luas Rumah (m²)',atap:'Atap',rangkaAtap:'Rangka Atap',dinding:'Dinding',lantai:'Lantai',sanitasi:'Sanitasi',dayaListrik:'Daya Listrik',sumberAir:'Sumber Air',jumlahJiwa:'Jumlah Jiwa',penghasilanBulanan:'Penghasilan (Rp/bulan)',penghasilan:'Penghasilan per Tahun (Rp)',latitude:'Latitude',longitude:'Longitude',accuracy:'Akurasi GPS (meter)'};
-  const dateValue=result.submittedAt?new Date(result.submittedAt):new Date();
-  const dateText=dateValue.toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
-  const fields=Object.keys(labels).filter(k=>payload[k]!==undefined && payload[k]!=='').map(k=>'<tr><th>'+esc(labels[k])+'</th><td>'+esc(payload[k])+'</td></tr>').join('');
-  const items=Array.isArray(result.scoring?.items)?result.scoring.items:[];
-  const scoring=items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('');
-  const photoLabels={fotoKtp:'Foto KTP',fotoKk:'Foto Kartu Keluarga',fotoRumahDepan:'Foto Rumah Tampak Depan',fotoRumahSamping:'Foto Rumah Tampak Samping',fotoRumahBelakang:'Foto Rumah Tampak Belakang',fotoRumahDalam:'Foto Kondisi Dalam Rumah'};
-  const driveImageUrl=url=>{
-    const raw=String(url||'');
-    if(/^data:image\//i.test(raw))return raw;
-    const m=raw.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i)||raw.match(/[?&]id=([^&#]+)/i);
-    return m?'https://drive.google.com/uc?export=view&id='+encodeURIComponent(decodeURIComponent(m[1])):raw;
-  };
-  const photoRows=Object.entries(result.photos||{}).filter(([k,v])=>v).map(([k,v])=>{
-    const label=photoLabels[k]||k,src=driveImageUrl(v),name=(result.photoNames&&result.photoNames[k])||label;
-    return '<figure class="photo-item"><img src="'+esc(src)+'" alt="'+esc(label)+'"><figcaption><b>'+esc(label)+'</b><span>'+esc(name)+'</span></figcaption></figure>';
-  }).join('');
-  const photoSection=photoRows?'<h2>Dokumentasi Foto Survey</h2><div class="photo-grid">'+photoRows+'</div>':'<h2>Dokumentasi Foto Survey</h2><p>Foto tidak tersedia pada data hasil survey ini.</p>';
+async function exportSurveyPdf(payload,result){
   const w=window.open('','_blank');
   if(!w){setStatus('formStatus','Izinkan pop-up browser untuk membuat PDF.');return;}
   w.document.open();
-  w.document.write('<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Hasil Survey - '+esc(payload.nama)+'</title><style>body{font:12px Arial,sans-serif;color:#222;margin:28px}h1{text-align:center;font-size:18px;margin:0}h2{font-size:14px;margin:22px 0 8px;border-bottom:1px solid #777;padding-bottom:6px}.sub{text-align:center;margin:5px 0 18px;color:#555}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f2f6f2;padding:12px;margin:16px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:7px;text-align:left;vertical-align:top}th{width:32%;background:#f3f5f3}.score{font-size:22px;font-weight:bold;color:#087b43}.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}.photo-item{margin:0;border:1px solid #bbb;padding:8px;break-inside:avoid;page-break-inside:avoid}.photo-item img{display:block;width:100%;height:220px;object-fit:contain;background:#f5f5f5}.photo-item figcaption{font-size:11px;margin-top:6px;display:flex;flex-direction:column;gap:3px;overflow-wrap:anywhere}.sign{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:55px;text-align:center}.sign div{padding-top:55px;border-top:1px solid #777}@media print{body{margin:15mm}.noprint{display:none}}form{padding-bottom:24px} .page-panel{scroll-margin-bottom:120px} @media(max-width:600px){.app-shell{padding-bottom:calc(170px + env(safe-area-inset-bottom))}.bottom-nav{min-height:76px}}\n</style></head><body><h1>HASIL SURVEY BANTUAN</h1><div class="sub">BAZNAS KABUPATEN SRAGEN</div><div class="meta"><div><b>Surveyor:</b> '+esc(result.surveyor||currentUser?.name||'-')+'</div><div><b>Tanggal Survey:</b> '+esc(dateText)+'</div><div><b>Nomor Data:</b> '+esc(result.row||'-')+'</div><div><b>Nama Penerima:</b> '+esc(payload.nama||'-')+'</div></div><h2>Identitas dan Kondisi Penerima</h2><table>'+fields+'</table><h2>Hasil Scoring</h2><div class="score">'+esc(result.scoring?.total||0)+' Poin — '+esc(result.scoring?.category||'-')+'</div><table><thead><tr><th>Kriteria</th><th>Skor</th></tr></thead><tbody>'+scoring+'</tbody></table><p><b>Lokasi:</b> '+esc(result.mapUrl||'-')+'</p>'+photoSection+'<div class="sign"><div>Surveyor<br><b>'+esc(result.surveyor||currentUser?.name||'-')+'</b></div><div>Penerima / Mengetahui</div></div><p class="noprint"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></p><script>window.onload=function(){const imgs=Array.from(document.images);Promise.race([Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=img.onerror=resolve}))),new Promise(resolve=>setTimeout(resolve,10000))]).then(()=>setTimeout(()=>window.print(),500))};<\/script></body></html>');
+  w.document.write('<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Menyiapkan Hasil Survey</title><style>body{font:13px Arial,sans-serif;padding:30px;color:#294b37} .wait{max-width:480px;margin:15vh auto;text-align:center}.bar{height:9px;background:#e3eee6;border-radius:20px;overflow:hidden}.bar span{display:block;width:40%;height:100%;background:#0f8a4b;animation:move 1.2s infinite}@keyframes move{from{transform:translateX(-110%)}to{transform:translateX(260%)}}</style></head><body><div class="wait"><h2>Menyiapkan dokumen survey...</h2><p>Memuat foto dari Google Drive agar dapat disertakan dalam PDF.</p><div class="bar"><span></span></div></div></body></html>');
   w.document.close();
+
+  try{
+    const labels={nama:'Nama Lengkap',jk:'Jenis Kelamin',nik:'NIK',nomorkk:'Nomor KK',alamat:'Alamat Lengkap',desa:'Desa/Kelurahan',kecamatan:'Kecamatan',shm:'SHM Atas Nama',kepemilikanRumah:'Kepemilikan Rumah',luasRumah:'Luas Rumah (m²)',atap:'Atap',rangkaAtap:'Rangka Atap',dinding:'Dinding',lantai:'Lantai',sanitasi:'Sanitasi',dayaListrik:'Daya Listrik',sumberAir:'Sumber Air',jumlahJiwa:'Jumlah Jiwa',penghasilanBulanan:'Penghasilan (Rp/bulan)',penghasilan:'Penghasilan per Tahun (Rp)',latitude:'Latitude',longitude:'Longitude',accuracy:'Akurasi GPS (meter)'};
+    const dateValue=result.submittedAt?new Date(result.submittedAt):new Date();
+    const dateText=dateValue.toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
+    const fields=Object.keys(labels).filter(k=>payload[k]!==undefined && payload[k]!=='').map(k=>'<tr><th>'+esc(labels[k])+'</th><td>'+esc(payload[k])+'</td></tr>').join('');
+    const items=Array.isArray(result.scoring?.items)?result.scoring.items:[];
+    const scoring=items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('');
+    const photoLabels={fotoKtp:'Foto KTP',fotoKk:'Foto Kartu Keluarga',fotoRumahDepan:'Foto Rumah Tampak Depan',fotoRumahSamping:'Foto Rumah Tampak Samping',fotoRumahBelakang:'Foto Rumah Tampak Belakang',fotoRumahDalam:'Foto Kondisi Dalam Rumah'};
+    const photoEntries=Object.entries(result.photos||{}).filter(([k,v])=>v);
+    const photoRows=[];
+    for(const [key,url] of photoEntries){
+      const label=photoLabels[key]||key;
+      try{
+        let dataUrl=String(url||'');
+        let fileName=label;
+        if(!/^data:image\//i.test(dataUrl)){
+          const photo=await api({action:'getPhotoData',token:authToken,url:String(url)});
+          if(!photo||!photo.success||!photo.dataUrl)throw new Error(photo?.message||'Server tidak mengembalikan data foto.');
+          dataUrl=photo.dataUrl;
+          fileName=photo.name||label;
+        }
+        photoRows.push('<figure class="photo-item"><img src="'+esc(dataUrl)+'" alt="'+esc(label)+'"><figcaption><b>'+esc(label)+'</b><span>'+esc(fileName)+'</span></figcaption></figure>');
+      }catch(photoError){
+        photoRows.push('<figure class="photo-item photo-error"><div class="photo-placeholder">Foto gagal dimuat</div><figcaption><b>'+esc(label)+'</b><span>'+esc(photoError.message||'Periksa akses file di Google Drive.')+'</span></figcaption></figure>');
+      }
+    }
+    const photoSection=photoRows.length?'<h2>Dokumentasi Foto Survey</h2><div class="photo-grid">'+photoRows.join('')+'</div>':'<h2>Dokumentasi Foto Survey</h2><p>Foto tidak tersedia pada data hasil survey ini.</p>';
+    const finalHtml='<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Hasil Survey - '+esc(payload.nama)+'</title><style>body{font:12px Arial,sans-serif;color:#222;margin:28px}h1{text-align:center;font-size:18px;margin:0}h2{font-size:14px;margin:22px 0 8px;border-bottom:1px solid #777;padding-bottom:6px}.sub{text-align:center;margin:5px 0 18px;color:#555}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f2f6f2;padding:12px;margin:16px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:7px;text-align:left;vertical-align:top}th{width:32%;background:#f3f5f3}.score{font-size:22px;font-weight:bold;color:#087b43}.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}.photo-item{margin:0;border:1px solid #bbb;padding:8px;break-inside:avoid;page-break-inside:avoid}.photo-item img{display:block;width:100%;height:220px;object-fit:contain;background:#f5f5f5}.photo-placeholder{height:150px;display:grid;place-items:center;background:#f8eeee;color:#a33}.photo-error{border-color:#d99}.photo-item figcaption{font-size:11px;margin-top:6px;display:flex;flex-direction:column;gap:3px;overflow-wrap:anywhere}.sign{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:55px;text-align:center}.sign div{padding-top:55px;border-top:1px solid #777}@media print{body{margin:15mm}.noprint{display:none}}@media(max-width:600px){.photo-grid{grid-template-columns:1fr}}</style></head><body><h1>HASIL SURVEY BANTUAN</h1><div class="sub">BAZNAS KABUPATEN SRAGEN</div><div class="meta"><div><b>Surveyor:</b> '+esc(result.surveyor||currentUser?.name||'-')+'</div><div><b>Tanggal Survey:</b> '+esc(dateText)+'</div><div><b>Nomor Data:</b> '+esc(result.row||'-')+'</div><div><b>Nama Penerima:</b> '+esc(payload.nama||'-')+'</div></div><h2>Identitas dan Kondisi Penerima</h2><table>'+fields+'</table><h2>Hasil Scoring</h2><div class="score">'+esc(result.scoring?.total||0)+' Poin — '+esc(result.scoring?.category||'-')+'</div><table><thead><tr><th>Kriteria</th><th>Skor</th></tr></thead><tbody>'+scoring+'</tbody></table><p><b>Lokasi:</b> '+esc(result.mapUrl||'-')+'</p>'+photoSection+'<div class="sign"><div>Surveyor<br><b>'+esc(result.surveyor||currentUser?.name||'-')+'</b></div><div>Penerima / Mengetahui</div></div><p class="noprint"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></p><script>window.onload=function(){const imgs=Array.from(document.images);Promise.all(imgs.map(img=>img.decode?img.decode().catch(()=>{}):new Promise(resolve=>{if(img.complete)return resolve();img.onload=img.onerror=resolve}))).then(()=>setTimeout(()=>window.print(),400))};<\/script></body></html>';
+    w.document.open();w.document.write(finalHtml);w.document.close();
+  }catch(e){
+    if(w&&!w.closed){w.document.open();w.document.write('<p style="font:14px Arial;padding:24px;color:#a00">Gagal menyiapkan PDF: '+esc(e.message||e)+'</p>');w.document.close();}
+    setStatus('formStatus','Gagal menyiapkan PDF: '+(e.message||e));
+  }
 }
 
 
