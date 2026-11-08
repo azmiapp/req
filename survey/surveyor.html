@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Form Survey Bantuan - BAZNAS Sragen</title>
+<title>Form Survey Bantuan Perbaikan RTLH - BAZNAS Sragen</title>
 <style>
 *{box-sizing:border-box}
 body{font-family:Arial,sans-serif;background:#eef5ef;margin:0;color:#24352b}
@@ -113,7 +113,7 @@ button:active{transform:translateY(1px)}
 <label>Foto Rumah Belakang (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahBelakang" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
 <label>Foto Rumah Dalam (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
 <div class="status">Setiap lampiran foto akan otomatis dikompres menjadi JPG dengan ukuran maksimal 700 KB sebelum diunggah.</div>
-<button type="submit" id="submitBtn">SIMPAN DATA</button><div id="formStatus" class="status" role="status"></div>
+<button type="button" id="saveDraftBtn" class="secondary-btn">SIMPAN DRAFT</button><button type="submit" id="submitBtn">UNGGAH DATA SURVEY</button><div id="formStatus" class="status" role="status"></div>
 <div class="progress-wrap" id="saveProgress" aria-live="polite"><div class="progress-label" id="progressLabel">Menyiapkan data...</div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
 </form>
 <div class="result-card" id="surveyResult" style="display:none"></div>
@@ -144,6 +144,18 @@ let authToken = '';
 let currentUser = null;
 let scoringRules = [];
 let scoringThresholds = {high:70,medium:40};
+const DRAFT_DB='baznas-survey-drafts-v1', DRAFT_KEY='active';
+let draftFiles={}, draftTimer=null, restoringDraft=false, uploadQueued=false;
+function openDraftDb(){return new Promise((resolve,reject)=>{const q=indexedDB.open(DRAFT_DB,1);q.onupgradeneeded=()=>q.result.createObjectStore('drafts');q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error);});}
+async function draftGet(){const db=await openDraftDb();return new Promise((resolve,reject)=>{const q=db.transaction('drafts').objectStore('drafts').get(DRAFT_KEY);q.onsuccess=()=>resolve(q.result||null);q.onerror=()=>reject(q.error);});}
+async function draftPut(value){const db=await openDraftDb();return new Promise((resolve,reject)=>{const tx=db.transaction('drafts','readwrite');tx.objectStore('drafts').put(value,DRAFT_KEY);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});}
+async function draftDelete(){const db=await openDraftDb();return new Promise((resolve,reject)=>{const tx=db.transaction('drafts','readwrite');tx.objectStore('drafts').delete(DRAFT_KEY);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});}
+function formValues(){const out={};for(const [k,v] of new FormData($('surveyForm')).entries())if(!(v instanceof File))out[k]=v;return out;}
+async function saveDraftNow(){if(restoringDraft)return;try{await draftPut({values:formValues(),files:draftFiles,tokenUser:currentUser?.username||'',updatedAt:new Date().toISOString(),queued:uploadQueued});setStatus('formStatus','Draft tersimpan di perangkat. Foto dan isian aman meski halaman ditutup.');}catch(e){setStatus('formStatus','Draft gagal disimpan: '+e.message);}}
+function scheduleDraftSave(){clearTimeout(draftTimer);draftTimer=setTimeout(saveDraftNow,700);}
+$('saveDraftBtn').addEventListener('click',async()=>{try{for(const name of ['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam']){const file=$('surveyForm').elements[name].files[0];if(file&&!draftFiles[name])draftFiles[name]=await fileToDataUrl(file);}await saveDraftNow();setStatus('formStatus','Draft berhasil disimpan di perangkat ini, termasuk foto. Bisa dilanjutkan setelah halaman dibuka kembali.');}catch(e){setStatus('formStatus','Gagal menyimpan draft: '+e.message);}});
+async function restoreDraft(){try{const d=await draftGet();if(!d)return;if(d.tokenUser&&currentUser&&d.tokenUser!==currentUser.username)return;restoringDraft=true;Object.entries(d.values||{}).forEach(([k,v])=>{const el=$('surveyForm').elements[k];if(el&&el.type!=='file')el.value=v;});draftFiles=d.files||{};uploadQueued=!!d.queued;previewScore();restoringDraft=false;setStatus('formStatus','Draft terakhir dipulihkan ('+new Date(d.updatedAt).toLocaleString('id-ID')+'). Foto terlampir: '+Object.keys(draftFiles).length+'.');if(uploadQueued&&navigator.onLine)setTimeout(submitSurveyDraft,500);}catch(e){restoringDraft=false;console.warn('Draft tidak dapat dipulihkan',e);}}
+
 async function api(payload) { return sendPayloadToAppsScript(payload); }
 
 $('loginBtn').addEventListener('click', async () => {
@@ -152,17 +164,20 @@ $('loginBtn').addEventListener('click', async () => {
     const r=await api({action:'login',username:$('loginUsername').value,password:$('loginPassword').value});
     if(!r.success) throw new Error(r.message);
     if(String(r.user.role).trim().toLowerCase()!=='surveyor') throw new Error('Halaman ini khusus akun Surveyor. Silakan gunakan halaman Admin.');
-    authToken=r.token; currentUser=r.user;
+    authToken=r.token; currentUser=r.user; localStorage.setItem('baznas_survey_session',JSON.stringify({token:authToken,user:currentUser,expires:Date.now()+6*60*60*1000}));
     const sr=await api({action:'getScoring',token:authToken}); if(!sr.success) throw new Error(sr.message); scoringRules=sr.rules||[]; scoringThresholds=sr.thresholds||scoringThresholds; previewScore();
     $('loginCard').style.display='none'; $('appCard').style.display='block';
     $('userBar').textContent='Login: '+currentUser.name+' ('+currentUser.role+')';
     $('profileName').textContent=currentUser.name||'-'; $('profileUsername').textContent=currentUser.username||'-'; $('profileRole').textContent=currentUser.role||'Surveyor'; $('homeUserName').textContent=currentUser.name||'Surveyor';
-    $('bottomNav').style.display='flex'; navigateTo('home'); loadSurveyHistory();
+    $('bottomNav').style.display='flex'; navigateTo('home'); loadSurveyHistory(); await restoreDraft();
   } catch(e) { setStatus('loginStatus',e.message); }
   finally { btn.disabled=false; }
 });
+
+(async function restoreLoginSession(){try{const saved=JSON.parse(localStorage.getItem('baznas_survey_session')||'null');if(!saved||!saved.token||saved.expires<Date.now())return;authToken=saved.token;currentUser=saved.user;const sr=await api({action:'getScoring',token:authToken});if(!sr.success)throw new Error(sr.message);scoringRules=sr.rules||[];scoringThresholds=sr.thresholds||scoringThresholds;previewScore();$('loginCard').style.display='none';$('appCard').style.display='block';$('userBar').textContent='Login: '+currentUser.name+' ('+currentUser.role+')';$('profileName').textContent=currentUser.name||'-';$('profileUsername').textContent=currentUser.username||'-';$('profileRole').textContent=currentUser.role||'Surveyor';$('homeUserName').textContent=currentUser.name||'Surveyor';$('bottomNav').style.display='flex';navigateTo('home');loadSurveyHistory();await restoreDraft();}catch(e){localStorage.removeItem('baznas_survey_session');authToken='';currentUser=null;}})();
+
 $('logoutBtn').addEventListener('click',logoutSurveyor); $('profileLogoutBtn').addEventListener('click',logoutSurveyor);
-function logoutSurveyor(){authToken='';currentUser=null;scoringRules=[];$('bottomNav').style.display='none';$('appCard').style.display='none';$('loginCard').style.display='block';$('loginPassword').value='';}
+function logoutSurveyor(){authToken='';currentUser=null;scoringRules=[];localStorage.removeItem('baznas_survey_session');$('bottomNav').style.display='none';$('appCard').style.display='none';$('loginCard').style.display='block';$('loginPassword').value='';}
 
 function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
@@ -184,6 +199,11 @@ function previewScore() {
 }
 $('surveyForm').addEventListener('change',previewScore);
 $('surveyForm').addEventListener('input',previewScore);
+$('surveyForm').addEventListener('input',scheduleDraftSave);
+$('surveyForm').addEventListener('change',scheduleDraftSave);
+['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam'].forEach(name=>{
+ const el=$('surveyForm').elements[name]; if(el)el.addEventListener('change',async()=>{try{if(el.files[0]){draftFiles[name]=await fileToDataUrl(el.files[0]);await saveDraftNow();}}catch(e){setStatus('formStatus',e.message);}});
+});
 
 
 $('getLocationBtn').addEventListener('click', () => {
@@ -354,11 +374,13 @@ function displayScore(value){const raw=String(value==null?'0':value).trim();cons
 function showSurveyResult(result, payload){
   const s=result.scoring||{};
   const items=Array.isArray(s.items)?s.items:[];
+  const photoMeta=[['fotoKtp','Foto KTP'],['fotoKk','Foto Kartu Keluarga'],['fotoRumahDepan','Foto Rumah Tampak Depan'],['fotoRumahSamping','Foto Rumah Tampak Samping'],['fotoRumahBelakang','Foto Rumah Tampak Belakang'],['fotoRumahDalam','Foto Kondisi Dalam Rumah']];
+  const photoHtml=photoMeta.filter(([k])=>result.photos&&result.photos[k]).map(([k,label])=>'<tr><td>'+esc(label)+'</td><td><a href="'+esc(result.photos[k])+'" target="_blank" rel="noopener">'+esc(((result.photoNames&&result.photoNames[k])||label))+'</a></td></tr>').join('');
   $('surveyResult').innerHTML='<h3>Hasil Nilai Survey</h3><div class="result-total">'+esc(s.total||0)+' Poin</div><div><strong>Kategori: '+esc(s.category||'-')+'</strong></div><div class="note">Data berhasil disimpan. Nomor data: '+esc(result.row||'-')+'</div><table class="result-table"><thead><tr><th>Indeks Rumah</th><th>Skor</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('')+'</tbody><tfoot><tr><th>Total</th><th>'+esc(s.total||0)+' poin</th></tr></tfoot></table><button type="button" id="exportPdfBtn">EKSPOR HASIL SURVEY PDF</button><button type="button" id="newSurveyBtn">INPUT SURVEY BERIKUTNYA</button>';
   $('surveyResult').style.display='block'; $('surveyForm').style.display='none'; navigateTo('survey');
   $('exportPdfBtn').addEventListener('click',()=>exportSurveyPdf(payload,result));
   $('newSurveyBtn').addEventListener('click',()=>{
-    $('surveyForm').reset(); $('surveyForm').style.display='block'; $('surveyResult').style.display='none'; navigateTo('survey');
+    $('surveyForm').reset(); draftFiles={}; uploadQueued=false; draftDelete(); $('surveyForm').style.display='block'; $('surveyResult').style.display='none'; navigateTo('survey');
     ['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');
     setStatus('locationStatus','Lokasi belum direkam.'); $('saveProgress').style.display='none'; $('progressFill').style.width='0%'; setStatus('formStatus',''); previewScore();
     window.scrollTo({top:0,behavior:'smooth'});
@@ -372,6 +394,8 @@ function exportSurveyPdf(payload,result){
   const fields=Object.keys(labels).filter(k=>payload[k]!==undefined && payload[k]!=='').map(k=>'<tr><th>'+esc(labels[k])+'</th><td>'+esc(payload[k])+'</td></tr>').join('');
   const items=Array.isArray(result.scoring?.items)?result.scoring.items:[];
   const scoring=items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('');
+  const photoLabels={fotoKtp:'Foto KTP',fotoKk:'Foto Kartu Keluarga',fotoRumahDepan:'Foto Rumah Tampak Depan',fotoRumahSamping:'Foto Rumah Tampak Samping',fotoRumahBelakang:'Foto Rumah Tampak Belakang',fotoRumahDalam:'Foto Kondisi Dalam Rumah'};
+  const photoRows=Object.entries(result.photos||{}).filter(([k,v])=>v).map(([k,v])=>'<tr><td>'+esc(photoLabels[k]||k)+'</td><td><a href="'+esc(v)+'">'+esc((result.photoNames&&result.photoNames[k])||photoLabels[k]||k)+'</a></td></tr>').join('');
   const w=window.open('','_blank');
   if(!w){setStatus('formStatus','Izinkan pop-up browser untuk membuat PDF.');return;}
   w.document.open();
@@ -418,53 +442,43 @@ function renderSurveyHistory(){
   host.querySelectorAll('[data-pdf]').forEach(b=>b.addEventListener('click',()=>{const r=surveyHistoryRows[Number(b.dataset.pdf)];exportSurveyPdf(historyPayload(r),historyResult(r));}));
 }
 function historyPayload(r){return {nama:r.nama,jk:r.jk,nik:r.nik,alamat:r.alamat,desa:r.desa,kecamatan:r.kecamatan,kepemilikanRumah:r.kepemilikanRumah,luasRumah:r.luasRumah,atap:r.atap,rangkaAtap:r.rangkaAtap,dinding:r.dinding,lantai:r.lantai,sanitasi:r.sanitasi,dayaListrik:r.dayaListrik,sumberAir:r.sumberAir,jumlahJiwa:r.jumlahJiwa,penghasilan:r.penghasilan,latitude:r.latitude,longitude:r.longitude,accuracy:r.accuracy};}
-function historyResult(r){return {row:r.rowNumber,surveyor:r.surveyor,submittedAt:r.submittedAt,mapUrl:r.mapUrl,scoring:r.scoring||{total:0,category:'-',items:[]}};}
+function historyResult(r){return {row:r.rowNumber,surveyor:r.surveyor,submittedAt:r.submittedAt,mapUrl:r.mapUrl,scoring:r.scoring||{total:0,category:'-',items:[]},photos:{fotoKtp:r.fotoKtp,fotoKk:r.fotoKk,fotoRumahDepan:r.fotoRumahDepan,fotoRumahSamping:r.fotoRumahSamping,fotoRumahBelakang:r.fotoRumahBelakang,fotoRumahDalam:r.fotoRumahDalam}};}
 function showHistoryDetail(r){
   const s=r.scoring||{},items=Array.isArray(s.items)?s.items:[];
+  const photoLabels={fotoKtp:'Foto KTP',fotoKk:'Foto Kartu Keluarga',fotoRumahDepan:'Foto Rumah Tampak Depan',fotoRumahSamping:'Foto Rumah Tampak Samping',fotoRumahBelakang:'Foto Rumah Tampak Belakang',fotoRumahDalam:'Foto Kondisi Dalam Rumah'};
+  const photoRows=Object.entries(photoLabels).filter(([k])=>r[k]).map(([k,label])=>'<tr><td>'+label+'</td><td><a href="'+esc(r[k])+'" target="_blank" rel="noopener">'+esc(decodeURIComponent((r[k].split('/').pop()||label).split('?')[0]))+'</a></td></tr>').join('');
   $('historyDetail').innerHTML='<div class="result-card"><h3>Detail Hasil Survei</h3><div><b>'+esc(r.nama)+'</b></div><div class="note">Surveyor: '+esc(r.surveyor||'-')+' · '+esc(r.submittedAt||'-')+'</div><div class="result-total">'+esc(displayScore(s.total||0))+' Poin</div><b>Kategori: '+esc(s.category||'-')+'</b><table class="result-table"><thead><tr><th>Kriteria</th><th>Nilai</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('')+'</tbody></table><button type="button" id="historyPdfDetailBtn">EKSPOR PDF</button></div>';
   $('historyPdfDetailBtn').addEventListener('click',()=>exportSurveyPdf(historyPayload(r),historyResult(r)));
   $('historyDetail').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-$('surveyForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const form = e.currentTarget;
-  if (!GAS_API_URL.startsWith('https://script.google.com/macros/s/')) {
-    setStatus('formStatus', 'URL backend belum diatur. Isi GAS_API_URL pada index.html.');
-    return;
-  }
-  if (!$('latitude').value || !$('longitude').value) {
-    setStatus('formStatus', 'Ambil lokasi GPS terlebih dahulu sebelum menyimpan.'); return;
-  }
-  const btn = $('submitBtn'); btn.disabled = true;
-  setStatus('formStatus', ''); setSaveProgress(5,'Menyiapkan data survey...');
-  try {
-    const fd = new FormData(form);
-    const payload = {};
-    for (const [key, value] of fd.entries()) {
-      if (!(value instanceof File)) payload[key] = value;
-    }
-    payload.token = authToken;
-    setSaveProgress(20,'Mengompres setiap foto maksimal 700 KB...');
-    payload.files = {
-      fotoKtp: await fileToDataUrl(form.elements.fotoKtp.files[0]),
-      fotoKk: await fileToDataUrl(form.elements.fotoKk.files[0]),
-      fotoRumahDepan: await fileToDataUrl(form.elements.fotoRumahDepan.files[0]),
-      fotoRumahSamping: await fileToDataUrl(form.elements.fotoRumahSamping.files[0]),
-      fotoRumahBelakang: await fileToDataUrl(form.elements.fotoRumahBelakang.files[0]),
-      fotoRumahDalam: await fileToDataUrl(form.elements.fotoRumahDalam.files[0])
-    };
-    setSaveProgress(65,'Mengirim data dan menyimpan foto. Proses dapat memerlukan beberapa menit; jangan tutup halaman...');
-    const result = await sendPayloadToAppsScript(payload);
-    if (!result || !result.success) throw new Error((result && result.message) || 'Data gagal disimpan.');
-    setSaveProgress(100,'Berhasil! Data terkonfirmasi tersimpan. Membuka halaman Skoring...');
-    showSurveyResult(result,payload); loadSurveyHistory(true);
-  } catch (err) {
-    setStatus('formStatus', 'Gagal menyimpan: ' + err.message); $('saveProgress').style.display='none';
-  } finally {
-    btn.disabled = false;
-  }
-});
+
+async function submitSurveyDraft(){
+ const form=$('surveyForm'),btn=$('submitBtn');
+ if(!authToken){setStatus('formStatus','Sesi login berakhir. Silakan login kembali.');return;}
+ if(!navigator.onLine){uploadQueued=true;await saveDraftNow();setStatus('formStatus','Koneksi belum tersedia. Draft dan foto tersimpan; akan diunggah otomatis saat koneksi kembali.');return;}
+ if(!$('latitude').value||!$('longitude').value){setStatus('formStatus','Ambil lokasi GPS terlebih dahulu sebelum mengunggah.');return;}
+ btn.disabled=true;setStatus('formStatus','');setSaveProgress(5,'Menyiapkan data survey...');
+ try{
+  const payload=formValues();payload.token=authToken;
+  setSaveProgress(20,'Memastikan semua foto tersimpan...');
+  const names=['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam'];
+  for(const name of names){if(!draftFiles[name]&&form.elements[name].files[0])draftFiles[name]=await fileToDataUrl(form.elements[name].files[0]);}
+  payload.files={};names.forEach(name=>payload.files[name]=draftFiles[name]||null);
+  setSaveProgress(65,'Mengunggah data dan foto ke penyimpanan...');
+  const result=await sendPayloadToAppsScript(payload);
+  if(!result||!result.success)throw new Error((result&&result.message)||'Data gagal disimpan.');
+  uploadQueued=false;await draftDelete();setSaveProgress(100,'Berhasil! Data dan foto terkonfirmasi tersimpan.');
+  showSurveyResult(result,payload);loadSurveyHistory(true);
+ }catch(err){
+  uploadQueued=true;await saveDraftNow();
+  setStatus('formStatus','Belum berhasil diunggah: '+err.message+'. Draft beserta foto tetap tersimpan di perangkat dan dapat dicoba lagi saat koneksi stabil.');
+  $('saveProgress').style.display='none';
+ }finally{btn.disabled=false;}
+}
+$('surveyForm').addEventListener('submit',async e=>{e.preventDefault();await submitSurveyDraft();});
+window.addEventListener('online',()=>{if(uploadQueued&&authToken){setStatus('formStatus','Koneksi kembali. Mencoba mengunggah draft...');submitSurveyDraft();}});
+
 
 </script>
 </body>
