@@ -118,8 +118,6 @@ button:active{transform:translateY(1px)}
 <div><label>Penghasilan (Rp/bulan)</label><input name="penghasilanBulanan" type="number" min="0" step="1" placeholder="Total penghasilan per bulan" required></div>
 <div><label>Penghasilan per Tahun (Rp)</label><input name="penghasilan" id="penghasilanTahunan" type="number" min="0" step="1" placeholder="Otomatis: pendapatan bulanan × 12" readonly aria-readonly="true"><div class="note">Dihitung otomatis dari pendapatan per bulan × 12.</div></div>
 </div>
-<div class="location"><strong>Pratinjau Scoring Otomatis</strong><div id="scorePreview" class="status">Isi kondisi rumah untuk melihat estimasi skor.</div><div class="note">Skor sementara dihitung berdasarkan aturan pada sheet Scoring.</div></div>
-<div class="location"><strong>Acuan Nilai Scoring Kategori</strong><table class="scoring-guide"><thead><tr><th>Rentang Nilai</th><th>Kategori</th></tr></thead><tbody><tr><td>0–20</td><td><b>Approve</b></td></tr><tr><td>21–39</td><td><b>Komite</b></td></tr><tr><td>40 ke atas</td><td><b>Reject</b></td></tr></tbody></table><div class="note">Kategori mengikuti total skor akhir hasil penilaian.</div></div>
 <div class="location"><strong>Catatan Khusus Surveyor</strong><div class="note">Tuliskan temuan lapangan, kondisi khusus penerima, atau rekomendasi tambahan (opsional).</div><textarea name="catatanSurveyor" id="catatanSurveyor" rows="4" maxlength="1500" placeholder="Catatan dan rekomendasi surveyor..."></textarea></div>
 <div class="location">
 <strong>Penanda Lokasi Rumah (GPS)</strong>
@@ -134,6 +132,9 @@ button:active{transform:translateY(1px)}
 <label>Foto Rumah Samping</label><input name="fotoRumahSamping" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoRumahSamping" aria-live="polite"></div>
 <label>Foto Rumah Belakang</label><input name="fotoRumahBelakang" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoRumahBelakang" aria-live="polite"></div>
 <label>Foto Rumah Dalam</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoRumahDalam" aria-live="polite"></div>
+<label>Foto Kondisi Atap</label><input name="fotoAtap" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoAtap" aria-live="polite"></div>
+<label>Foto Kondisi Dinding</label><input name="fotoDinding" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoDinding" aria-live="polite"></div>
+<label>Foto Kondisi Lantai</label><input name="fotoLantai" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoLantai" aria-live="polite"></div>
 
 <button type="button" id="saveDraftBtn" class="secondary-btn">SIMPAN DRAFT</button><button type="submit" id="submitBtn">UNGGAH DATA SURVEY</button><div id="formStatus" class="status" role="status"></div>
 <div class="progress-wrap" id="saveProgress" aria-live="polite"><div class="progress-head"><div class="progress-label" id="progressLabel">Menyiapkan data...</div><div class="progress-percent" id="progressPercent">0%</div></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
@@ -184,8 +185,8 @@ function formValues(){const out={};for(const [k,v] of new FormData($('surveyForm
 function makeDraftRecord(){return {values:formValues(),files:draftFiles,tokenUser:currentUser?.username||'',tokenName:currentUser?.name||'',updatedAt:new Date().toISOString(),queued:uploadQueued};}
 async function saveDraftNow(){if(restoringDraft)return;try{await draftPut(makeDraftRecord(),activeDraftKey);setStatus('formStatus','Draft tersimpan di perangkat. Foto dan isian aman meski halaman ditutup.');}catch(e){setStatus('formStatus','Draft gagal disimpan: '+e.message);}}
 function scheduleDraftSave(){clearTimeout(draftTimer);draftTimer=setTimeout(saveDraftNow,700);}
-$('saveDraftBtn').addEventListener('click',async()=>{try{for(const name of ['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam']){const file=$('surveyForm').elements[name].files[0];if(file&&!draftFiles[name])draftFiles[name]=await fileToDataUrl(file);}if(activeDraftKey===DRAFT_KEY){const old=await draftGet(DRAFT_KEY);if(old){activeDraftKey='draft_'+Date.now();await draftPut(old,activeDraftKey);await draftDelete(DRAFT_KEY);}}await saveDraftNow();setStatus('draftStatus','Draft berhasil disimpan. Anda dapat membukanya kembali atau mengunggahnya kapan saja.');await renderDraftList();navigateTo('draft');}catch(e){setStatus('formStatus','Gagal menyimpan draft: '+e.message);}});
-function applyDraftToForm(d,key){restoringDraft=true;Object.entries(d.values||{}).forEach(([k,v])=>{const el=$('surveyForm').elements[k];if(el&&el.type!=='file')el.value=v;});draftFiles=d.files||{};uploadQueued=!!d.queued;activeDraftKey=key;syncOtherNotes();updateAnnualIncome();renderAllPhotoPreviews();previewScore();restoringDraft=false;setStatus('formStatus','Draft dipulihkan ('+new Date(d.updatedAt).toLocaleString('id-ID')+'). Foto terlampir: '+Object.keys(draftFiles).length+'.');}
+$('saveDraftBtn').addEventListener('click',async()=>{try{for(const name of ['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam','fotoAtap','fotoDinding','fotoLantai']){const file=$('surveyForm').elements[name].files[0];if(file&&!draftFiles[name])draftFiles[name]=await fileToDataUrl(file);}if(activeDraftKey===DRAFT_KEY){const old=await draftGet(DRAFT_KEY);if(old){activeDraftKey='draft_'+Date.now();await draftPut(old,activeDraftKey);await draftDelete(DRAFT_KEY);}}await saveDraftNow();setStatus('draftStatus','Draft berhasil disimpan. Anda dapat membukanya kembali atau mengunggahnya kapan saja.');await renderDraftList();navigateTo('draft');}catch(e){setStatus('formStatus','Gagal menyimpan draft: '+e.message);}});
+function applyDraftToForm(d,key){restoringDraft=true;Object.entries(d.values||{}).forEach(([k,v])=>{const el=$('surveyForm').elements[k];if(el&&el.type!=='file')el.value=v;});draftFiles=d.files||{};uploadQueued=!!d.queued;activeDraftKey=key;syncOtherNotes();updateAnnualIncome();renderAllPhotoPreviews();restoringDraft=false;setStatus('formStatus','Draft dipulihkan ('+new Date(d.updatedAt).toLocaleString('id-ID')+'). Foto terlampir: '+Object.keys(draftFiles).length+'.');}
 async function restoreDraft(){try{const d=await draftGet(DRAFT_KEY);if(!d)return;if(d.tokenUser&&currentUser&&d.tokenUser!==currentUser.username)return;applyDraftToForm(d,DRAFT_KEY);if(uploadQueued&&navigator.onLine)setTimeout(submitSurveyDraft,500);}catch(e){restoringDraft=false;console.warn('Draft tidak dapat dipulihkan',e);}}
 async function openSavedDraft(key,upload=false){try{const d=await draftGet(key);if(!d)throw new Error('Draft tidak ditemukan.');if(d.tokenUser&&currentUser&&d.tokenUser!==currentUser.username)throw new Error('Draft ini milik akun surveyor lain.');applyDraftToForm(d,key);$('surveyForm').style.display='block';$('surveyResult').style.display='none';navigateTo('survey');if(upload){if(!$('surveyForm').reportValidity())return;await submitSurveyDraft();}}catch(e){setStatus('draftStatus','Tidak dapat membuka draft: '+e.message);}}
 async function renderDraftList(){const host=$('draftList');if(!host)return;try{const all=await draftGetAll();const mine=all.filter(x=>x.value.tokenUser===(currentUser?.username||'')).sort((a,b)=>String(b.value.updatedAt||'').localeCompare(String(a.value.updatedAt||'')));const badge=$('draftNavCount');if(badge){badge.textContent=String(mine.length);badge.style.display=mine.length?'inline-flex':'none';}if(!mine.length){host.innerHTML='<div class="empty-state">Belum ada draft. Tekan “Simpan Draft” pada formulir survei untuk menyimpannya di sini.</div>';setStatus('draftStatus','0 draft tersimpan di perangkat.');return;}host.innerHTML=mine.map((x,i)=>{const v=x.value,dt=v.updatedAt?new Date(v.updatedAt).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}):'-',nm=v.values?.nama||'Survei tanpa nama',photos=Object.keys(v.files||{}).length;return '<article class="history-item"><h4>'+esc(nm)+'</h4><div class="history-meta">Disimpan: '+esc(dt)+'<br>Foto tersimpan: '+photos+' · '+(v.queued?'Menunggu unggah':'Siap dilanjutkan')+'</div><div class="history-actions"><button type="button" data-draft-edit="'+i+'">Buka / Edit</button><button type="button" data-draft-upload="'+i+'">Unggah sekarang</button><button type="button" class="secondary-btn" data-draft-delete="'+i+'">Hapus</button></div></article>';}).join('');
@@ -204,7 +205,7 @@ $('loginBtn').addEventListener('click', async () => {
     if(!r.success) throw new Error(r.message);
     if(String(r.user.role).trim().toLowerCase()!=='surveyor') throw new Error('Halaman ini khusus akun Surveyor. Silakan gunakan halaman Admin.');
     authToken=r.token; currentUser=r.user; localStorage.setItem('baznas_survey_session',JSON.stringify({token:authToken,user:currentUser,expires:Date.now()+6*60*60*1000}));
-    const sr=await api({action:'getScoring',token:authToken}); if(!sr.success) throw new Error(sr.message); scoringRules=sr.rules||[]; scoringThresholds=sr.thresholds||scoringThresholds; previewScore();
+    const sr=await api({action:'getScoring',token:authToken}); if(!sr.success) throw new Error(sr.message); scoringRules=sr.rules||[]; scoringThresholds=sr.thresholds||scoringThresholds;
     $('loginCard').style.display='none'; $('appCard').style.display='block';
     $('userBar').textContent='Login: '+currentUser.name+' ('+currentUser.role+')';
     $('profileName').textContent=currentUser.name||'-'; $('profileUsername').textContent=currentUser.username||'-'; $('profileRole').textContent=currentUser.role||'Surveyor'; $('homeUserName').textContent=currentUser.name||'Surveyor';
@@ -221,7 +222,7 @@ $('loginBtn').addEventListener('click', async () => {
     authToken=saved.token;currentUser=saved.user;
     const sr=await api({action:'getScoring',token:authToken});
     if(!sr.success)throw new Error(sr.message||'Sesi tidak dapat dipulihkan.');
-    scoringRules=sr.rules||[];scoringThresholds=sr.thresholds||scoringThresholds;previewScore();
+    scoringRules=sr.rules||[];scoringThresholds=sr.thresholds||scoringThresholds;
     $('loginCard').style.display='none';$('appCard').style.display='block';
     $('userBar').textContent='Login: '+currentUser.name+' ('+currentUser.role+')';
     $('profileName').textContent=currentUser.name||'-';$('profileUsername').textContent=currentUser.username||'-';
@@ -259,36 +260,20 @@ OTHER_FIELDS.forEach(name=>$('surveyForm').elements[name]?.addEventListener('cha
 $('surveyForm').elements.penghasilanBulanan.addEventListener('input',updateAnnualIncome);
 $('surveyForm').elements.penghasilanBulanan.addEventListener('change',updateAnnualIncome);
 
-function previewScore() {
- const f=$('surveyForm'); const get=n=>f.elements[n] ? f.elements[n].value : '';
- const grouped={};
- scoringRules.forEach(r=>{
-  if(!grouped[r.field]) grouped[r.field]={name:r.criterion,score:0,max:Number(r.maxScore)||0};
-  const raw=get(r.field); if(raw==='') return;
-  let ok=false; const n=Number(raw);
-  if(r.operator==='EQUALS') ok=String(raw).trim()===String(r.value);
-  else if(r.operator==='RANGE') ok=Number.isFinite(n)&&(r.min==null||n>=Number(r.min))&&(r.max==null||n<=Number(r.max));
-  else if(r.operator==='GT') ok=n>Number(r.min);
-  if(ok) grouped[r.field].score=Number(r.score)||0;
- });
- const vals=Object.values(grouped), total=vals.reduce((a,x)=>a+x.score,0), max=vals.reduce((a,x)=>a+x.max,0);
- const category=total<=20?'Approve':total<=39?'Komite':'Reject';
- $('scorePreview').textContent='Estimasi total: '+total+' poin dari maksimal '+max+' poin — Kategori: '+category;
-}
-$('surveyForm').addEventListener('change',()=>{syncOtherNotes();updateAnnualIncome();previewScore();});
-$('surveyForm').addEventListener('input',()=>{updateAnnualIncome();previewScore();});
+$('surveyForm').addEventListener('change',()=>{syncOtherNotes();updateAnnualIncome();});
+$('surveyForm').addEventListener('input',updateAnnualIncome);
 $('surveyForm').addEventListener('input',scheduleDraftSave);
 $('surveyForm').addEventListener('change',scheduleDraftSave);
 syncOtherNotes();updateAnnualIncome();
 function renderPhotoPreview(name, photo, originalName){
   const host=$('preview_'+name); if(!host)return;
   if(!photo || !photo.data){host.style.display='none';host.innerHTML='';return;}
-  const title=({fotoKtp:'Foto KTP',fotoKk:'Foto KK',fotoRumahDepan:'Foto Rumah Depan',fotoRumahSamping:'Foto Rumah Samping',fotoRumahBelakang:'Foto Rumah Belakang',fotoRumahDalam:'Foto Rumah Dalam'})[name]||'Pratinjau foto';
+  const title=({fotoKtp:'Foto KTP',fotoKk:'Foto KK',fotoRumahDepan:'Foto Rumah Depan',fotoRumahSamping:'Foto Rumah Samping',fotoRumahBelakang:'Foto Rumah Belakang',fotoRumahDalam:'Foto Rumah Dalam',fotoAtap:'Foto Kondisi Atap',fotoDinding:'Foto Kondisi Dinding',fotoLantai:'Foto Kondisi Lantai'})[name]||'Pratinjau foto';
   host.innerHTML='<img src="'+photo.data+'" alt="'+esc(title)+'"><div class="preview-meta"><strong>'+esc(title)+' siap diunggah</strong>'+esc(originalName||photo.name||'Foto tersimpan')+(photo.displaySize?' · '+esc(photo.displaySize):'')+'</div>';
   host.style.display='flex';
 }
-function renderAllPhotoPreviews(){['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam'].forEach(name=>renderPhotoPreview(name,draftFiles[name]));}
-['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam'].forEach(name=>{
+function renderAllPhotoPreviews(){['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam','fotoAtap','fotoDinding','fotoLantai'].forEach(name=>renderPhotoPreview(name,draftFiles[name]));}
+['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam','fotoAtap','fotoDinding','fotoLantai'].forEach(name=>{
  const el=$('surveyForm').elements[name];
  if(el)el.addEventListener('change',async()=>{
   try{
@@ -470,7 +455,7 @@ function displayScore(value){const raw=String(value==null?'0':value).trim();cons
 function showSurveyResult(result, payload){
   const s=result.scoring||{};
   const items=Array.isArray(s.items)?s.items:[];
-  const photoMeta=[['fotoKtp','Foto KTP'],['fotoKk','Foto Kartu Keluarga'],['fotoRumahDepan','Foto Rumah Tampak Depan'],['fotoRumahSamping','Foto Rumah Tampak Samping'],['fotoRumahBelakang','Foto Rumah Tampak Belakang'],['fotoRumahDalam','Foto Kondisi Dalam Rumah']];
+  const photoMeta=[['fotoKtp','Foto KTP'],['fotoKk','Foto Kartu Keluarga'],['fotoRumahDepan','Foto Rumah Tampak Depan'],['fotoRumahSamping','Foto Rumah Tampak Samping'],['fotoRumahBelakang','Foto Rumah Tampak Belakang'],['fotoRumahDalam','Foto Kondisi Dalam Rumah'],['fotoAtap','Foto Kondisi Atap'],['fotoDinding','Foto Kondisi Dinding'],['fotoLantai','Foto Kondisi Lantai']];
   const photoHtml=photoMeta.filter(([k])=>result.photos&&result.photos[k]).map(([k,label])=>'<tr><td>'+esc(label)+'</td><td><a href="'+esc(result.photos[k])+'" target="_blank" rel="noopener">'+esc(((result.photoNames&&result.photoNames[k])||label))+'</a></td></tr>').join('');
   $('surveyResult').innerHTML='<h3>Hasil Nilai Survey</h3><div class="result-total">'+esc(s.total||0)+' Poin</div><div><strong>Kategori: '+esc(s.category||'-')+'</strong></div><div class="note">Data berhasil disimpan. Nomor data: '+esc(result.row||'-')+'</div><table class="result-table"><thead><tr><th>Indeks Rumah</th><th>Skor</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('')+'</tbody><tfoot><tr><th>Total</th><th>'+esc(s.total||0)+' poin</th></tr></tfoot></table><h4>Acuan Kategori</h4><div class="note">0–20 Approve · 21–39 Komite · 40 ke atas Reject</div><h4>Catatan Khusus Surveyor</h4><p style="white-space:pre-wrap">'+esc(payload.catatanSurveyor||'-')+'</p><button type="button" id="exportPdfBtn">EKSPOR HASIL SURVEY PDF</button><button type="button" id="newSurveyBtn">INPUT SURVEY BERIKUTNYA</button>';
   $('surveyResult').style.display='block'; $('surveyForm').style.display='none'; $('saveProgress').style.display='none'; navigateTo('survey');
@@ -478,7 +463,7 @@ function showSurveyResult(result, payload){
   $('newSurveyBtn').addEventListener('click',()=>{
     $('surveyForm').reset(); draftFiles={}; activeDraftKey=DRAFT_KEY; renderAllPhotoPreviews(); syncOtherNotes(); updateAnnualIncome(); uploadQueued=false; $('surveyForm').style.display='block'; $('surveyResult').style.display='none'; navigateTo('survey');
     ['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');
-    setStatus('locationStatus','Lokasi belum direkam.'); $('saveProgress').style.display='none'; $('progressFill').style.width='0%'; $('progressPercent').textContent='0%'; setStatus('formStatus',''); previewScore();
+    setStatus('locationStatus','Lokasi belum direkam.'); $('saveProgress').style.display='none'; $('progressFill').style.width='0%'; $('progressPercent').textContent='0%'; setStatus('formStatus','');
     window.scrollTo({top:0,behavior:'smooth'});
   });
 }
@@ -509,7 +494,7 @@ async function exportSurveyPdf(payload,result){
     const fields=Object.keys(labels).filter(k=>payload[k]!==undefined && payload[k]!=='').map(k=>'<tr><th>'+esc(labels[k])+'</th><td>'+esc(payload[k])+'</td></tr>').join('');
     const items=Array.isArray(result.scoring?.items)?result.scoring.items:[];
     const scoring=items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('');
-    const photoLabels={fotoKtp:'Foto KTP',fotoKk:'Foto Kartu Keluarga',fotoRumahDepan:'Foto Rumah Tampak Depan',fotoRumahSamping:'Foto Rumah Tampak Samping',fotoRumahBelakang:'Foto Rumah Tampak Belakang',fotoRumahDalam:'Foto Kondisi Dalam Rumah'};
+    const photoLabels={fotoKtp:'Foto KTP',fotoKk:'Foto Kartu Keluarga',fotoRumahDepan:'Foto Rumah Tampak Depan',fotoRumahSamping:'Foto Rumah Tampak Samping',fotoRumahBelakang:'Foto Rumah Tampak Belakang',fotoRumahDalam:'Foto Kondisi Dalam Rumah',fotoAtap:'Foto Kondisi Atap',fotoDinding:'Foto Kondisi Dinding',fotoLantai:'Foto Kondisi Lantai'};
     const photoEntries=Object.entries(result.photos||{}).filter(([k,v])=>v);
     const photoRows=[];
     updatePdfLoading(photoEntries.length ? 'Menyiapkan daftar foto dokumentasi...' : 'Menyusun data hasil survey...', 8);
@@ -565,7 +550,7 @@ function navigateTo(page){
 })();
 document.querySelectorAll('.bottom-nav button').forEach(b=>b.addEventListener('click',()=>navigateTo(b.dataset.page)));
 $('refreshHistoryBtn').addEventListener('click',()=>loadSurveyHistory());
-$('startSurveyBtn').addEventListener('click',async()=>{try{clearTimeout(draftTimer);if(activeDraftKey===DRAFT_KEY){const old=await draftGet(DRAFT_KEY);if(old){const archivedKey='draft_'+Date.now();await draftPut(old,archivedKey);await draftDelete(DRAFT_KEY);}}$('surveyForm').reset();activeDraftKey=DRAFT_KEY;draftFiles={};uploadQueued=false;renderAllPhotoPreviews();syncOtherNotes();updateAnnualIncome();['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');$('surveyForm').style.display='block';$('surveyResult').style.display='none';setStatus('formStatus','Survei baru siap diisi. Draft sebelumnya tetap tersimpan di menu Draft.');previewScore();navigateTo('survey');await renderDraftList();}catch(err){setStatus('formStatus','Tidak dapat membuka formulir survei: '+err.message);}}); $('openHistoryBtn').addEventListener('click',()=>navigateTo('history'));
+$('startSurveyBtn').addEventListener('click',async()=>{try{clearTimeout(draftTimer);if(activeDraftKey===DRAFT_KEY){const old=await draftGet(DRAFT_KEY);if(old){const archivedKey='draft_'+Date.now();await draftPut(old,archivedKey);await draftDelete(DRAFT_KEY);}}$('surveyForm').reset();activeDraftKey=DRAFT_KEY;draftFiles={};uploadQueued=false;renderAllPhotoPreviews();syncOtherNotes();updateAnnualIncome();['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');$('surveyForm').style.display='block';$('surveyResult').style.display='none';setStatus('formStatus','Survei baru siap diisi. Draft sebelumnya tetap tersimpan di menu Draft.');navigateTo('survey');await renderDraftList();}catch(err){setStatus('formStatus','Tidak dapat membuka formulir survei: '+err.message);}}); $('openHistoryBtn').addEventListener('click',()=>navigateTo('history'));
 
 let surveyHistoryRows=[];
 async function loadSurveyHistory(silent=false){
@@ -604,10 +589,10 @@ function renderSurveyHistory(){
   host.querySelectorAll('[data-pdf]').forEach(b=>b.addEventListener('click',()=>{const r=surveyHistoryRows[Number(b.dataset.pdf)];exportSurveyPdf(historyPayload(r),historyResult(r));}));
 }
 function historyPayload(r){return {nama:r.nama,jk:r.jk,nik:r.nik,nomorkk:r.nomorkk,alamat:r.alamat,desa:r.desa,kecamatan:r.kecamatan,shm:r.shm,kepemilikanRumah:r.kepemilikanRumah,luasRumah:r.luasRumah,atap:r.atap,atapLainnya:r.atapLainnya,rangkaAtap:r.rangkaAtap,rangkaAtapLainnya:r.rangkaAtapLainnya,dinding:r.dinding,dindingLainnya:r.dindingLainnya,lantai:r.lantai,lantaiLainnya:r.lantaiLainnya,sanitasi:r.sanitasi,dayaListrik:r.dayaListrik,sumberAir:r.sumberAir,sumberAirLainnya:r.sumberAirLainnya,jumlahJiwa:r.jumlahJiwa,penghasilanBulanan:r.penghasilanBulanan,penghasilan:r.penghasilan,catatanSurveyor:r.catatanSurveyor,latitude:r.latitude,longitude:r.longitude,accuracy:r.accuracy};}
-function historyResult(r){return {row:r.rowNumber,surveyor:r.surveyor,submittedAt:r.submittedAt,mapUrl:r.mapUrl,scoring:r.scoring||{total:0,category:'-',items:[]},photos:{fotoKtp:r.fotoKtp,fotoKk:r.fotoKk,fotoRumahDepan:r.fotoRumahDepan,fotoRumahSamping:r.fotoRumahSamping,fotoRumahBelakang:r.fotoRumahBelakang,fotoRumahDalam:r.fotoRumahDalam}};}
+function historyResult(r){return {row:r.rowNumber,surveyor:r.surveyor,submittedAt:r.submittedAt,mapUrl:r.mapUrl,scoring:r.scoring||{total:0,category:'-',items:[]},photos:{fotoKtp:r.fotoKtp,fotoKk:r.fotoKk,fotoRumahDepan:r.fotoRumahDepan,fotoRumahSamping:r.fotoRumahSamping,fotoRumahBelakang:r.fotoRumahBelakang,fotoRumahDalam:r.fotoRumahDalam,fotoAtap:r.fotoAtap,fotoDinding:r.fotoDinding,fotoLantai:r.fotoLantai}};}
 function showHistoryDetail(r){
   const s=r.scoring||{},items=Array.isArray(s.items)?s.items:[];
-  const photoLabels={fotoKtp:'Foto KTP',fotoKk:'Foto Kartu Keluarga',fotoRumahDepan:'Foto Rumah Tampak Depan',fotoRumahSamping:'Foto Rumah Tampak Samping',fotoRumahBelakang:'Foto Rumah Tampak Belakang',fotoRumahDalam:'Foto Kondisi Dalam Rumah'};
+  const photoLabels={fotoKtp:'Foto KTP',fotoKk:'Foto Kartu Keluarga',fotoRumahDepan:'Foto Rumah Tampak Depan',fotoRumahSamping:'Foto Rumah Tampak Samping',fotoRumahBelakang:'Foto Rumah Tampak Belakang',fotoRumahDalam:'Foto Kondisi Dalam Rumah',fotoAtap:'Foto Kondisi Atap',fotoDinding:'Foto Kondisi Dinding',fotoLantai:'Foto Kondisi Lantai'};
   const photoRows=Object.entries(photoLabels).filter(([k])=>r[k]).map(([k,label])=>'<tr><td>'+label+'</td><td><a href="'+esc(r[k])+'" target="_blank" rel="noopener">'+esc(decodeURIComponent((r[k].split('/').pop()||label).split('?')[0]))+'</a></td></tr>').join('');
   $('historyDetail').innerHTML='<div class="result-card"><h3>Detail Hasil Survei</h3><div><b>'+esc(r.nama)+'</b></div><div class="note">Surveyor: '+esc(r.surveyor||'-')+' · '+esc(r.submittedAt||'-')+'</div><div class="result-total">'+esc(displayScore(s.total||0))+' Poin</div><b>Kategori: '+esc(s.category||'-')+'</b><div style="margin-top:10px"><b>Catatan Khusus Surveyor:</b><p style="white-space:pre-wrap">'+esc(r.catatanSurveyor||'-')+'</p></div><div class="note">Acuan kategori: 0–20 Approve · 21–39 Komite · 40 ke atas Reject</div><table class="result-table"><thead><tr><th>Kriteria</th><th>Nilai</th></tr></thead><tbody>'+items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('')+'</tbody></table><button type="button" id="historyPdfDetailBtn">EKSPOR PDF</button></div>';
   $('historyPdfDetailBtn').addEventListener('click',()=>exportSurveyPdf(historyPayload(r),historyResult(r)));
@@ -626,7 +611,7 @@ async function submitSurveyDraft(){
  try{
   const payload=formValues();payload.token=authToken;
   setSaveProgress(20,'Memastikan semua foto tersimpan...');
-  const names=['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam'];
+  const names=['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam','fotoAtap','fotoDinding','fotoLantai'];
   for(const name of names){if(!draftFiles[name]&&form.elements[name].files[0])draftFiles[name]=await fileToDataUrl(form.elements[name].files[0]);}
   payload.files={};names.forEach(name=>payload.files[name]=draftFiles[name]||null);
   setSaveProgress(65,'Mengunggah data dan foto ke penyimpanan...');
