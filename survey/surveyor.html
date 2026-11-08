@@ -17,6 +17,18 @@ button:disabled{opacity:.55;cursor:wait}
 .location{background:#f1f8f3;border:1px solid #cfe5d5;padding:14px;border-radius:9px;margin-top:12px}
 .status{font-size:13px;color:#555;white-space:pre-wrap;margin-top:8px}.progress-wrap{display:none;margin:14px 0;padding:12px;background:#f1f8f3;border-radius:10px}.progress-track{height:12px;background:#dce9df;border-radius:20px;overflow:hidden}.progress-fill{height:100%;width:0;background:#0f8a4b;border-radius:20px;transition:width .25s}.progress-label{font-size:13px;margin-bottom:7px;color:#28543a}.result-card{border:1px solid #cfe5d5;background:#f8fcf9;border-radius:12px;padding:18px;margin-top:14px}.result-total{font-size:32px;font-weight:700;color:#0f8a4b}.result-table{width:100%;border-collapse:collapse;margin-top:12px}.result-table td,.result-table th{border:1px solid #d5e1d8;padding:8px;text-align:left;font-size:13px}.result-table th{background:#e8f3eb}
 .note{font-size:12px;color:#666}
+.session-loading{display:none;margin:14px 0 4px;padding:14px;background:#f1f8f3;border:1px solid #d8eadc;border-radius:11px}
+.session-loading-title{display:flex;align-items:center;gap:9px;color:#28543a;font-size:13px;font-weight:600;margin-bottom:11px}
+.loading-dot{width:9px;height:9px;border-radius:50%;background:#0f8a4b;box-shadow:0 0 0 5px #0f8a4b1c;animation:sessionPulse 1.2s infinite}
+.session-progress{height:7px;border-radius:20px;background:#dce9df;overflow:hidden}
+.session-progress span{display:block;width:35%;height:100%;border-radius:20px;background:linear-gradient(90deg,#0f8a4b,#62bd83);animation:sessionProgress 1.35s ease-in-out infinite}
+@keyframes sessionProgress{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
+@keyframes sessionPulse{50%{opacity:.45;transform:scale(.85)}}
+.photo-preview{display:none;align-items:center;gap:12px;margin:8px 0 14px;padding:9px;border:1px solid #dce8df;border-radius:10px;background:#f8fcf9}
+.photo-preview img{width:88px;height:76px;object-fit:cover;border-radius:7px;border:1px solid #d5e1d8;background:#fff}
+.photo-preview .preview-meta{min-width:0;font-size:12px;color:#52665a;overflow-wrap:anywhere}
+.photo-preview .preview-meta strong{display:block;color:#245238;margin-bottom:3px}
+@media print{.photo-preview{display:none!important}}
 @media(max-width:600px){.grid{grid-template-columns:1fr}.card{margin:10px;padding:14px}}
 
 .app-shell{max-width:900px;margin:0 auto}
@@ -61,9 +73,15 @@ button:active{transform:translateY(1px)}
 <div class="header">FORM SURVEY BANTUAN<br>BAZNAS KABUPATEN SRAGEN</div>
 <div class="card" id="loginCard">
 <h3>Login Surveyor</h3>
-<label>Username</label><input id="loginUsername" autocomplete="username" required>
-<label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" required>
-<button type="button" id="loginBtn">MASUK</button><div id="loginStatus" class="status" role="status"></div>
+<div id="sessionLoading" class="session-loading" aria-live="polite">
+  <div class="session-loading-title"><span class="loading-dot"></span><span id="sessionLoadingText">Memeriksa sesi dan memuat data surveyor...</span></div>
+  <div class="session-progress"><span></span></div>
+</div>
+<div id="loginFields" style="display:none">
+  <label>Username</label><input id="loginUsername" autocomplete="username" required>
+  <label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" required>
+  <button type="button" id="loginBtn">MASUK</button><div id="loginStatus" class="status" role="status"></div>
+</div>
 </div>
 <div id="appCard" style="display:none">
 <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span id="userBar"></span><button type="button" id="logoutBtn" style="width:auto;margin:0;padding:9px 16px;background:#64748b">KELUAR</button></div>
@@ -106,13 +124,13 @@ button:active{transform:translateY(1px)}
 <div id="locationStatus" class="status">Lokasi belum direkam.</div>
 <input type="hidden" name="latitude" id="latitude"><input type="hidden" name="longitude" id="longitude"><input type="hidden" name="accuracy" id="accuracy"><input type="hidden" name="locationTime" id="locationTime">
 </div>
-<label>Foto KTP (otomatis dikompres maks. 700 KB)</label><input name="fotoKtp" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto KK (otomatis dikompres maks. 700 KB)</label><input name="fotoKk" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Depan (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahDepan" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Samping (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahSamping" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Belakang (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahBelakang" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<label>Foto Rumah Dalam (otomatis dikompres maks. 700 KB)</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
-<div class="status">Setiap lampiran foto akan otomatis dikompres menjadi JPG dengan ukuran maksimal 700 KB sebelum diunggah.</div>
+<label>Foto KTP</label><input name="fotoKtp" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoKtp" aria-live="polite"></div>
+<label>Foto KK</label><input name="fotoKk" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoKk" aria-live="polite"></div>
+<label>Foto Rumah Depan</label><input name="fotoRumahDepan" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoRumahDepan" aria-live="polite"></div>
+<label>Foto Rumah Samping</label><input name="fotoRumahSamping" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoRumahSamping" aria-live="polite"></div>
+<label>Foto Rumah Belakang</label><input name="fotoRumahBelakang" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoRumahBelakang" aria-live="polite"></div>
+<label>Foto Rumah Dalam</label><input name="fotoRumahDalam" type="file" accept="image/jpeg,image/png,image/webp" capture="environment"><div class="photo-preview" id="preview_fotoRumahDalam" aria-live="polite"></div>
+
 <button type="button" id="saveDraftBtn" class="secondary-btn">SIMPAN DRAFT</button><button type="submit" id="submitBtn">UNGGAH DATA SURVEY</button><div id="formStatus" class="status" role="status"></div>
 <div class="progress-wrap" id="saveProgress" aria-live="polite"><div class="progress-label" id="progressLabel">Menyiapkan data...</div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
 </form>
@@ -140,6 +158,8 @@ const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyQAp6dbJv6d99DeSF8
 const $ = id => document.getElementById(id);
 
 function setStatus(id, text) { $(id).textContent = text; }
+function showLoginFields(message=''){ $('sessionLoading').style.display='none'; $('loginFields').style.display='block'; if(message)setStatus('loginStatus',message); }
+function showSessionLoading(message='Memeriksa sesi dan memuat data surveyor...'){ $('loginFields').style.display='none'; $('sessionLoading').style.display='block'; $('sessionLoadingText').textContent=message; }
 let authToken = '';
 let currentUser = null;
 let scoringRules = [];
@@ -154,12 +174,12 @@ function formValues(){const out={};for(const [k,v] of new FormData($('surveyForm
 async function saveDraftNow(){if(restoringDraft)return;try{await draftPut({values:formValues(),files:draftFiles,tokenUser:currentUser?.username||'',updatedAt:new Date().toISOString(),queued:uploadQueued});setStatus('formStatus','Draft tersimpan di perangkat. Foto dan isian aman meski halaman ditutup.');}catch(e){setStatus('formStatus','Draft gagal disimpan: '+e.message);}}
 function scheduleDraftSave(){clearTimeout(draftTimer);draftTimer=setTimeout(saveDraftNow,700);}
 $('saveDraftBtn').addEventListener('click',async()=>{try{for(const name of ['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam']){const file=$('surveyForm').elements[name].files[0];if(file&&!draftFiles[name])draftFiles[name]=await fileToDataUrl(file);}await saveDraftNow();setStatus('formStatus','Draft berhasil disimpan di perangkat ini, termasuk foto. Bisa dilanjutkan setelah halaman dibuka kembali.');}catch(e){setStatus('formStatus','Gagal menyimpan draft: '+e.message);}});
-async function restoreDraft(){try{const d=await draftGet();if(!d)return;if(d.tokenUser&&currentUser&&d.tokenUser!==currentUser.username)return;restoringDraft=true;Object.entries(d.values||{}).forEach(([k,v])=>{const el=$('surveyForm').elements[k];if(el&&el.type!=='file')el.value=v;});draftFiles=d.files||{};uploadQueued=!!d.queued;previewScore();restoringDraft=false;setStatus('formStatus','Draft terakhir dipulihkan ('+new Date(d.updatedAt).toLocaleString('id-ID')+'). Foto terlampir: '+Object.keys(draftFiles).length+'.');if(uploadQueued&&navigator.onLine)setTimeout(submitSurveyDraft,500);}catch(e){restoringDraft=false;console.warn('Draft tidak dapat dipulihkan',e);}}
+async function restoreDraft(){try{const d=await draftGet();if(!d)return;if(d.tokenUser&&currentUser&&d.tokenUser!==currentUser.username)return;restoringDraft=true;Object.entries(d.values||{}).forEach(([k,v])=>{const el=$('surveyForm').elements[k];if(el&&el.type!=='file')el.value=v;});draftFiles=d.files||{};uploadQueued=!!d.queued;renderAllPhotoPreviews();previewScore();restoringDraft=false;setStatus('formStatus','Draft terakhir dipulihkan ('+new Date(d.updatedAt).toLocaleString('id-ID')+'). Foto terlampir: '+Object.keys(draftFiles).length+'.');if(uploadQueued&&navigator.onLine)setTimeout(submitSurveyDraft,500);}catch(e){restoringDraft=false;console.warn('Draft tidak dapat dipulihkan',e);}}
 
 async function api(payload) { return sendPayloadToAppsScript(payload); }
 
 $('loginBtn').addEventListener('click', async () => {
-  const btn=$('loginBtn'); btn.disabled=true; setStatus('loginStatus','Memeriksa akun...');
+  const btn=$('loginBtn'); btn.disabled=true; showSessionLoading('Memeriksa akun dan memuat data surveyor...');
   try {
     const r=await api({action:'login',username:$('loginUsername').value,password:$('loginPassword').value});
     if(!r.success) throw new Error(r.message);
@@ -170,11 +190,28 @@ $('loginBtn').addEventListener('click', async () => {
     $('userBar').textContent='Login: '+currentUser.name+' ('+currentUser.role+')';
     $('profileName').textContent=currentUser.name||'-'; $('profileUsername').textContent=currentUser.username||'-'; $('profileRole').textContent=currentUser.role||'Surveyor'; $('homeUserName').textContent=currentUser.name||'Surveyor';
     $('bottomNav').style.display='flex'; navigateTo('home'); loadSurveyHistory(); await restoreDraft();
-  } catch(e) { setStatus('loginStatus',e.message); }
+  } catch(e) { showLoginFields(e.message); }
   finally { btn.disabled=false; }
 });
 
-(async function restoreLoginSession(){try{const saved=JSON.parse(localStorage.getItem('baznas_survey_session')||'null');if(!saved||!saved.token||saved.expires<Date.now())return;authToken=saved.token;currentUser=saved.user;const sr=await api({action:'getScoring',token:authToken});if(!sr.success)throw new Error(sr.message);scoringRules=sr.rules||[];scoringThresholds=sr.thresholds||scoringThresholds;previewScore();$('loginCard').style.display='none';$('appCard').style.display='block';$('userBar').textContent='Login: '+currentUser.name+' ('+currentUser.role+')';$('profileName').textContent=currentUser.name||'-';$('profileUsername').textContent=currentUser.username||'-';$('profileRole').textContent=currentUser.role||'Surveyor';$('homeUserName').textContent=currentUser.name||'Surveyor';$('bottomNav').style.display='flex';navigateTo('home');loadSurveyHistory();await restoreDraft();}catch(e){localStorage.removeItem('baznas_survey_session');authToken='';currentUser=null;}})();
+(async function restoreLoginSession(){
+  showSessionLoading('Memeriksa sesi login dan memuat data surveyor...');
+  try{
+    const saved=JSON.parse(localStorage.getItem('baznas_survey_session')||'null');
+    if(!saved||!saved.token||saved.expires<Date.now()){showLoginFields();return;}
+    authToken=saved.token;currentUser=saved.user;
+    const sr=await api({action:'getScoring',token:authToken});
+    if(!sr.success)throw new Error(sr.message||'Sesi tidak dapat dipulihkan.');
+    scoringRules=sr.rules||[];scoringThresholds=sr.thresholds||scoringThresholds;previewScore();
+    $('loginCard').style.display='none';$('appCard').style.display='block';
+    $('userBar').textContent='Login: '+currentUser.name+' ('+currentUser.role+')';
+    $('profileName').textContent=currentUser.name||'-';$('profileUsername').textContent=currentUser.username||'-';
+    $('profileRole').textContent=currentUser.role||'Surveyor';$('homeUserName').textContent=currentUser.name||'Surveyor';
+    $('bottomNav').style.display='flex';navigateTo('home');loadSurveyHistory();await restoreDraft();
+  }catch(e){
+    localStorage.removeItem('baznas_survey_session');authToken='';currentUser=null;showLoginFields('Sesi login berakhir. Silakan masuk kembali.');
+  }
+})();
 
 $('logoutBtn').addEventListener('click',logoutSurveyor); $('profileLogoutBtn').addEventListener('click',logoutSurveyor);
 function logoutSurveyor(){authToken='';currentUser=null;scoringRules=[];localStorage.removeItem('baznas_survey_session');$('bottomNav').style.display='none';$('appCard').style.display='none';$('loginCard').style.display='block';$('loginPassword').value='';}
@@ -201,8 +238,23 @@ $('surveyForm').addEventListener('change',previewScore);
 $('surveyForm').addEventListener('input',previewScore);
 $('surveyForm').addEventListener('input',scheduleDraftSave);
 $('surveyForm').addEventListener('change',scheduleDraftSave);
+function renderPhotoPreview(name, photo, originalName){
+  const host=$('preview_'+name); if(!host)return;
+  if(!photo || !photo.data){host.style.display='none';host.innerHTML='';return;}
+  const title=({fotoKtp:'Foto KTP',fotoKk:'Foto KK',fotoRumahDepan:'Foto Rumah Depan',fotoRumahSamping:'Foto Rumah Samping',fotoRumahBelakang:'Foto Rumah Belakang',fotoRumahDalam:'Foto Rumah Dalam'})[name]||'Pratinjau foto';
+  host.innerHTML='<img src="'+photo.data+'" alt="'+esc(title)+'"><div class="preview-meta"><strong>'+esc(title)+' siap diunggah</strong>'+esc(originalName||photo.name||'Foto tersimpan')+(photo.displaySize?' · '+esc(photo.displaySize):'')+'</div>';
+  host.style.display='flex';
+}
+function renderAllPhotoPreviews(){['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam'].forEach(name=>renderPhotoPreview(name,draftFiles[name]));}
 ['fotoKtp','fotoKk','fotoRumahDepan','fotoRumahSamping','fotoRumahBelakang','fotoRumahDalam'].forEach(name=>{
- const el=$('surveyForm').elements[name]; if(el)el.addEventListener('change',async()=>{try{if(el.files[0]){draftFiles[name]=await fileToDataUrl(el.files[0]);await saveDraftNow();}}catch(e){setStatus('formStatus',e.message);}});
+ const el=$('surveyForm').elements[name];
+ if(el)el.addEventListener('change',async()=>{
+  try{
+   const file=el.files&&el.files[0];
+   if(file){setStatus('formStatus','Menyiapkan pratinjau foto...');draftFiles[name]=await fileToDataUrl(file);renderPhotoPreview(name,draftFiles[name],file.name);await saveDraftNow();setStatus('formStatus','Foto berhasil disiapkan dan tersimpan dalam draft.');}
+   else{delete draftFiles[name];renderPhotoPreview(name,null);}
+  }catch(e){setStatus('formStatus',e.message);}
+ });
 });
 
 
@@ -380,7 +432,7 @@ function showSurveyResult(result, payload){
   $('surveyResult').style.display='block'; $('surveyForm').style.display='none'; navigateTo('survey');
   $('exportPdfBtn').addEventListener('click',()=>exportSurveyPdf(payload,result));
   $('newSurveyBtn').addEventListener('click',()=>{
-    $('surveyForm').reset(); draftFiles={}; uploadQueued=false; draftDelete(); $('surveyForm').style.display='block'; $('surveyResult').style.display='none'; navigateTo('survey');
+    $('surveyForm').reset(); draftFiles={}; renderAllPhotoPreviews(); uploadQueued=false; draftDelete(); $('surveyForm').style.display='block'; $('surveyResult').style.display='none'; navigateTo('survey');
     ['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');
     setStatus('locationStatus','Lokasi belum direkam.'); $('saveProgress').style.display='none'; $('progressFill').style.width='0%'; setStatus('formStatus',''); previewScore();
     window.scrollTo({top:0,behavior:'smooth'});
@@ -395,11 +447,21 @@ function exportSurveyPdf(payload,result){
   const items=Array.isArray(result.scoring?.items)?result.scoring.items:[];
   const scoring=items.map(x=>'<tr><td>'+esc(x.criterion)+'</td><td>'+esc(displayScore(x.score))+'</td></tr>').join('');
   const photoLabels={fotoKtp:'Foto KTP',fotoKk:'Foto Kartu Keluarga',fotoRumahDepan:'Foto Rumah Tampak Depan',fotoRumahSamping:'Foto Rumah Tampak Samping',fotoRumahBelakang:'Foto Rumah Tampak Belakang',fotoRumahDalam:'Foto Kondisi Dalam Rumah'};
-  const photoRows=Object.entries(result.photos||{}).filter(([k,v])=>v).map(([k,v])=>'<tr><td>'+esc(photoLabels[k]||k)+'</td><td><a href="'+esc(v)+'">'+esc((result.photoNames&&result.photoNames[k])||photoLabels[k]||k)+'</a></td></tr>').join('');
+  const driveImageUrl=url=>{
+    const raw=String(url||'');
+    if(/^data:image\//i.test(raw))return raw;
+    const m=raw.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i)||raw.match(/[?&]id=([^&#]+)/i);
+    return m?'https://drive.google.com/uc?export=view&id='+encodeURIComponent(decodeURIComponent(m[1])):raw;
+  };
+  const photoRows=Object.entries(result.photos||{}).filter(([k,v])=>v).map(([k,v])=>{
+    const label=photoLabels[k]||k,src=driveImageUrl(v),name=(result.photoNames&&result.photoNames[k])||label;
+    return '<figure class="photo-item"><img src="'+esc(src)+'" alt="'+esc(label)+'"><figcaption><b>'+esc(label)+'</b><span>'+esc(name)+'</span></figcaption></figure>';
+  }).join('');
+  const photoSection=photoRows?'<h2>Dokumentasi Foto Survey</h2><div class="photo-grid">'+photoRows+'</div>':'<h2>Dokumentasi Foto Survey</h2><p>Foto tidak tersedia pada data hasil survey ini.</p>';
   const w=window.open('','_blank');
   if(!w){setStatus('formStatus','Izinkan pop-up browser untuk membuat PDF.');return;}
   w.document.open();
-  w.document.write('<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Hasil Survey - '+esc(payload.nama)+'</title><style>body{font:12px Arial,sans-serif;color:#222;margin:28px}h1{text-align:center;font-size:18px;margin:0}h2{font-size:14px;margin:22px 0 8px;border-bottom:1px solid #777;padding-bottom:6px}.sub{text-align:center;margin:5px 0 18px;color:#555}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f2f6f2;padding:12px;margin:16px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:7px;text-align:left;vertical-align:top}th{width:32%;background:#f3f5f3}.score{font-size:22px;font-weight:bold;color:#087b43}.sign{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:55px;text-align:center}.sign div{padding-top:55px;border-top:1px solid #777}@media print{body{margin:15mm}.noprint{display:none}}form{padding-bottom:24px} .page-panel{scroll-margin-bottom:120px} @media(max-width:600px){.app-shell{padding-bottom:calc(170px + env(safe-area-inset-bottom))}.bottom-nav{min-height:76px}}\n</style></head><body><h1>HASIL SURVEY BANTUAN</h1><div class="sub">BAZNAS KABUPATEN SRAGEN</div><div class="meta"><div><b>Surveyor:</b> '+esc(result.surveyor||currentUser?.name||'-')+'</div><div><b>Tanggal Survey:</b> '+esc(dateText)+'</div><div><b>Nomor Data:</b> '+esc(result.row||'-')+'</div><div><b>Nama Penerima:</b> '+esc(payload.nama||'-')+'</div></div><h2>Identitas dan Kondisi Penerima</h2><table>'+fields+'</table><h2>Hasil Scoring</h2><div class="score">'+esc(result.scoring?.total||0)+' Poin — '+esc(result.scoring?.category||'-')+'</div><table><thead><tr><th>Kriteria</th><th>Skor</th></tr></thead><tbody>'+scoring+'</tbody></table><p><b>Lokasi:</b> '+esc(result.mapUrl||'-')+'</p><div class="sign"><div>Surveyor<br><b>'+esc(result.surveyor||currentUser?.name||'-')+'</b></div><div>Penerima / Mengetahui</div></div><p class="noprint"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></p><script>window.onload=function(){setTimeout(function(){window.print()},400)};<\/script></body></html>');
+  w.document.write('<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Hasil Survey - '+esc(payload.nama)+'</title><style>body{font:12px Arial,sans-serif;color:#222;margin:28px}h1{text-align:center;font-size:18px;margin:0}h2{font-size:14px;margin:22px 0 8px;border-bottom:1px solid #777;padding-bottom:6px}.sub{text-align:center;margin:5px 0 18px;color:#555}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f2f6f2;padding:12px;margin:16px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:7px;text-align:left;vertical-align:top}th{width:32%;background:#f3f5f3}.score{font-size:22px;font-weight:bold;color:#087b43}.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}.photo-item{margin:0;border:1px solid #bbb;padding:8px;break-inside:avoid;page-break-inside:avoid}.photo-item img{display:block;width:100%;height:220px;object-fit:contain;background:#f5f5f5}.photo-item figcaption{font-size:11px;margin-top:6px;display:flex;flex-direction:column;gap:3px;overflow-wrap:anywhere}.sign{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:55px;text-align:center}.sign div{padding-top:55px;border-top:1px solid #777}@media print{body{margin:15mm}.noprint{display:none}}form{padding-bottom:24px} .page-panel{scroll-margin-bottom:120px} @media(max-width:600px){.app-shell{padding-bottom:calc(170px + env(safe-area-inset-bottom))}.bottom-nav{min-height:76px}}\n</style></head><body><h1>HASIL SURVEY BANTUAN</h1><div class="sub">BAZNAS KABUPATEN SRAGEN</div><div class="meta"><div><b>Surveyor:</b> '+esc(result.surveyor||currentUser?.name||'-')+'</div><div><b>Tanggal Survey:</b> '+esc(dateText)+'</div><div><b>Nomor Data:</b> '+esc(result.row||'-')+'</div><div><b>Nama Penerima:</b> '+esc(payload.nama||'-')+'</div></div><h2>Identitas dan Kondisi Penerima</h2><table>'+fields+'</table><h2>Hasil Scoring</h2><div class="score">'+esc(result.scoring?.total||0)+' Poin — '+esc(result.scoring?.category||'-')+'</div><table><thead><tr><th>Kriteria</th><th>Skor</th></tr></thead><tbody>'+scoring+'</tbody></table><p><b>Lokasi:</b> '+esc(result.mapUrl||'-')+'</p>'+photoSection+'<div class="sign"><div>Surveyor<br><b>'+esc(result.surveyor||currentUser?.name||'-')+'</b></div><div>Penerima / Mengetahui</div></div><p class="noprint"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button></p><script>window.onload=function(){const imgs=Array.from(document.images);Promise.race([Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=img.onerror=resolve}))),new Promise(resolve=>setTimeout(resolve,10000))]).then(()=>setTimeout(()=>window.print(),500))};<\/script></body></html>');
   w.document.close();
 }
 
