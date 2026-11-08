@@ -450,7 +450,7 @@ function showSurveyResult(result, payload){
   $('surveyResult').style.display='block'; $('surveyForm').style.display='none'; $('saveProgress').style.display='none'; navigateTo('survey');
   $('exportPdfBtn').addEventListener('click',()=>exportSurveyPdf(payload,result));
   $('newSurveyBtn').addEventListener('click',()=>{
-    $('surveyForm').reset(); draftFiles={}; activeDraftId=null; renderAllPhotoPreviews(); uploadQueued=false; $('surveyForm').style.display='block'; $('surveyResult').style.display='none'; navigateTo('survey');
+    $('surveyForm').reset(); draftFiles={}; activeDraftKey=DRAFT_KEY; renderAllPhotoPreviews(); uploadQueued=false; $('surveyForm').style.display='block'; $('surveyResult').style.display='none'; navigateTo('survey');
     ['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');
     setStatus('locationStatus','Lokasi belum direkam.'); $('saveProgress').style.display='none'; $('progressFill').style.width='0%'; $('progressPercent').textContent='0%'; setStatus('formStatus',''); previewScore();
     window.scrollTo({top:0,behavior:'smooth'});
@@ -539,8 +539,7 @@ function navigateTo(page){
 })();
 document.querySelectorAll('.bottom-nav button').forEach(b=>b.addEventListener('click',()=>navigateTo(b.dataset.page)));
 $('refreshHistoryBtn').addEventListener('click',()=>loadSurveyHistory());
-$('refreshDraftBtn').addEventListener('click',()=>renderDraftList());
-$('startSurveyBtn').addEventListener('click',()=>{if(activeDraftId){$('surveyForm').reset();activeDraftId=null;draftFiles={};uploadQueued=false;renderAllPhotoPreviews();['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');setStatus('formStatus','Survey baru. Draft sebelumnya tetap tersimpan di menu Draft.');previewScore();}$('surveyForm').style.display='block';$('surveyResult').style.display='none';navigateTo('survey');}); $('openHistoryBtn').addEventListener('click',()=>navigateTo('history'));
+$('startSurveyBtn').addEventListener('click',async()=>{try{clearTimeout(draftTimer);if(activeDraftKey===DRAFT_KEY){const old=await draftGet(DRAFT_KEY);if(old){const archivedKey='draft_'+Date.now();await draftPut(old,archivedKey);await draftDelete(DRAFT_KEY);}}$('surveyForm').reset();activeDraftKey=DRAFT_KEY;draftFiles={};uploadQueued=false;renderAllPhotoPreviews();['latitude','longitude','accuracy','locationTime'].forEach(id=>$(id).value='');$('surveyForm').style.display='block';$('surveyResult').style.display='none';setStatus('formStatus','Survei baru siap diisi. Draft sebelumnya tetap tersimpan di menu Draft.');previewScore();navigateTo('survey');await renderDraftList();}catch(err){setStatus('formStatus','Tidak dapat membuka formulir survei: '+err.message);}}); $('openHistoryBtn').addEventListener('click',()=>navigateTo('history'));
 
 let surveyHistoryRows=[];
 async function loadSurveyHistory(silent=false){
@@ -597,6 +596,7 @@ async function submitSurveyDraft(){
  if(!navigator.onLine){uploadQueued=true;await saveDraftNow();setStatus('formStatus','Koneksi belum tersedia. Draft dan foto tersimpan; akan diunggah otomatis saat koneksi kembali.');return;}
  if(!$('latitude').value||!$('longitude').value){setStatus('formStatus','Ambil lokasi GPS terlebih dahulu sebelum mengunggah.');return;}
  btn.disabled=true;setStatus('formStatus','');setSaveProgress(5,'Menyiapkan data survey...');
+ const submittedDraftKey=activeDraftKey;
  try{
   const payload=formValues();payload.token=authToken;
   setSaveProgress(20,'Memastikan semua foto tersimpan...');
@@ -606,7 +606,11 @@ async function submitSurveyDraft(){
   setSaveProgress(65,'Mengunggah data dan foto ke penyimpanan...');
   const result=await sendPayloadToAppsScript(payload);
   if(!result||!result.success)throw new Error((result&&result.message)||'Data gagal disimpan.');
-  uploadQueued=false;if(activeDraftId){await draftDelete(activeDraftId);activeDraftId=null;}await renderDraftList();setSaveProgress(100,'Berhasil! Data dan foto terkonfirmasi tersimpan.');
+  uploadQueued=false;
+  try{await draftDelete(submittedDraftKey);}catch(cleanupError){console.warn('Data berhasil diunggah, tetapi draft lokal belum dapat dihapus:',cleanupError);}
+  activeDraftKey=DRAFT_KEY;
+  await renderDraftList();
+  setSaveProgress(100,'Berhasil! Data dan foto terkonfirmasi tersimpan.');
   showSurveyResult(result,payload);loadSurveyHistory(true);
  }catch(err){
   uploadQueued=true;await saveDraftNow();
@@ -615,7 +619,7 @@ async function submitSurveyDraft(){
  }finally{btn.disabled=false;}
 }
 $('surveyForm').addEventListener('submit',async e=>{e.preventDefault();await submitSurveyDraft();});
-window.addEventListener('online',()=>{if(uploadQueued&&authToken&&activeDraftId){setStatus('formStatus','Koneksi kembali. Mencoba mengunggah draft...');submitSurveyDraft();}});
+window.addEventListener('online',()=>{if(uploadQueued&&authToken){setStatus('formStatus','Koneksi kembali. Mencoba mengunggah draft...');submitSurveyDraft();}});
 
 
 </script>
