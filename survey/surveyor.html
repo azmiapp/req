@@ -518,7 +518,7 @@ function applicationDetails(payload,result){
  const date=dt.toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'});
  const incomeRaw=payload.penghasilanBulanan;
  const incomeValue=incomeRaw!==undefined&&incomeRaw!==null&&String(incomeRaw).trim()!==''?'Rp '+Number(incomeRaw).toLocaleString('id-ID'):'-';
- const rows=[['Nomor Data',result.row||'-'],['Tanggal Pengajuan',date],['Nama Pemohon',payload.nama||'-'],['Nomor KK',payload.nomorkk||'-'],['Penghasilan per Bulan',incomeValue],['Nama Layanan','Bantuan RTLH'],['Nama Surveyor',result.surveyor||currentUser?.name||'-'],['Tanggal Penilaian',dt.toLocaleDateString('id-ID',{year:'numeric',month:'2-digit',day:'2-digit'})]];
+ const rows=[['Nomor Data',result.row||'-'],['Tanggal Pengajuan',date],['Nama Pemohon',payload.nama||'-'],['Nama Layanan','Bantuan Perbaikan RTLH'],['Nama Surveyor',result.surveyor||currentUser?.name||'-'],['Tanggal Penilaian',dt.toLocaleDateString('id-ID',{year:'numeric',month:'2-digit',day:'2-digit'})]];
  return rows.map((x,i)=>'<tr><td class="detail-no">'+(i+1)+'.</td><td class="detail-label">'+esc(x[0])+'</td><td class="detail-colon">:</td><td>'+esc(x[1])+'</td></tr>').join('');
 }
 function reportScoringBlock(payload,result){
