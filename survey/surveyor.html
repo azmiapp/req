@@ -105,7 +105,7 @@ button:active{transform:translateY(1px)}
 <div class="grid">
 <div><label>Desa/Kelurahan</label><input name="desa" id="desa" type="text" required placeholder="Masukkan desa/kelurahan"></div>
 <div><label>Kecamatan</label><input name="kecamatan" id="kecamatan" type="text" required placeholder="Masukkan kecamatan"></div>
-<div><label>SHM Atas Nama</label><input name="shm" maxlength="150" placeholder="Nama pada sertifikat"></div>
+<div><label>SHM Atas Nama</label><select name="shm" required><option value="Sendiri">Sendiri</option><option value="Suami/Istri">Suami/Istri</option><option value="Orang Tua">Orang Tua</option><option value="Kakek/Nenek">Kakek/Nenek</option></select><div class="note">Jika SHM bukan atas nama sendiri, hasil survei otomatis REJECT.</div></div>
 <div><label>Luas Rumah (m²)</label><input name="luasRumah" type="number" min="0" step="any" required></div>
 <div><label>Atap</label><select name="atap" required><option>Genteng</option><option>Seng</option><option>Asbes</option><option>Beton</option><option>Lainnya</option></select><div class="other-note" data-other-for="atap"><label>Catatan Atap Lainnya</label><input name="atapLainnya" maxlength="120" placeholder="Jelaskan jenis/kondisi atap"></div></div>
 <div><label>Rangka Atap</label><select name="rangkaAtap" required><option>Kayu</option><option>Baja Ringan</option><option>Bambu</option><option>Lainnya</option></select><div class="other-note" data-other-for="rangkaAtap"><label>Catatan Rangka Atap Lainnya</label><input name="rangkaAtapLainnya" maxlength="120" placeholder="Jelaskan jenis rangka atap"></div></div>
@@ -474,8 +474,16 @@ function scoringGuideRows(rules){
   return '<tr><td>'+esc(r.criterion||'-')+'</td><td>'+esc(r.field||'-')+'</td><td>'+esc(ket)+'</td><td>'+esc(r.score)+' / '+esc(r.maxScore)+'</td></tr>';
  }).join('');
 }
-function scoreStatusBlock(category,total){
- return '<aside class="result-status '+statusClass(category)+'"><span class="status-label">STATUS HASIL SURVEI</span><span class="status-value">'+esc(category||'-')+'</span><span class="status-total">Total Nilai: '+esc(displayScore(total??0))+'</span></aside>';
+function shmRequiresReject(payload){
+ return String(payload?.shm||'').trim().toLowerCase()!=='sendiri';
+}
+function effectiveSurveyCategory(payload,result){
+ return shmRequiresReject(payload)?'Reject':(result?.scoring?.category||'-');
+}
+function scoreStatusBlock(category,total,payload){
+ const forcedReject=shmRequiresReject(payload);
+ const reason=forcedReject?'<span class="status-total" style="margin-top:7px">Alasan: SHM bukan atas nama sendiri ('+esc(payload.shm||'-')+')</span>':'';
+ return '<aside class="result-status '+statusClass(forcedReject?'Reject':category)+'"><span class="status-label">STATUS HASIL SURVEI</span><span class="status-value">'+esc(forcedReject?'Reject':(category||'-'))+'</span><span class="status-total">Total Nilai: '+esc(displayScore(total??0))+'</span>'+reason+'</aside>';
 }
 function ruleMatchesPayload(rule,payload){
  const raw=payload[rule.field]; if(raw===undefined||raw===null||String(raw).trim()==='')return false;
@@ -511,8 +519,8 @@ function applicationDetails(payload,result){
  return rows.map((x,i)=>'<tr><td class="detail-no">'+(i+1)+'.</td><td class="detail-label">'+esc(x[0])+'</td><td class="detail-colon">:</td><td>'+esc(x[1])+'</td></tr>').join('');
 }
 function reportScoringBlock(payload,result){
- const total=result.scoring?.total||0,category=result.scoring?.category||'-';
- return '<div class="report-scoring-wrap"><table class="report-scoring"><thead><tr><th>No</th><th>Indeks Rumah</th><th>Kriteria</th><th>Bobot Nilai</th></tr></thead><tbody>'+scoringTableRows(payload)+'</tbody><tfoot><tr><th colspan="3">TOTAL SKOR</th><th>'+esc(total)+'</th></tr></tfoot></table><div class="report-bottom"><div>'+scoreThresholdTable()+'</div>'+scoreStatusBlock(category,total)+'</div></div>';
+ const total=result.scoring?.total||0,category=effectiveSurveyCategory(payload,result);
+ return '<div class="report-scoring-wrap"><table class="report-scoring"><thead><tr><th>No</th><th>Indeks Rumah</th><th>Kriteria</th><th>Bobot Nilai</th></tr></thead><tbody>'+scoringTableRows(payload)+'</tbody><tfoot><tr><th colspan="3">TOTAL SKOR</th><th>'+esc(total)+'</th></tr></tfoot></table><div class="report-bottom"><div>'+scoreThresholdTable()+'</div>'+scoreStatusBlock(category,total,payload)+'</div></div>';
 }
 function showSurveyResult(result, payload){
  const s=result.scoring||{},items=Array.isArray(s.items)?s.items:[];
@@ -639,7 +647,7 @@ function renderSurveyHistory(){
   host.innerHTML=surveyHistoryRows.map((r,i)=>{
     const d=r.submittedAt?new Date(r.submittedAt):null;
     const date=d&&!isNaN(d)?d.toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}):esc(r.submittedAt||'-');
-    return '<article class="history-item"><h4>'+esc(r.nama||'Tanpa nama')+'</h4><div class="history-meta">'+esc(r.desa||'-')+', '+esc(r.kecamatan||'-')+'<br>'+esc(date)+'<br>Skor: <b>'+esc(displayScore(r.scoring?.total||0))+'</b> poin · '+esc(r.scoring?.category||'-')+'</div><div class="history-actions"><button type="button" data-detail="'+i+'">Lihat detail</button><button type="button" class="secondary-btn" data-pdf="'+i+'">Ekspor PDF</button></div></article>';
+    return '<article class="history-item"><h4>'+esc(r.nama||'Tanpa nama')+'</h4><div class="history-meta">'+esc(r.desa||'-')+', '+esc(r.kecamatan||'-')+'<br>'+esc(date)+'<br>Skor: <b>'+esc(displayScore(r.scoring?.total||0))+'</b> poin · '+esc(effectiveSurveyCategory(historyPayload(r),historyResult(r)))+'</div><div class="history-actions"><button type="button" data-detail="'+i+'">Lihat detail</button><button type="button" class="secondary-btn" data-pdf="'+i+'">Ekspor PDF</button></div></article>';
   }).join('');
   host.querySelectorAll('[data-detail]').forEach(b=>b.addEventListener('click',()=>showHistoryDetail(surveyHistoryRows[Number(b.dataset.detail)])));
   host.querySelectorAll('[data-pdf]').forEach(b=>b.addEventListener('click',()=>{const r=surveyHistoryRows[Number(b.dataset.pdf)];exportSurveyPdf(historyPayload(r),historyResult(r));}));
