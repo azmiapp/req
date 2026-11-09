@@ -18,7 +18,7 @@ button:disabled{opacity:.55;cursor:wait}
 .status{font-size:13px;color:#555;white-space:pre-wrap;margin-top:8px}.progress-wrap{display:none;margin:18px 0 8px;padding:15px 16px;background:#fff;border:1px solid #dce9df;border-radius:13px;box-shadow:0 4px 14px #183b240b}.progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.progress-label{font-size:13px;line-height:1.4;color:#28543a;font-weight:600}.progress-percent{font-size:12px;color:#087b43;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}.progress-track{height:9px;background:#e7eee9;border-radius:30px;overflow:hidden;position:relative}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#087b43,#35a86b);border-radius:30px;transition:width .35s ease;position:relative}.progress-fill:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,#ffffff55,transparent);animation:progressShine 1.4s linear infinite}@keyframes progressShine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}.result-card{border:1px solid #cfe5d5;background:#f8fcf9;border-radius:12px;padding:18px;margin-top:14px}.result-total{font-size:32px;font-weight:700;color:#0f8a4b}.result-table{width:100%;border-collapse:collapse;margin-top:12px}.result-table td,.result-table th{border:1px solid #d5e1d8;padding:8px;text-align:left;font-size:13px}.result-table th{background:#e8f3eb}
 .note{font-size:12px;color:#666}
 .session-loading{display:none;margin:14px 0 4px;padding:14px;background:#f1f8f3;border:1px solid #d8eadc;border-radius:11px}
-.session-loading-title{display:flex;align-items:center;gap:9px;color:#28543a;font-size:13px;font-weight:600;margin-bottom:11px}
+.session-loading-title{display:flex;align-items:center;gap:9px;color:#28543a;font-size:13px;font-weight:600;margiFn-bottom:11px}
 .loading-dot{width:9px;height:9px;border-radius:50%;background:#0f8a4b;box-shadow:0 0 0 5px #0f8a4b1c;animation:sessionPulse 1.2s infinite}
 .session-progress{height:7px;border-radius:20px;background:#dce9df;overflow:hidden}
 .session-progress span{display:block;width:35%;height:100%;border-radius:20px;background:linear-gradient(90deg,#0f8a4b,#62bd83);animation:sessionProgress 1.35s ease-in-out infinite}
@@ -105,7 +105,7 @@ button:active{transform:translateY(1px)}
 <div class="grid">
 <div><label>Desa/Kelurahan</label><input name="desa" id="desa" type="text" required placeholder="Masukkan desa/kelurahan"></div>
 <div><label>Kecamatan</label><input name="kecamatan" id="kecamatan" type="text" required placeholder="Masukkan kecamatan"></div>
-<div><label>SHM Atas Nama</label><select name="shm" required><option value="Sendiri">Sendiri</option><option value="Suami/Istri">Suami/Istri</option><option value="Orang Tua">Orang Tua</option><option value="Kakek/Nenek">Kakek/Nenek</option></select><div class="note">Jika SHM bukan atas nama sendiri, hasil survei otomatis REJECT.</div></div>
+<div><label>SHM Atas Nama</label><select name="shm" id="shmAtasNama" required><option value="Sendiri">Sendiri</option><option value="Suami/Istri">Suami/Istri</option><option value="Orang Tua">Orang Tua</option><option value="Kakek/Nenek">Kakek/Nenek</option><option value="Lainnya">Lainnya</option></select><div class="note">Hanya pilihan “Lainnya” yang otomatis menetapkan hasil survei REJECT. Pilihan lainnya mengikuti hasil scoring.</div><label for="catatanShm">Catatan SHM</label><textarea name="catatanShm" id="catatanShm" rows="2" maxlength="1000" placeholder="Tambahkan keterangan terkait kepemilikan SHM (opsional)"></textarea></div>
 <div><label>Luas Rumah (m²)</label><input name="luasRumah" type="number" min="0" step="any" required></div>
 <div><label>Atap</label><select name="atap" required><option>Genteng</option><option>Seng</option><option>Asbes</option><option>Beton</option><option>Lainnya</option></select><div class="other-note" data-other-for="atap"><label>Catatan Atap Lainnya</label><input name="atapLainnya" maxlength="120" placeholder="Jelaskan jenis/kondisi atap"></div></div>
 <div><label>Rangka Atap</label><select name="rangkaAtap" required><option>Kayu</option><option>Baja Ringan</option><option>Bambu</option><option>Lainnya</option></select><div class="other-note" data-other-for="rangkaAtap"><label>Catatan Rangka Atap Lainnya</label><input name="rangkaAtapLainnya" maxlength="120" placeholder="Jelaskan jenis rangka atap"></div></div>
@@ -452,15 +452,16 @@ function setSaveProgress(percent,label){
 }
 function displayScore(value){const raw=String(value==null?'0':value).trim();const m=raw.match(/^T?\s*(-?\d+(?:[.,]\d+)?)(?:\s*\/\s*\d+(?:[.,]\d+)?)?$/i);return m?m[1].replace(',','.'):raw.replace(/\s*\/\s*\d+(?:[.,]\d+)?$/,'').replace(/^T\s*/i,'');}
 
-const RESULT_LABELS={nama:'Nama Lengkap',jk:'Jenis Kelamin',nik:'NIK',nomorkk:'Nomor KK',alamat:'Alamat Lengkap',desa:'Desa/Kelurahan',kecamatan:'Kecamatan',shm:'SHM Atas Nama',kepemilikanRumah:'Kepemilikan Rumah',luasRumah:'Luas Rumah (m²)',atap:'Atap',rangkaAtap:'Rangka Atap',dinding:'Dinding',lantai:'Lantai',sanitasi:'Sanitasi',dayaListrik:'Daya Listrik',sumberAir:'Sumber Air',jumlahJiwa:'Jumlah Jiwa',penghasilanBulanan:'Penghasilan (Rp/bulan)',penghasilan:'Penghasilan per Tahun (Rp)',atapLainnya:'Catatan Atap Lainnya',rangkaAtapLainnya:'Catatan Rangka Atap Lainnya',dindingLainnya:'Catatan Dinding Lainnya',lantaiLainnya:'Catatan Lantai Lainnya',sumberAirLainnya:'Catatan Sumber Air Lainnya',catatanSurveyor:'Catatan Khusus Surveyor',latitude:'Latitude',longitude:'Longitude'};
+const RESULT_LABELS={nama:'Nama Lengkap',jk:'Jenis Kelamin',nik:'NIK',nomorkk:'Nomor KK',alamat:'Alamat Lengkap',desa:'Desa/Kelurahan',kecamatan:'Kecamatan',shm:'SHM Atas Nama',catatanShm:'Catatan SHM',kepemilikanRumah:'Kepemilikan Rumah',luasRumah:'Luas Rumah (m²)',atap:'Atap',rangkaAtap:'Rangka Atap',dinding:'Dinding',lantai:'Lantai',sanitasi:'Sanitasi',dayaListrik:'Daya Listrik',sumberAir:'Sumber Air',jumlahJiwa:'Jumlah Jiwa',penghasilanBulanan:'Penghasilan (Rp/bulan)',penghasilan:'Penghasilan per Tahun (Rp)',atapLainnya:'Catatan Atap Lainnya',rangkaAtapLainnya:'Catatan Rangka Atap Lainnya',dindingLainnya:'Catatan Dinding Lainnya',lantaiLainnya:'Catatan Lantai Lainnya',sumberAirLainnya:'Catatan Sumber Air Lainnya',catatanSurveyor:'Catatan Khusus Surveyor',latitude:'Latitude',longitude:'Longitude'};
 const OTHER_NOTE_KEYS={atap:'atapLainnya',rangkaAtap:'rangkaAtapLainnya',dinding:'dindingLainnya',lantai:'lantaiLainnya',sumberAir:'sumberAirLainnya'};
 function statusClass(category){const c=String(category||'').toLowerCase();return c==='approve'?'status-approve':c==='komite'?'status-komite':c==='reject'?'status-reject':'status-neutral';}
 function surveyorDetailRows(payload){
- return Object.keys(RESULT_LABELS).filter(k=>!Object.values(OTHER_NOTE_KEYS).includes(k)&&payload[k]!==undefined&&payload[k]!==null&&String(payload[k]).trim()!=='').map(k=>{
+ return Object.keys(RESULT_LABELS).filter(k=>k!=='catatanShm'&&!Object.values(OTHER_NOTE_KEYS).includes(k)&&payload[k]!==undefined&&payload[k]!==null&&String(payload[k]).trim()!=='').map(k=>{
   const chosen=['atap','rangkaAtap','dinding','lantai','sumberAir'].includes(k);
   const noteKey=OTHER_NOTE_KEYS[k];
   const note=noteKey&&String(payload[k]||'').trim()==='Lainnya'&&payload[noteKey]?'<span class="other-note-text"><b>Catatan lainnya:</b> '+esc(payload[noteKey])+'</span>':'';
-  const value=chosen?'<span class="selected-option">'+esc(payload[k])+'</span>'+note:esc(payload[k]);
+  const shmNote=k==='shm'&&String(payload.catatanShm||'').trim()?'<span class="other-note-text"><b>Catatan SHM:</b> '+esc(payload.catatanShm)+'</span>':'';
+  const value=(chosen?'<span class="selected-option">'+esc(payload[k])+'</span>'+note:esc(payload[k]))+shmNote;
   return '<tr><th>'+esc(RESULT_LABELS[k])+'</th><td>'+value+'</td></tr>';
  }).join('');
 }
@@ -475,14 +476,14 @@ function scoringGuideRows(rules){
  }).join('');
 }
 function shmRequiresReject(payload){
- return String(payload?.shm||'').trim().toLowerCase()!=='sendiri';
+ return String(payload?.shm||'').trim().toLowerCase()==='lainnya';
 }
 function effectiveSurveyCategory(payload,result){
  return shmRequiresReject(payload)?'Reject':(result?.scoring?.category||'-');
 }
 function scoreStatusBlock(category,total,payload){
  const forcedReject=shmRequiresReject(payload);
- const reason=forcedReject?'<span class="status-total" style="margin-top:7px">Alasan: SHM bukan atas nama sendiri ('+esc(payload.shm||'-')+')</span>':'';
+ const reason=forcedReject?'<span class="status-total" style="margin-top:7px">Alasan: SHM atas nama Lainnya</span>':'';
  return '<aside class="result-status '+statusClass(forcedReject?'Reject':category)+'"><span class="status-label">STATUS HASIL SURVEI</span><span class="status-value">'+esc(forcedReject?'Reject':(category||'-'))+'</span><span class="status-total">Total Nilai: '+esc(displayScore(total??0))+'</span>'+reason+'</aside>';
 }
 function ruleMatchesPayload(rule,payload){
@@ -520,7 +521,8 @@ function applicationDetails(payload,result){
 }
 function reportScoringBlock(payload,result){
  const total=result.scoring?.total||0,category=effectiveSurveyCategory(payload,result);
- return '<div class="report-scoring-wrap"><table class="report-scoring"><thead><tr><th>No</th><th>Indeks Rumah</th><th>Kriteria</th><th>Bobot Nilai</th></tr></thead><tbody>'+scoringTableRows(payload)+'</tbody><tfoot><tr><th colspan="3">TOTAL SKOR</th><th>'+esc(total)+'</th></tr></tfoot></table><div class="report-bottom"><div>'+scoreThresholdTable()+'</div>'+scoreStatusBlock(category,total,payload)+'</div></div>';
+ const shmNote=String(payload.catatanShm||'').trim()?'<div class="guide-note" style="white-space:pre-wrap"><b>Catatan SHM:</b> '+esc(payload.catatanShm)+'</div>':'';
+  return '<div class="report-scoring-wrap"><table class="report-scoring"><thead><tr><th>No</th><th>Indeks Rumah</th><th>Kriteria</th><th>Bobot Nilai</th></tr></thead><tbody>'+scoringTableRows(payload)+'</tbody><tfoot><tr><th colspan="3">TOTAL SKOR</th><th>'+esc(total)+'</th></tr></tfoot></table>'+shmNote+'<div class="report-bottom"><div>'+scoreThresholdTable()+'</div>'+scoreStatusBlock(category,total,payload)+'</div></div>';
 }
 function showSurveyResult(result, payload){
  const s=result.scoring||{},items=Array.isArray(s.items)?s.items:[];
@@ -652,7 +654,7 @@ function renderSurveyHistory(){
   host.querySelectorAll('[data-detail]').forEach(b=>b.addEventListener('click',()=>showHistoryDetail(surveyHistoryRows[Number(b.dataset.detail)])));
   host.querySelectorAll('[data-pdf]').forEach(b=>b.addEventListener('click',()=>{const r=surveyHistoryRows[Number(b.dataset.pdf)];exportSurveyPdf(historyPayload(r),historyResult(r));}));
 }
-function historyPayload(r){return {nama:r.nama,jk:r.jk,nik:r.nik,nomorkk:r.nomorkk,alamat:r.alamat,desa:r.desa,kecamatan:r.kecamatan,shm:r.shm,kepemilikanRumah:r.kepemilikanRumah,luasRumah:r.luasRumah,atap:r.atap,atapLainnya:r.atapLainnya,rangkaAtap:r.rangkaAtap,rangkaAtapLainnya:r.rangkaAtapLainnya,dinding:r.dinding,dindingLainnya:r.dindingLainnya,lantai:r.lantai,lantaiLainnya:r.lantaiLainnya,sanitasi:r.sanitasi,dayaListrik:r.dayaListrik,sumberAir:r.sumberAir,sumberAirLainnya:r.sumberAirLainnya,jumlahJiwa:r.jumlahJiwa,penghasilanBulanan:r.penghasilanBulanan,penghasilan:r.penghasilan,catatanSurveyor:r.catatanSurveyor,latitude:r.latitude,longitude:r.longitude,accuracy:r.accuracy};}
+function historyPayload(r){return {nama:r.nama,jk:r.jk,nik:r.nik,nomorkk:r.nomorkk,alamat:r.alamat,desa:r.desa,kecamatan:r.kecamatan,shm:r.shm,catatanShm:r.catatanShm||'',kepemilikanRumah:r.kepemilikanRumah,luasRumah:r.luasRumah,atap:r.atap,atapLainnya:r.atapLainnya,rangkaAtap:r.rangkaAtap,rangkaAtapLainnya:r.rangkaAtapLainnya,dinding:r.dinding,dindingLainnya:r.dindingLainnya,lantai:r.lantai,lantaiLainnya:r.lantaiLainnya,sanitasi:r.sanitasi,dayaListrik:r.dayaListrik,sumberAir:r.sumberAir,sumberAirLainnya:r.sumberAirLainnya,jumlahJiwa:r.jumlahJiwa,penghasilanBulanan:r.penghasilanBulanan,penghasilan:r.penghasilan,catatanSurveyor:r.catatanSurveyor,latitude:r.latitude,longitude:r.longitude,accuracy:r.accuracy};}
 function historyResult(r){return {row:r.rowNumber,surveyor:r.surveyor,submittedAt:r.submittedAt,mapUrl:r.mapUrl,scoring:r.scoring||{total:0,category:'-',items:[]},photos:{fotoKtp:r.fotoKtp,fotoKk:r.fotoKk,fotoRumahDepan:r.fotoRumahDepan,fotoRumahSamping:r.fotoRumahSamping,fotoRumahBelakang:r.fotoRumahBelakang,fotoRumahDalam:r.fotoRumahDalam,fotoAtap:r.fotoAtap,fotoDinding:r.fotoDinding,fotoLantai:r.fotoLantai}};}
 function showHistoryDetail(r){
  const s=r.scoring||{},items=Array.isArray(s.items)?s.items:[];
