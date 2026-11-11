@@ -480,7 +480,7 @@ function renderMonthlyDailyDetail(){
   const masuk=time(pick(x,"masuk","jamMasuk","checkIn")),pulang=time(pick(x,"pulang","jamPulang","checkOut"));
   const late=!!pick(x,"late","terlambat")||/TERLAMBAT/i.test(String(pick(x,"status","keteranganStatus")||""));
   const status=late?'<span class="monthly-late">TERLAMBAT</span>':statusPill(pick(x,"status")||(masuk!=="—"?"HADIR":"BELUM ABSEN"));
-  const map=monthlyMapLink(x),photo=monthlyPhotoLink(x),note=pick(x,"catatan","notes","note","keteranganLuar","catatanLuar","lampiranCatatan","outsideNote");
+  const map=monthlyMapLinkByType(x,"masuk"),mapOut=monthlyMapLinkByType(x,"pulang"),photo=monthlyPhotoLink(x,"masuk"),photoOut=monthlyPhotoLink(x,"pulang"),note=pick(x,"catatan","notes","note","keteranganLuar","catatanLuar","lampiranCatatan","outsideNote");
   return `<tr class="${weekend?"monthly-weekend":""}"><td>${i+1}</td><td>${esc(x.date)}</td><td>${esc(day)}${weekend?" • LIBUR":""}</td><td>${person(pick(x,"name","nama","employeeName"),pick(x,"nia","NIA")||pick(x,"email"))}</td><td>${esc(masuk)}</td><td>${esc(pulang)}</td><td>${status}</td><td>${map?`<a class="monthly-detail-link" href="${esc(map)}" target="_blank" rel="noopener">Masuk ↗</a>`:"—"}${mapOut?`<br><a class="monthly-detail-link" href="${esc(mapOut)}" target="_blank" rel="noopener">Pulang ↗</a>`:""}</td><td>${photo?`<a class="monthly-detail-link" href="${esc(photo)}" target="_blank" rel="noopener">Masuk ↗</a>`:"—"}${photoOut?`<br><a class="monthly-detail-link" href="${esc(photoOut)}" target="_blank" rel="noopener">Pulang ↗</a>`:""}</td><td class="monthly-note">${note?esc(note):"—"}</td></tr>`;
  }).join(""):`<tr><td colspan="10" class="empty">Tidak ada data sesuai filter karyawan.</td></tr>`;
  $("monthlyDetailInfo").textContent=`${rows.length} baris ditampilkan • urut tanggal 1 sampai akhir bulan${$("monthlySearch").value.trim()?" • filter karyawan aktif":""}`;
@@ -491,7 +491,7 @@ function exportMonthlyDetailExcel(){
  rows.forEach((x,i)=>{
   const d=new Date(String(x.date)+"T12:00:00"),day=d.toLocaleDateString("id-ID",{weekday:"long"}),weekend=[0,6].includes(d.getDay());
   const late=!!pick(x,"late","terlambat")||/TERLAMBAT/i.test(String(pick(x,"status","keteranganStatus")||""));
-  const map=monthlyMapLink(x),photo=monthlyPhotoLink(x),note=pick(x,"catatan","notes","note","keteranganLuar","catatanLuar","lampiranCatatan","outsideNote");
+  const map=monthlyMapLinkByType(x,"masuk"),mapOut=monthlyMapLinkByType(x,"pulang"),photo=monthlyPhotoLink(x,"masuk"),photoOut=monthlyPhotoLink(x,"pulang"),note=pick(x,"catatan","notes","note","keteranganLuar","catatanLuar","lampiranCatatan","outsideNote");
   html+=`<tr class="${weekend?"weekend":""}"><td>${i+1}</td><td>${excelEscape(x.date)}</td><td>${excelEscape(day)}</td><td>${excelEscape(pick(x,"name","nama","employeeName")||"—")}</td><td>${excelEscape(time(pick(x,"masuk","jamMasuk","checkIn")))}</td><td>${excelEscape(time(pick(x,"pulang","jamPulang","checkOut")))}</td><td class="${late?"late":""}">${late?"TERLAMBAT":excelEscape(pick(x,"status")||"—")}</td><td>${map?`<a href="${excelEscape(map)}">Buka lokasi</a>`:"—"}</td><td>${photo?`<a href="${excelEscape(photo)}">Lihat foto</a>`:"—"}</td><td>${excelEscape(note||"—")}</td></tr>`;
  });
  html+='</table></body></html>';
