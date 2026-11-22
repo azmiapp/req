@@ -401,6 +401,8 @@ tr:hover{
     background:#f5f9f5;
 }
 
+/* FILTER/PAGINATION DATA KEUANGAN */
+.finance-local-filters{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:12px;margin:0 0 14px;padding:14px;background:#f7faf7;border:1px solid #e4eee4;border-radius:12px}.finance-local-filters label{display:block;font-size:13px;font-weight:bold;margin-bottom:6px}.finance-local-filters select{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;background:white}.finance-filter-actions button,.finance-pagination button{border:0;border-radius:8px;padding:10px 13px;color:white;background:#607d8b;cursor:pointer}.finance-table-info{font-size:13px;color:#667;margin:0 0 10px}.finance-pagination{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}.finance-pagination button:disabled{opacity:.45;cursor:not-allowed}.finance-pagination span{font-size:13px;color:#555}@media(max-width:650px){.finance-local-filters{grid-template-columns:1fr}}
 /* =====================================================
    USER FORM
 ===================================================== */
@@ -1085,6 +1087,13 @@ tr:hover{
     </div>
 
 
+    <div class="finance-local-filters no-print">
+        <div><label for="financeFilterMonth">Filter Bulan</label><select id="financeFilterMonth"><option value="">Semua Bulan</option></select></div>
+        <div><label for="financeFilterName">Nama Mustahik</label><select id="financeFilterName"><option value="">Semua Mustahik</option></select></div>
+        <div class="finance-filter-actions"><button type="button" id="financeFilterReset">↺ Reset Filter Tabel</button></div>
+    </div>
+    <div id="financeTableInfo" class="finance-table-info">Tabel menampilkan maksimal 50 data per halaman.</div>
+
     <div class="table-wrapper">
 
         <table>
@@ -1113,6 +1122,7 @@ tr:hover{
         </table>
 
     </div>
+    <div class="finance-pagination no-print"><button type="button" id="financePrevPage">← Sebelumnya</button><span id="financePageInfo">Halaman 1</span><button type="button" id="financeNextPage">Berikutnya →</button></div>
 
 </div>
 
@@ -1174,6 +1184,9 @@ let adminData = [];
 let adminUsers = [];
 
 let financeChart = null;
+let financeTablePage = 1;
+const FINANCE_TABLE_PAGE_SIZE = 50;
+let financeTableRows = [];
 
 
 /* =====================================================
@@ -2354,6 +2367,7 @@ async function loadAdminDashboard(){
 
         adminData =
             result.data || [];
+        populateFinanceLocalFilters();
 
         adminUsers =
             result.users || [];
@@ -3031,106 +3045,27 @@ function applyAdminFilter(){
    RENDER ADMIN TABLE
 ===================================================== */
 
-function renderAdminTable(rows){
-
-    const body =
-        document.getElementById(
-            "adminTableBody"
-        );
-
-    body.innerHTML = "";
-
-
-    if(
-        !rows ||
-        rows.length === 0
-    ){
-
-        body.innerHTML =
-            `
-            <tr>
-
-                <td
-                    colspan="10"
-                    class="empty">
-
-                    Tidak ada data sesuai filter.
-
-                </td>
-
-            </tr>
-            `;
-
-        return;
-
-    }
-
-
-    rows
-        .slice()
-        .reverse()
-        .forEach(function(row){
-
-            body.innerHTML +=
-            `
-            <tr>
-
-                <td>${escapeHTML(formatTanggal(row.tanggalLaporan || row.waktu))}</td>
-                <td>${escapeHTML(formatTanggal(row.waktu))}</td>
-
-                <td>
-                    <b>
-                        ${escapeHTML(
-                            row.namaMustahik
-                        )}
-                    </b>
-                </td>
-
-                <td>
-                    ${escapeHTML(
-                        row.bulanTahun
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHTML(
-                        row.email
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHTML(
-                        row.kecamatan
-                    )}
-                </td>
-
-                <td>
-                    ${rupiah(row.omset)}
-                </td>
-
-                <td>
-                    ${rupiah(row.kulakan)}
-                </td>
-
-                <td>
-                    ${rupiah(
-                        (Number(row.omset) || 0) * 0.10
-                    )}
-                </td>
-
-                <td>
-                    ${rupiah(
-                        row.pendapatanTambahan
-                    )}
-                </td>
-
-            </tr>
-            `;
-
-        });
-
+function populateFinanceLocalFilters(){
+    const ms=document.getElementById("financeFilterMonth"), ns=document.getElementById("financeFilterName");
+    if(!ms||!ns)return; const om=ms.value,on=ns.value;
+    const months=[...new Set((adminData||[]).map(r=>String(r.bulanTahun||"").trim()).filter(Boolean))];
+    const names=[...new Set((adminData||[]).map(r=>String(r.namaMustahik||"").trim()).filter(Boolean))];
+    ms.innerHTML='<option value="">Semua Bulan</option>'; ns.innerHTML='<option value="">Semua Mustahik</option>';
+    months.sort().reverse().forEach(v=>{let o=document.createElement("option");o.value=o.textContent=v;ms.appendChild(o);});
+    names.sort((a,b)=>a.localeCompare(b,"id",{sensitivity:"base"})).forEach(v=>{let o=document.createElement("option");o.value=o.textContent=v;ns.appendChild(o);});
+    if(months.includes(om))ms.value=om;if(names.includes(on))ns.value=on;
 }
-
+function renderAdminTable(rows){
+    const body=document.getElementById("adminTableBody"), month=document.getElementById("financeFilterMonth").value, name=document.getElementById("financeFilterName").value;
+    financeTableRows=(rows||[]).filter(r=>(!month||String(r.bulanTahun||"")===month)&&(!name||String(r.namaMustahik||"").trim()===name));
+    const pages=Math.max(1,Math.ceil(financeTableRows.length/FINANCE_TABLE_PAGE_SIZE));financeTablePage=Math.min(Math.max(1,financeTablePage),pages);
+    const start=(financeTablePage-1)*FINANCE_TABLE_PAGE_SIZE, pageRows=financeTableRows.slice(start,start+FINANCE_TABLE_PAGE_SIZE);
+    body.innerHTML=pageRows.length?pageRows.slice().reverse().map(r=>`<tr><td>${escapeHTML(formatTanggal(r.tanggalLaporan||r.waktu))}</td><td>${escapeHTML(formatTanggal(r.waktu))}</td><td><b>${escapeHTML(r.namaMustahik||"")}</b></td><td>${escapeHTML(r.bulanTahun||"")}</td><td>${escapeHTML(r.email||"")}</td><td>${escapeHTML(r.kecamatan||"")}</td><td>${rupiah(r.omset)}</td><td>${rupiah(r.kulakan)}</td><td>${rupiah((Number(r.omset)||0)*.10)}</td><td>${rupiah(r.pendapatanTambahan)}</td></tr>`).join(""):'<tr><td colspan="10" class="empty">Tidak ada data sesuai filter.</td></tr>';
+    const active=[];if(month)active.push("Bulan: "+month);if(name)active.push("Mustahik: "+name);
+    document.getElementById("financeTableInfo").textContent=(active.length?active.join(" | ")+" — ":"")+`Menampilkan ${financeTableRows.length?start+1:0}–${Math.min(start+pageRows.length,financeTableRows.length)} dari ${financeTableRows.length} data (50 per halaman).`;
+    document.getElementById("financePageInfo").textContent=`Halaman ${financeTablePage} dari ${pages}`;
+    document.getElementById("financePrevPage").disabled=financeTablePage<=1;document.getElementById("financeNextPage").disabled=financeTablePage>=pages;
+}
 
 /* =====================================================
    RENDER USER ADMIN
@@ -3676,6 +3611,10 @@ function getFilteredAdminRows(){
             if(!text.includes(search)) return false;
         }
 
+        const localMonth=document.getElementById("financeFilterMonth").value;
+        const localName=document.getElementById("financeFilterName").value;
+        if(localMonth && String(row.bulanTahun||"")!==localMonth) return false;
+        if(localName && String(row.namaMustahik||"").trim()!==localName) return false;
         return true;
     });
 }
@@ -3948,6 +3887,13 @@ document.getElementById(
     }
 );
 
+
+/* FILTER LOKAL TABEL DAN PAGINATION */
+document.getElementById("financeFilterMonth").addEventListener("change",function(){financeTablePage=1;applyAdminFilter();});
+document.getElementById("financeFilterName").addEventListener("change",function(){financeTablePage=1;applyAdminFilter();});
+document.getElementById("financeFilterReset").addEventListener("click",function(){document.getElementById("financeFilterMonth").value="";document.getElementById("financeFilterName").value="";financeTablePage=1;applyAdminFilter();});
+document.getElementById("financePrevPage").addEventListener("click",function(){if(financeTablePage>1){financeTablePage--;applyAdminFilter();}});
+document.getElementById("financeNextPage").addEventListener("click",function(){const max=Math.max(1,Math.ceil(financeTableRows.length/FINANCE_TABLE_PAGE_SIZE));if(financeTablePage<max){financeTablePage++;applyAdminFilter();}});
 
 /* =====================================================
    LOGOUT
