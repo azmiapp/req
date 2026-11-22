@@ -60,8 +60,8 @@ label{display:block;font-size:13px;font-weight:650;margin:14px 0 6px;color:#3446
     <div id="queueList"><div class="empty">Belum ada draft di perangkat.</div></div>
     <div class="notice">Tips GPS: aktifkan lokasi perangkat, izinkan akses lokasi pada browser, dan ambil titik di luar ruangan. Nilai akurasi dalam meter akan membantu menilai kualitas koordinat.</div>
     <div id="adminPanel" class="adminbox hidden">
-     <h3>Kelola akun surveyor</h3>
-     <form id="createUserForm"><label>Username surveyor</label><input id="newUsername" required minlength="4" maxlength="40"><label>Password awal</label><input id="newPassword" type="password" required minlength="8"><button class="btn secondary full" type="submit">Buat akun surveyor</button><div id="userMessage" class="error"></div></form>
+     <h3>Kelola akun pengguna</h3>
+     <form id="createUserForm"><label>Username</label><input id="newUsername" required minlength="4" maxlength="40" autocomplete="off"><label>Password awal</label><input id="newPassword" type="password" required minlength="8" autocomplete="new-password"><label>Role akun</label><select id="newRole"><option value="surveyor">Surveyor</option><option value="admin">Admin</option></select><button class="btn secondary full" type="submit">Buat akun pengguna</button><div id="userMessage" class="error"></div></form>
     </div>
    </aside>
   </div>
@@ -73,8 +73,9 @@ label{display:block;font-size:13px;font-weight:650;margin:14px 0 6px;color:#3446
  <div class="footer-note">BAKTI CINTA LANSIA · Pendataan titik lokasi penerima bantuan</div>
 </main>
 <script>
-/* GANTI dengan URL Worker Cloudflare setelah backend dipasang. */
-const API_URL = "https://shiny-hat-30c1.azmiasisten.workers.dev/";
+/* Tempel URL Web App Google Apps Script yang berakhiran /exec. */
+const API_URL = "https://script.google.com/macros/s/AKfycbzKu3H4ZVhTVAoYj9phh5DBpYM9nw77eD_znET5JVtXhY2MpMnJiyFOjP5qb7hfTliC/exec";
+const SESSION_KEY = "bcl_auth_session";
 const DB_NAME = "BaktiCintaLansiaDB", STORE = "drafts";
 let session = null, currentGps = null, selectedPhoto = null, db = null;
 
@@ -88,10 +89,38 @@ function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open
 function allDrafts(){return new Promise((resolve,reject)=>{const r=db.transaction(STORE).objectStore(STORE).getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error);});}
 function putDraft(item){return new Promise((resolve,reject)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).put(item);r.onsuccess=resolve;r.onerror=()=>reject(r.error);});}
 function deleteDraft(id){return new Promise((resolve,reject)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).delete(id);r.onsuccess=resolve;r.onerror=()=>reject(r.error);});}
-async function api(action,payload={}){if(!online())throw Error("Tidak ada koneksi internet.");if(!API_URL.startsWith("https://"))throw Error("URL API belum dikonfigurasi.");const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,token:session?.token||"",...payload})});if(!res.ok)throw Error("Server merespons HTTP "+res.status);const data=await res.json();if(!data.ok)throw Error(data.error||"Permintaan gagal.");return data;}
+async function api(action,payload={}){
+ if(!online())throw Error("Tidak ada koneksi internet.");
+ if(!API_URL.startsWith("https://script.google.com/macros/s/") || !API_URL.endsWith("/exec"))
+   throw Error("URL Web App GAS belum dikonfigurasi. Tempel URL deployment yang berakhiran /exec.");
+ // text/plain adalah CORS-safelisted sehingga browser tidak mengirim preflight OPTIONS.
+ const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,token:session?.token||"",...payload})});
+ if(!res.ok)throw Error("Server merespons HTTP "+res.status);
+ let data; try{data=await res.json();}catch(_){throw Error("Respons GAS bukan JSON. Pastikan deployment Web App sudah diperbarui.");}
+ if(!data.ok)throw Error(data.error||"Permintaan gagal.");
+ return data;
+}
+function saveSession(){if(session)localStorage.setItem(SESSION_KEY,JSON.stringify(session));else localStorage.removeItem(SESSION_KEY);}
+function clearSession(){session=null;saveSession();}
+async function restoreSession(){
+ try{
+   const raw=localStorage.getItem(SESSION_KEY); if(!raw)return false;
+   const saved=JSON.parse(raw);
+   if(!saved || !saved.token || !saved.user)throw Error("Data sesi tidak valid.");
+   session=saved;
+   await api("listRecords"); // validasi token ke GAS sebelum membuka aplikasi
+   showApp(session.user);
+   await refreshAll();
+   return true;
+ }catch(err){
+   clearSession();
+   $("loginError").textContent="Sesi sebelumnya tidak dapat dipulihkan. Silakan login kembali. "+(err.message||"");
+   return false;
+ }
+}
 function showApp(user){$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("logoutBtn").classList.remove("hidden");$("welcome").textContent="Halo, "+user.username;$("roleInfo").textContent=user.role==="admin"?"Administrator · Akses seluruh data dan pengelolaan surveyor":"Surveyor · Formulir pendataan titik lokasi";$("adminPanel").classList.toggle("hidden",user.role!=="admin");$("formPanel").classList.remove("hidden");}
-$("loginForm").addEventListener("submit",async e=>{e.preventDefault();$("loginError").textContent="Memeriksa akun…";try{const d=await api("login",{username:$("username").value.trim(),password:$("password").value});session={token:d.token,user:d.user};showApp(d.user);await refreshAll();}catch(err){$("loginError").textContent=err.message;}});
-$("logoutBtn").onclick=()=>{session=null;$("appView").classList.add("hidden");$("loginView").classList.remove("hidden");$("logoutBtn").classList.add("hidden");$("password").value="";};
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();$("loginError").textContent="Memeriksa akun…";try{const d=await api("login",{username:$("username").value.trim(),password:$("password").value});session={token:d.token,user:d.user};saveSession();showApp(d.user);await refreshAll();}catch(err){$("loginError").textContent=err.message;}});
+$("logoutBtn").onclick=async()=>{try{if(session)await api("logout");}catch(_){}clearSession();$("appView").classList.add("hidden");$("loginView").classList.remove("hidden");$("logoutBtn").classList.add("hidden");$("password").value="";};
 $("gpsBtn").onclick=()=>getGPS();
 function getGPS(){ $("gpsError").textContent="Meminta lokasi GPS…";if(!navigator.geolocation){$("gpsError").textContent="Browser tidak mendukung GPS.";return;}navigator.geolocation.getCurrentPosition(pos=>{currentGps={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy};$("latText").textContent=currentGps.lat.toFixed(7);$("lngText").textContent=currentGps.lng.toFixed(7);$("accuracyText").textContent="Akurasi terdeteksi ±"+Math.round(currentGps.accuracy)+" meter · "+(currentGps.accuracy<=20?"Baik":currentGps.accuracy<=50?"Cukup":"Belum optimal, coba ambil ulang di area terbuka");$("gpsError").textContent="";},err=>{$("gpsError").textContent=({1:"Izin lokasi ditolak. Aktifkan izin lokasi browser.",2:"Sinyal lokasi belum tersedia. Coba di area terbuka.",3:"Permintaan GPS melewati batas waktu. Coba lagi."})[err.code]||err.message;},{enableHighAccuracy:true,maximumAge:0,timeout:30000});}
 $("photo").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;if(f.size>12*1024*1024){alert("Ukuran foto maksimal 12 MB.");e.target.value="";return;}selectedPhoto=f;const url=URL.createObjectURL(f);$("photoPreview").src=url;$("photoPreview").classList.remove("hidden");});
@@ -107,9 +136,12 @@ async function syncDrafts(){if(!session||!online())return;const drafts=await all
 async function loadRecords(){try{const d=await api("listRecords");$("totalServer").textContent=d.records.length;$("recordsBody").innerHTML=d.records.length?d.records.map(r=>`<tr><td><b>${escapeHtml(r.nama)}</b></td><td>${escapeHtml(r.alamat)}</td><td>${escapeHtml(r.desa)}</td><td>${escapeHtml(r.kecamatan)}</td><td>${Number(r.latitude).toFixed(6)}, ${Number(r.longitude).toFixed(6)}<br><a target="_blank" rel="noopener" href="https://maps.google.com/?q=${r.latitude},${r.longitude}">Buka peta</a></td><td>${r.photoUrl?`<a href="${escapeAttr(r.photoUrl)}" target="_blank" rel="noopener">Lihat foto</a>`:"—"}</td><td>${escapeHtml(r.surveyor||"")}</td></tr>`).join(""):'<tr><td colspan="7" class="empty">Belum ada data.</td></tr>';}catch(err){$("recordsBody").innerHTML=`<tr><td colspan="7" class="empty">${escapeHtml(err.message)}</td></tr>`;}}
 async function refreshAll(){await refreshDrafts();await loadRecords();}
 $("syncBtn").onclick=syncDrafts;$("refreshBtn").onclick=refreshAll;
-$("createUserForm").addEventListener("submit",async e=>{e.preventDefault();$("userMessage").textContent="Membuat akun…";try{await api("createUser",{username:$("newUsername").value.trim(),password:$("newPassword").value});$("userMessage").textContent="Akun surveyor berhasil dibuat.";$("createUserForm").reset();}catch(err){$("userMessage").textContent=err.message;}});
+$("createUserForm").addEventListener("submit",async e=>{e.preventDefault();$("userMessage").textContent="Membuat akun…";try{await api("createUser",{username:$("newUsername").value.trim(),password:$("newPassword").value,role:$("newRole").value});$("userMessage").textContent="Akun "+$("newRole").value+" berhasil dibuat dan tersimpan di sheet Users.";$("createUserForm").reset();}catch(err){$("userMessage").textContent=err.message;}});
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function escapeAttr(s){return escapeHtml(s);}
-(async()=>{await openDB();await refreshDrafts();})();
+(async()=>{
+ try{await openDB();await refreshDrafts();await restoreSession();}
+ catch(err){$("loginError").textContent="Gagal menyiapkan aplikasi: "+err.message;}
+})();
 </script>
 </body></html>
