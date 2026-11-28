@@ -73,9 +73,12 @@ async function saveUser(e){
  e.preventDefault();const d={NAMA:$('userName').value.trim(),USERNAME:$('userUsername').value.trim(),PASSWORD:$('userPassword').value,EMAIL:$('userEmail').value.trim(),NIP:$('userNip').value.trim(),JABATAN:$('userPosition').value.trim(),BIDANG:$('userField').value.trim(),ROLE:$('userRole').value.toUpperCase(),STATUS:$('userStatus').value.toUpperCase()};
  if(!d.NAMA||!d.USERNAME||!d.PASSWORD){toast('Nama, username, dan password wajib diisi untuk akun baru.');return}
  if(d.PASSWORD.length<8){toast('Password minimal 8 karakter.');return}
- const btn=$('userModal').querySelector('[type="submit"]');btn.disabled=true;btn.classList.add('is-loading');
+ const form=$('userModal')?.querySelector('form');
+ const btn=$('saveUserBtn')||form?.querySelector('button[type="submit"],button:not([type]),input[type="submit"]');
+ if(btn){btn.disabled=true;btn.classList.add('is-loading');}
  try{await call('saveUser',d);closeModal('userModal');toast('Akun '+d.ROLE+' berhasil ditambahkan.');await refresh()}
- catch(err){}finally{btn.disabled=false;btn.classList.remove('is-loading')}
+ catch(err){toast(err?.message||'Gagal menyimpan akun pengguna.');}
+ finally{if(btn){btn.disabled=false;btn.classList.remove('is-loading');}}
 }
 async function refresh(){const d=await call('bootstrap');DATA=d;renderAll()}
 init();
