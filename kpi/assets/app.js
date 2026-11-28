@@ -39,4 +39,3 @@ function openUser(){openModal('userModal')}
 function saveUser(e){e.preventDefault();const d={NAMA:$('userName').value,USERNAME:$('userUsername').value,PASSWORD:$('userPassword').value,EMAIL:$('userEmail').value,NIP:$('userNip').value,JABATAN:$('userPosition').value,BIDANG:$('userField').value,ROLE:$('userRole').value,STATUS:$('userStatus').value},btn=$('userModal').querySelector('[type="submit"]');btn.disabled=true;btn.classList.add('is-loading');call('saveUser',d,async()=>{closeModal('userModal');toast('Akun pegawai berhasil disimpan');await refresh()}).finally(()=>{btn.disabled=false;btn.classList.remove('is-loading')})}
 async function refresh(){const d=await call('bootstrap');DATA=d;renderAll()}
 init();
-
