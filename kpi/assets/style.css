@@ -3,33 +3,8 @@
 
 .login-screen{position:fixed;inset:0;z-index:1000;background:linear-gradient(135deg,#0f766e,#134e4a);display:grid;place-items:center;padding:20px}.login-screen.hidden{display:none}.login-card{background:#fff;width:min(100%,390px);padding:28px;border-radius:22px;box-shadow:0 20px 60px #062d2a55}.login-mark{width:52px;height:52px;border-radius:16px;background:#e5f4f1;color:#0f766e;display:grid;place-items:center;font-size:28px;font-weight:900}.login-card h2{margin:16px 0 6px}.login-card p{font-size:13px;color:#718096;margin:0 0 20px}.login-error{color:#dc5454;font-size:12px;margin-top:10px}.login-card .field{margin-bottom:13px}
 
-/* Penyempurnaan visual dan indikator aktivitas */
-.top-progress{position:fixed;top:0;left:0;width:100%;height:3px;z-index:100;pointer-events:none;opacity:0;overflow:hidden;transition:opacity .2s}
-.top-progress span{display:block;width:35%;height:100%;background:linear-gradient(90deg,#5eead4,#fff,#5eead4);transform:translateX(-120%)}
-.top-progress.running,.top-progress.tap{opacity:1}
-.top-progress.running span{animation:progress-sweep 1.15s ease-in-out infinite}
-.top-progress.tap span{animation:progress-sweep .42s ease-out 1}
-@keyframes progress-sweep{0%{transform:translateX(-120%)}100%{transform:translateX(320%)}}
-.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .16s,box-shadow .16s,background .16s}
-.btn:active{transform:translateY(1px) scale(.985)}
-.btn:hover{box-shadow:0 5px 14px #0f766e20}
-.btn.is-busy{opacity:.82;pointer-events:none}
-.btn-spinner{width:13px;height:13px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;display:inline-block;animation:btn-spin .7s linear infinite}
-@keyframes btn-spin{to{transform:rotate(360deg)}}
-.panel,.stat,.task{transition:box-shadow .2s,border-color .2s}
-.panel:hover,.stat:hover{box-shadow:0 8px 24px #183c3612}
-.top{position:relative;overflow:hidden;background:radial-gradient(circle at 90% 0%,#ffffff20,transparent 35%),linear-gradient(125deg,#0f766e,#115e59 60%,#123f3b)}
-.brand{letter-spacing:1.1px;font-size:15px}
-.page-title{letter-spacing:-.45px}
-.stat{border-color:#e8efee}
-.stat strong{letter-spacing:-.8px;color:#143f3a}
-.login-screen{background:linear-gradient(135deg,#eaf4f2,#f5f8fa 55%,#e6f0ee)}
-.login-card{border:1px solid #e2ecea;box-shadow:0 18px 55px #163d3617}
-.login-note{font-size:11px;line-height:1.5;color:#718783;background:#f1f7f6;border:1px solid #e3efec;padding:9px 11px;border-radius:10px;margin:-2px 0 14px}
-input:focus,select:focus,textarea:focus{outline:none;border-color:#0f9b8e!important;box-shadow:0 0 0 3px #0f766e16}
-button:focus-visible{outline:3px solid #5eead4;outline-offset:2px}
-.nav{padding-bottom:env(safe-area-inset-bottom)}
-.wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
-.modal{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
-@media(max-width:700px){.top{padding:19px 16px 25px;border-radius:0 0 20px 20px}.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat{padding:12px}.stat strong{font-size:22px}.grid2{grid-template-columns:1fr;gap:0}.panel{padding:14px}.tasktop{align-items:flex-start}.taskfoot{align-items:flex-start;flex-direction:column}.taskactions{width:100%}.taskactions button{flex:1}.navinner{padding-top:9px}.modalbox{border-radius:20px 20px 14px 14px}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* Desk Harian Amil 2.0 – KPI bulanan, loading, dan responsivitas */
+.global-loading{position:fixed;top:0;left:0;right:0;height:3px;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s;background:transparent;overflow:hidden}.global-loading.show{opacity:1}.global-loading span{display:block;height:100%;width:35%;background:linear-gradient(90deg,#34b3a2,#d5fff5,#0f766e);border-radius:0 4px 4px 0;animation:loadingSweep 1.15s ease-in-out infinite}@keyframes loadingSweep{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
+.btn{transition:transform .15s ease,box-shadow .15s ease,opacity .15s ease}.btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px #0f766e20}.btn:disabled{opacity:.65;cursor:wait;transform:none}.btn.is-loading{position:relative;color:transparent!important;pointer-events:none}.btn.is-loading:after{content:"";position:absolute;width:15px;height:15px;left:calc(50% - 8px);top:calc(50% - 8px);border:2px solid #ffffff80;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.kpi-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.kpi-actions input{border:1px solid var(--line);border-radius:10px;padding:9px 10px;color:var(--ink);background:#fff}.kpi-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 18px}.kpi-summary>div{background:#f3f8f7;border:1px solid #e4efed;border-radius:13px;padding:13px}.kpi-summary small{display:block;color:var(--muted);font-size:11px}.kpi-summary strong{display:block;font-size:23px;margin-top:5px;color:var(--green2)}.kpi-note{margin-top:14px;line-height:1.6}.table-wrap{width:100%;overflow:auto;border:1px solid var(--line);border-radius:12px}.kpi-table{width:100%;border-collapse:collapse;min-width:560px;font-size:12px}.kpi-table th,.kpi-table td{padding:12px;text-align:left;border-bottom:1px solid var(--line)}.kpi-table th{background:#f5f8f8;color:#526966;font-size:11px}.kpi-table tr:last-child td{border-bottom:0}.kpi-table td small{display:block;color:var(--muted);margin-top:3px}.mini-progress{height:5px;background:#e9f0ef;border-radius:8px;overflow:hidden;margin-top:5px;min-width:75px}.mini-progress i{display:block;height:100%;background:var(--green);border-radius:8px}.kpi-detail{display:grid;gap:4px}.kpi-detail .employee-row{align-items:flex-start}.login-card .btn{min-height:42px}.login-card .btn.is-loading:after{border-color:#ffffff80;border-top-color:#fff}
+@media(max-width:680px){.kpi-summary{gap:7px}.kpi-summary>div{padding:10px}.kpi-summary strong{font-size:19px}.kpi-actions{width:100%}.kpi-actions input{flex:1;min-width:135px}.kpi-actions .btn{flex:1}.kpi-actions #snapshotBtn{flex-basis:100%}.navinner{overflow-x:auto;justify-content:flex-start}.nav button{flex:1;min-width:65px;padding:5px 7px}.tabs{scroll-snap-type:x proximity}.tab{scroll-snap-align:start}}
